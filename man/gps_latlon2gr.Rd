@@ -1,0 +1,37 @@
+\name{gps_latlon2gr}
+\alias{gps_latlon2gr}
+\title{Covert latitude and longitude to other formats}
+\usage{
+  gps_latlon2gr(latitude, longitude,
+    out_projection = "OSGB", return_type = "both")
+}
+\arguments{
+  \item{latitude}{a vector of numerics giving latitudes}
+
+  \item{longitude}{a vector of numerics giving longitudes}
+
+  \item{out_projection}{a string giving the desired output
+  projection. Defaults to \code{"OSGB"}. ASK COLIN WHAT
+  OTHER VARIENTS ARE AVAILABLE.}
+
+  \item{return_type}{a string defining what information the
+  funtion should return. If \code{"both"} (default), grid
+  reference and easting/northing are returned. If
+  \code{"en"}, only easting and northing are returned. If
+  \code{gr}, only grid reference is returned}
+}
+\value{
+  A dataframe of results are returned
+}
+\description{
+  Coverts latitude and longitude to a grid reference and/or
+  easting and northing.
+}
+\examples{
+gps_latlon2gr(51.60233,-1.111254)
+}
+\keyword{grid-reference}
+\keyword{latitude}
+\keyword{longitude}
+\keyword{mapping}
+
