@@ -9,3 +9,4 @@ To install the development version of sparta, it's easiest to use the `devtools`
     # install.packages("devtools")
     library(devtools)
     install_github("sparta",username='YOURNAME',password='YOURPASSWORD')
+
