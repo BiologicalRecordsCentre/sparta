@@ -2,7 +2,7 @@ plot.frescalo<-function(x){
   
   options(device = "windows") #this is fix for windows for Rstudio's 1 device rule
   
-  lm_stats<-x$lm_stats
+  if('lm_stats' %in% names(x)) lm_stats<-x$lm_stats
   stats<-x$stat
   
   dev.new()
@@ -25,12 +25,19 @@ plot.frescalo<-function(x){
   mtext("(b) Rescaled No. Species", adj = 0.05, font = 1, cex = 0.7)
   
   # Alpha (Derivied Breaks)
+  
   map_data_R(gridrefs = stats$Location, attribute = stats$Alpha, breaks = cat_breaks(stats$Alpha, n_cat = 10, whole_breaks = FALSE, rnd_digits = 2), show.axis = FALSE, show.grid = FALSE, legend_pos = "topleft", leg_cex = 0.7,  sq_border = NA, bg.col = NULL,shape_data = UK, xlab='',ylab='')
   mtext("(c) Alpha (Derived Breaks)", adj = 0.05, font = 1, cex = 0.7)
-    
+  
+  par(mar=c(4,4,0,0))
+  
   # histogram of trends
-  hist(lm_stats$b,main='',xlab='Trend',ylab='Frequency',cex.axis=0.7,prob=TRUE)
-  abline(v=0,col='blue')
-  lines(density(lm_stats$b),col='red')     
-  mtext("(d) Histogram of species trends", adj = 0.05, font = 1, cex= 0.7)  
+  if('lm_stats' %in% names(x)){
+    density_line<-density(lm_stats$b)
+    hist(lm_stats$b,main='',xlab='Trend',ylab='Frequency',ylim=c(0,max(density_line$y)),cex.axis=0.7,prob=TRUE)
+    abline(v=0,col='blue')
+    lines(density_line,col='red')     
+    str(density(lm_stats$b))
+    mtext("(d) Histogram of species trends", adj = 0.05, font = 1, cex= 0.7)  
+  }
 }

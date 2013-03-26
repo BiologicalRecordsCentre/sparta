@@ -207,13 +207,24 @@ function(
 		fpaths_out = file.path(fres_sub_dir["OUTPUT"], c(fres_f_log, fres_f_stat, fres_f_freq, fres_f_trend,"Freq_quickload.txt"))
 		
   # format files for returning
+    if(!exists('spp_names')) spp_names = read.table(spp_names_file, sep=",", header=TRUE, stringsAsFactors = FALSE)
+    
     trend<-as.data.frame(trend)
-    names(trend)<-gsub('_','',names(trend))
-		stats<-as.data.frame(stats)
+		names(trend)<-gsub('_','',names(trend))
+		for(i in unique(trend$Species)){
+		  trend$Species[trend$Species==i]<-spp_names$NAME[spp_names$SPECIES==i]
+		}
+		
+    stats<-as.data.frame(stats)
+    
     freq<-as.data.frame(freq)
 		names(freq)<-gsub('_','',names(freq))
-    
+		for(i in unique(freq$Species)){
+		  freq$Species[freq$Species==i]<-spp_names$NAME[spp_names$SPECIES==i]
+		}
+    		  
   # Create list to return
-    frescalo<-list(paths=invisible(fpaths_out),trend=trend,stat=stats,freq=freq,log=log_out,lm_stats=lm_stats)
+    frescalo<-list(paths=invisible(fpaths_out),trend=trend,stat=stats,freq=freq,log=log_out)
+    if(exists('lm_stats')) frescalo[["lm_stats"]] = lm_stats
     return(frescalo)
 }

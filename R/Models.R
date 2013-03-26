@@ -4,7 +4,7 @@ function (MMdata,min.L,nyr,MM=T,LL=T,wellsamp='visit'){
   if (MM){
     MM <- fit_LadybirdMM(MMdata, nsp=min.L, nyr,wellsamp=wellsamp)[c(1,3:8)]
     names(MM) <- c('trend','zscore','p','cvg','pCombosUsed','SiteDatecombos','n_Obs')
-    names(MM) <- paste('MMsp_', names(MM), sep='')
+    names(MM) <- paste('MM_', names(MM), sep='')
     output <- MM
   }
   if(LL){

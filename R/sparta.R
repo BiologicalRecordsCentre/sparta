@@ -18,11 +18,11 @@
 #'        output files when written
 #' @param Run_models Logical, if \code{FALSE} no models are run. This overrules \code{Run_MM, 
 #'        Run_LL, Run_Fres} and \code{Run_Basic}. Default is \code{TRUE}
-#' @param Run_MM Logical, if \code{TRUE} mixed model analyses are run. Default is \code{Run_Basic}
-#' @param Run_LL Logical, if \code{TRUE} list-length model analyses are run. Default is \code{Run_Basic}
-#' @param Run_Fres Logical, if \code{TRUE} Frescalo analyses are run. Default is \code{Run_Basic}
-#' @param Run_Basic Logical, if \code{TRUE} mixed model analyses are run. Default is \code{Run_Basic}
-#' @param Create_persistance_table NOT IMPLEMENTED IN 
+#' @param Run_MM Logical, if \code{TRUE} mixed model analyses are run. Default is \code{TRUE}
+#' @param Run_LL Logical, if \code{TRUE} list-length model analyses are run. Default is \code{TRUE}
+#' @param Run_Fres Logical, if \code{TRUE} Frescalo analyses are run. Default is \code{TRUE}
+#' @param Run_Basic Logical, if \code{TRUE} mixed model analyses are run. Default is \code{TRUE}
+#' @param Create_persistance_table NOT IMPLEMENTED
 #' @param Create_persistance_summary NOT IMPLEMENTED 
 #' @param Calc_D_england_only NOT IMPLEMENTED 
 #' @param Year.range The time period over which you wish to analyse your trends. This
@@ -78,8 +78,9 @@
 #' @param get_names_from_BRC Default is \code{FALSE}. if \code{TRUE} it assumes the CONCEPT 
 #'        in your data relates to a BRC concept code and the names of species will be retireve
 #'        from the database using \code{channel} for use in output.
-#' @param fres_site_filter Optionally a character vector of the names of sites not to be included
-#'        in the Frescalo analysis.
+#' @param fres_site_filter Optionally a character vector of the names of sites to be used for
+#'        in the trend analysis. Sites not include in this list are not used for estimating
+#'        TFactors. Default is \code{NULL} and all sites are used
 #' @return \code{NULL} Results are save to file rather than returned to R
 #' @keywords trends
 #' @import lme4 reshape2 sp RODBC
@@ -189,6 +190,8 @@ function(data=NULL,#your data (.rdata files) as a file path (or list of file pat
     length_data<-length(data)
   }
   
+  return_object=list()
+  
   for(i in 1:length_data){
        
     print(paste('Starting',taxon_name[i]))
@@ -253,6 +256,8 @@ function(data=NULL,#your data (.rdata files) as a file path (or list of file pat
         }
         write.csv(basic_master,file_name,row.names=FALSE)
         if(Log) report(logfilename, 'Basic trend analysis complete')
+        
+        return_object[['basic_methods']]<-basic_master
       }
             
       
@@ -300,7 +305,7 @@ function(data=NULL,#your data (.rdata files) as a file path (or list of file pat
           Mod_out<-t(as.data.frame(Models(species_space_time,min.L,min.yrs,MM=Run_MM,LL=Run_LL,wellsamp=wellsamp)))
           row.names(Mod_out)<-ii
           Mod_out<-as.data.frame(Mod_out)
-          if(Run_MM) Mod_out$MMsp_trend10<-pc.change(ilt(10*Mod_out$MMsp_trend))
+          if(Run_MM) Mod_out$MM_trend10<-pc.change(ilt(10*Mod_out$MM_trend))
           if(Run_LL) Mod_out$LL_trend10<-pc.change(ilt(10*Mod_out$LL_trend))
           Mod_out$CONCEPT<-row.names(Mod_out)
           if(!is.null(taxon_reg)) Mod_out<-merge(x=Mod_out,y=taxon_reg,by='CONCEPT') #add taxon information
@@ -315,7 +320,9 @@ function(data=NULL,#your data (.rdata files) as a file path (or list of file pat
           
         }
         if(Log) report(logfilename, paste('Models fitted for', counter, 'species'))
-       
+        
+        return_object[['model_methods']]<-read.csv(file_name)
+        
         rm(list=c('Mod_out'))
       }
       
@@ -382,7 +389,7 @@ function(data=NULL,#your data (.rdata files) as a file path (or list of file pat
          class(fres_return)<-'frescalo'
          
          # Calculate z-values if only two time periods
-         if(length(time_periods[,1])==2){
+         if(length(time_periods[,1])==2 & 'lm_stats' %in% names(fres_return)){
            fres_lm_path<-paste(sinkdir,'/',taxon_name[i],'_frescalo',datecode,'/Frescalo/Maps_Results/Frescalo Tfactor lm stats.csv',sep='')
            fres_lm<-read.csv(fres_lm_path)
            trendpath<-paste(sinkdir,'/',taxon_name[i],'_frescalo',datecode,'/Frescalo/Output/Trend.txt',sep='')
@@ -390,7 +397,7 @@ function(data=NULL,#your data (.rdata files) as a file path (or list of file pat
            lm_z<-merge(x=fres_lm,y=zvalues,by='SPECIES',all=TRUE)
            write.csv(lm_z,fres_lm_path)
          }
-       return(fres_return)
+       return_object[['frescalo']]<-fres_return
        if(Log) report(logfilename,'Frescalo complete')
        }
     }
@@ -408,7 +415,7 @@ function(data=NULL,#your data (.rdata files) as a file path (or list of file pat
       if(length(out_files)>1) stop(paste("There is more than one trends file for",taxon,'in',sinkdir))  
     
       trends<-read.csv(paste(sinkdir,'/',out_files,sep=''))
-      declining_sp<-trends$CONCEPT[trends$MMsp_trend10<0 | trends$LL_trend10<0]
+      declining_sp<-trends$CONCEPT[trends$MM_trend10<0 | trends$LL_trend10<0]
       
       #get english hectads
       eng.hectads<-read.csv(paste(datadir,'/','English_hectads.csv',sep=''))[,2]
@@ -452,7 +459,7 @@ function(data=NULL,#your data (.rdata files) as a file path (or list of file pat
         group_names<-unique(taxa_data[c('CONCEPT','taxon')])
         persist_SP<-merge(x=persist_SP,y=group_names,by.x='concept',by.y='CONCEPT',all.x=TRUE,all.y=FALSE)
         #Add concept info and trend
-        trends_merge<-trends[c('CONCEPT','MMsp_trend10','LL_trend10','CONCEPT_REC','NAME','NAME_ENGLISH','VALID')]
+        trends_merge<-trends[c('CONCEPT','MM_trend10','LL_trend10','CONCEPT_REC','NAME','NAME_ENGLISH','VALID')]
         persist_SP<-merge(x=persist_SP,y=trends_merge,by.x='concept',by.y='CONCEPT')
         
         #Fractal/Residual D for all time
@@ -495,5 +502,6 @@ function(data=NULL,#your data (.rdata files) as a file path (or list of file pat
     }
   }
   print('Completed')
+  return(return_object)
   if(Log) report(logfilename,'Finished')
 }

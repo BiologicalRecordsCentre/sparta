@@ -1,6 +1,6 @@
 #' Frescalo
 #' 
-#' A function for using Frescalo (Hill, 2001), a tool for analysing occurrence data when
+#' A function for using Frescalo (Hill, 2011), a tool for analysing occurrence data when
 #' recording effort is not known. This function returns the output from Frescalo to the 
 #' R session and saves it to the path specified by \code{sinkdir}. By setting 
 #' \code{Plot_Fres} to \code{TRUE} maps of the results will also be saved. Plotting the 
@@ -38,8 +38,9 @@
 #'        weight. 
 #' @param non_benchmark_sp a character vector giving the concepts of species not to be
 #'        used as benchmarks in Frescalo
-#' @param fres_site_filter Optionally a character vector of the names of sites not to be included
-#'        in the Frescalo analysis.
+#' @param fres_site_filter Optionally a character vector of the names of sites to be used for
+#'        in the trend analysis. Sites not include in this list are not used for estimating
+#'        TFactors. Default is \code{NULL} and all sites are used
 #' @return Results are saved to file and the relevant files are returned in a list
 #' @keywords trends, frescalo
 #' @references Hill, Mark. Local frequency as a key to interpreting species occurrence data when
@@ -203,8 +204,8 @@ frescalo <-
                                   Plot=Plot_Fres,spp_names_file=spp_names,fres_f_nobench=non_bench_txt,fres_f_filter=fres_site_txt)
       class(fres_return)<-'frescalo'
       
-      # Calculate z-values if only two time periods
-      if(length(time_periods[,1])==2){
+      # Calculate z-values if only two time periods & lm_stats exists
+      if(length(time_periods[,1])==2 & 'lm_stats' %in% names(fres_return)){
         fres_lm_path<-paste(sinkdir,'/',taxon_name,'_frescalo',datecode,'/Frescalo/Maps_Results/Frescalo Tfactor lm stats.csv',sep='')
         fres_lm<-read.csv(fres_lm_path)
         trendpath<-paste(sinkdir,'/',taxon_name,'_frescalo',datecode,'/Frescalo/Output/Trend.txt',sep='')
