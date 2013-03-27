@@ -37,18 +37,18 @@
   \code{Run_Basic}. Default is \code{TRUE}}
 
   \item{Run_MM}{Logical, if \code{TRUE} mixed model
-  analyses are run. Default is \code{Run_Basic}}
+  analyses are run. Default is \code{TRUE}}
 
   \item{Run_LL}{Logical, if \code{TRUE} list-length model
-  analyses are run. Default is \code{Run_Basic}}
+  analyses are run. Default is \code{TRUE}}
 
   \item{Run_Fres}{Logical, if \code{TRUE} Frescalo analyses
-  are run. Default is \code{Run_Basic}}
+  are run. Default is \code{TRUE}}
 
   \item{Run_Basic}{Logical, if \code{TRUE} mixed model
-  analyses are run. Default is \code{Run_Basic}}
+  analyses are run. Default is \code{TRUE}}
 
-  \item{Create_persistance_table}{NOT IMPLEMENTED IN}
+  \item{Create_persistance_table}{NOT IMPLEMENTED}
 
   \item{Create_persistance_summary}{NOT IMPLEMENTED}
 
@@ -154,8 +154,10 @@
   in output.}
 
   \item{fres_site_filter}{Optionally a character vector of
-  the names of sites not to be included in the Frescalo
-  analysis.}
+  the names of sites to be used for in the trend analysis.
+  Sites not include in this list are not used for
+  estimating TFactors. Default is \code{NULL} and all sites
+  are used}
 }
 \value{
   \code{NULL} Results are save to file rather than returned

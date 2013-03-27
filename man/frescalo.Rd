@@ -70,15 +70,17 @@
   Frescalo}
 
   \item{fres_site_filter}{Optionally a character vector of
-  the names of sites not to be included in the Frescalo
-  analysis.}
+  the names of sites to be used for in the trend analysis.
+  Sites not include in this list are not used for
+  estimating TFactors. Default is \code{NULL} and all sites
+  are used}
 }
 \value{
   Results are saved to file and the relevant files are
   returned in a list
 }
 \description{
-  A function for using Frescalo (Hill, 2001), a tool for
+  A function for using Frescalo (Hill, 2011), a tool for
   analysing occurrence data when recording effort is not
   known. This function returns the output from Frescalo to
   the R session and saves it to the path specified by

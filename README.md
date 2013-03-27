@@ -11,6 +11,8 @@ To install the development version of sparta, it's easiest to use the `devtools`
     library(devtools)
     install_github("sparta",username='TomAugust')
     
+    library(sparta)
+    
 Once installed why not try out what sparta can do with the example dataset of unicorns in the UK?
 
     #Load the unicorn dataset
