@@ -187,7 +187,7 @@ function(
 		# Print progress to screen
 			cat("\nREAD FRESCALO OUTPUT\n",rep("*",20),"\n\n", sep="")
 					
-		# Extract species names from BRC
+		# Extract species names from BRC if not given
 			if(is.null(spp_names_file)){
 				spp_names = get_spp_names(channel,unique(freq$Species), output_list = TRUE)
 			} else {
@@ -197,8 +197,17 @@ function(
 			# Print progress to screen
 				cat("\nPLOT MAPS AND CALCULATE RESULTS\n",rep("*",20),"\n\n", sep="")
 			# Do plots
-			lm_stats<-all_oneplots(stat = stats, trend = trend, freq = freq, spp_names = spp_names, onefile_name = "Standard Frescalo Plots", dir_path = fres_sub_dir["RESULTS"])
-	}	
+			lm_stats<-all_oneplots(stat = stats, trend = trend, freq = freq, spp_names = spp_names, onefile_name = "Standard Frescalo Plots", dir_path = fres_sub_dir["RESULTS"], plot = Plot)
+	}	else {
+  	  # Extract species names from BRC if not given
+  	  if(is.null(spp_names_file)){
+  	    spp_names = get_spp_names(channel,unique(freq$Species), output_list = TRUE)
+  	  } else {
+  	    spp_names = read.table(spp_names_file, sep=",", header=TRUE, stringsAsFactors = FALSE)
+  	  }
+      #Run tfactor stats without plotting
+	    lm_stats<-all_oneplots(stat = stats, trend = trend, freq = freq, spp_names = spp_names, dir_path = fres_sub_dir["RESULTS"], plot = Plot)
+	}
 	
 	# Make mapping file for NBN validation stuff (essentially freq file but quicker to load?)
 	#	write.table(freq, file = file.path(fres_sub_dir["RESULTS"],"Freq_quickload.txt"), sep="\t", col.names = TRUE, row.names = FALSE, quote=FALSE)

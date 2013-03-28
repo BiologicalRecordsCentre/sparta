@@ -80,7 +80,7 @@
   well sampled visits in \code{min.yrs} number of years are
   included in mixed model analysis.}
 
-  \item{wellsamp}{defines what makes a site 'well samples'
+  \item{wellsamp}{defines what makes a site 'well sampled'
   and therefore included in the mixed model analysis. If
   \code{'visit'} then the site must have atleast
   \code{min.yrs} number of well.sampled visits (as defined
@@ -160,8 +160,24 @@
   are used}
 }
 \value{
-  \code{NULL} Results are save to file rather than returned
-  to R
+  Results are save to file and most are returned to R.
+
+  A list is returned:
+
+  \item{\bold{$basic_methods}} {This gives the results of
+  the basic methods. This includes three measures: power
+  law residual (plr), Telfer's change index and
+  proportional difference. These methods can only compare
+  two time periods and so if there are more than two time
+  periods in 'time_periods' these metrics are calculated
+  for all pairwise comparisons. The number after the column
+  name gives the time periods being compared where 1 is the
+  first time period, 2 the second etc.}
+  \item{\bold{$model_methods}} {This gives the results from
+  the mixed models and list length models. [TOM TO ADD MORE
+  DETAILS HERE]} \item{\bold{$frescalo}} {This gives the
+  results of the frescalo analysis. See
+  \code{\link{frescalo}}}
 }
 \description{
   A function that implements a range of methods used to
