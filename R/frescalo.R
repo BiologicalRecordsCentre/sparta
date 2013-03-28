@@ -109,13 +109,13 @@
 #'          - \tab \code{r2} \tab t-value for a test of significance of the intercept\cr
 #'          - \tab \code{F_val} \tab F-value of the model\cr
 #'          - \tab \code{F_num_df} \tab Degrees of freedom of the model\cr
-#'          - \tab \code{F_den_df} \tab Degrees of freedom of smoothed line (only fitted where more than two time periods are set)\cr
+#'          - \tab \code{F_den_df} \tab Denominator degrees of freedom from the F-statistic \cr
 #'          }
 #'          \bold{The following columns are only produced when there are only two time periods}
 #'          \tabular{rll}{
 #'          - \tab \code{Z_VAL} \tab Z-value for the significance test of the trend\cr
 #'          - \tab \code{SIG_95} \tab A logical statement indicating if the trend is significant (TRUE) or non-significant (FALSE)\cr
-#'         
+#'          }
 #' @keywords trends, frescalo
 #' @references Hill, Mark. Local frequency as a key to interpreting species occurrence data when
 #' recording effort is not known. 2011. \emph{Methods in Ecology and Evolution}, 3 (1), 195-205.
