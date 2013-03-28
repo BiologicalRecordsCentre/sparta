@@ -37,7 +37,6 @@ plot.frescalo<-function(x){
     hist(lm_stats$b,main='',xlab='Trend',ylab='Frequency',ylim=c(0,max(density_line$y)),cex.axis=0.7,prob=TRUE)
     abline(v=0,col='blue')
     lines(density_line,col='red')     
-    str(density(lm_stats$b))
     mtext("(d) Histogram of species trends", adj = 0.05, font = 1, cex= 0.7)  
   }
 }
