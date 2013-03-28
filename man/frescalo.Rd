@@ -174,14 +174,14 @@
   \code{r2} \tab t-value for a test of significance of the
   intercept\cr - \tab \code{F_val} \tab F-value of the
   model\cr - \tab \code{F_num_df} \tab Degrees of freedom
-  of the model\cr - \tab \code{F_den_df} \tab Degrees of
-  freedom of smoothed line (only fitted where more than two
-  time periods are set)\cr } \bold{The following columns
-  are only produced when there are only two time periods}
-  \tabular{rll}{ - \tab \code{Z_VAL} \tab Z-value for the
-  significance test of the trend\cr - \tab \code{SIG_95}
-  \tab A logical statement indicating if the trend is
-  significant (TRUE) or non-significant (FALSE)\cr
+  of the model\cr - \tab \code{F_den_df} \tab Denominator
+  degrees of freedom from the F-statistic \cr } \bold{The
+  following columns are only produced when there are only
+  two time periods} \tabular{rll}{ - \tab \code{Z_VAL} \tab
+  Z-value for the significance test of the trend\cr - \tab
+  \code{SIG_95} \tab A logical statement indicating if the
+  trend is significant (TRUE) or non-significant (FALSE)\cr
+  }
 }
 \description{
   A function for using Frescalo (Hill, 2011), a tool for
