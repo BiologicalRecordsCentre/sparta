@@ -82,18 +82,18 @@
 #'        in the trend analysis. Sites not include in this list are not used for estimating
 #'        TFactors. Default is \code{NULL} and all sites are used
 #' @return Results are save to file and most are returned to R.
-#'         
+#'          
 #'         A list is returned:
 #'         
-#'         \item{\bold{$basic_methods}} {This gives the results of the basic methods. This includes three
+#'         \item{\bold{$basic_methods}}{This gives the results of the basic methods. This includes three
 #'         measures: power law residual (plr), Telfer's change index and proportional
 #'         difference. These methods can only compare two time periods and so if there are
 #'         more than two time periods in 'time_periods' these metrics are calculated for all
 #'         pairwise comparisons. The number after the column name gives the time periods
 #'         being compared where 1 is the first time period, 2 the second etc.}
-#'         \item{\bold{$model_methods}} {This gives the results from the mixed models and list length
+#'         \item{\bold{$model_methods}}{This gives the results from the mixed models and list length
 #'         models. [TOM TO ADD MORE DETAILS HERE]}
-#'         \item{\bold{$frescalo}} {This gives the results of the frescalo analysis. See
+#'         \item{\bold{$frescalo}}{This gives the results of the frescalo analysis. See
 #'         \code{\link{frescalo}}}
 #'         
 #' @keywords trends
@@ -335,9 +335,13 @@ function(data=NULL,#your data (.rdata files) as a file path (or list of file pat
         }
         if(Log) report(logfilename, paste('Models fitted for', counter, 'species'))
         
-        return_object[['model_methods']]<-read.csv(file_name)
+        model_methods<-read.csv(file_name)
+        new_order<-c('CONCEPT',names(model_methods)[-length(names(model_methods))])
+        model_methods<-model_methods[new_order]
+        model_methods<-model_methods[with(model_methods, order(CONCEPT)),]
+        return_object[['model_methods']]<-model_methods
         
-        rm(list=c('Mod_out'))
+        rm(list=c('Mod_out','model_methods'))
       }
       
        if(Run_Fres){
@@ -410,6 +414,7 @@ function(data=NULL,#your data (.rdata files) as a file path (or list of file pat
            zvalues<-fres_zvalues(trendpath)
            lm_z<-merge(x=fres_lm,y=zvalues,by='SPECIES',all=TRUE)
            write.csv(lm_z,fres_lm_path)
+           fres_return$lm_stats<-lm_z
          }
        return_object[['frescalo']]<-fres_return
        if(Log) report(logfilename,'Frescalo complete')

@@ -164,7 +164,7 @@
 
   A list is returned:
 
-  \item{\bold{$basic_methods}} {This gives the results of
+  \item{\bold{$basic_methods}}{This gives the results of
   the basic methods. This includes three measures: power
   law residual (plr), Telfer's change index and
   proportional difference. These methods can only compare
@@ -173,9 +173,9 @@
   for all pairwise comparisons. The number after the column
   name gives the time periods being compared where 1 is the
   first time period, 2 the second etc.}
-  \item{\bold{$model_methods}} {This gives the results from
+  \item{\bold{$model_methods}}{This gives the results from
   the mixed models and list length models. [TOM TO ADD MORE
-  DETAILS HERE]} \item{\bold{$frescalo}} {This gives the
+  DETAILS HERE]} \item{\bold{$frescalo}}{This gives the
   results of the frescalo analysis. See
   \code{\link{frescalo}}}
 }

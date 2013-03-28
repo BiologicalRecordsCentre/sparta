@@ -111,6 +111,10 @@
 #'          - \tab \code{F_num_df} \tab Degrees of freedom of the model\cr
 #'          - \tab \code{F_den_df} \tab Degrees of freedom of smoothed line (only fitted where more than two time periods are set)\cr
 #'          }
+#'          \bold{The following columns are only produced when there are only two time periods}
+#'          \tabular{rll}{
+#'          - \tab \code{Z_VAL} \tab Z-value for the significance test of the trend\cr
+#'          - \tab \code{SIG_95} \tab A logical statement indicating if the trend is significant (TRUE) or non-significant (FALSE)\cr
 #'         
 #' @keywords trends, frescalo
 #' @references Hill, Mark. Local frequency as a key to interpreting species occurrence data when
@@ -282,6 +286,7 @@ frescalo <-
         zvalues<-fres_zvalues(trendpath)
         lm_z<-merge(x=fres_lm,y=zvalues,by='SPECIES',all=TRUE)
         write.csv(lm_z,fres_lm_path)
+        fres_return$lm_stats<-lm_z
       }
       print('frescalo complete')
       return(fres_return)

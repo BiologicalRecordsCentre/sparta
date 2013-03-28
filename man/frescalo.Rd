@@ -79,7 +79,7 @@
   Results are saved to file and most are returned in a list
   to R.
 
-  The list is comprised of the following:
+  The list object returned is comprised of the following:
 
   \item{\bold{$paths}}{This list of file paths provides the
   locations of the raw data files for $log, $stat, $freq
@@ -176,7 +176,12 @@
   model\cr - \tab \code{F_num_df} \tab Degrees of freedom
   of the model\cr - \tab \code{F_den_df} \tab Degrees of
   freedom of smoothed line (only fitted where more than two
-  time periods are set)\cr }
+  time periods are set)\cr } \bold{The following columns
+  are only produced when there are only two time periods}
+  \tabular{rll}{ - \tab \code{Z_VAL} \tab Z-value for the
+  significance test of the trend\cr - \tab \code{SIG_95}
+  \tab A logical statement indicating if the trend is
+  significant (TRUE) or non-significant (FALSE)\cr
 }
 \description{
   A function for using Frescalo (Hill, 2011), a tool for
