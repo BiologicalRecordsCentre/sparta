@@ -2,6 +2,9 @@
 
 This R package includes methods used to analyse trends in unstructured occurrence datasets and a range of useful functions for mapping such data in the UK.
 
+
+### Installation
+
 To install the development version of sparta, it's easiest to use the `devtools` package:
 
     # install.packages("devtools")
@@ -9,7 +12,7 @@ To install the development version of sparta, it's easiest to use the `devtools`
     # session before installing to avoid problems
     
     library(devtools)
-    install_github("sparta",username='TomAugust')
+    install_github("sparta",username='BiologicalRecordsCentre')
     
     library(sparta)
     
@@ -22,6 +25,9 @@ Once installed why not try out what sparta can do with the example dataset of un
     head(ex_dat)
     
 The data has a range of information for each observation including the location of the observation, the precision of this observation in meters and the 1km square and 10km square that these observations fall into. We also have the date range when the observation occurred (given as 'TO_STARTDATE' - 'Date') and the year of the end date.
+
+
+### Frescalo
 
 To do a frescalo analysis of this data try the following:
     
@@ -36,7 +42,7 @@ To do a frescalo analysis of this data try the following:
             
 You will see a number of different outputs come to your console. First is the output from Frescalo itself, reporting on progress through the analysis. Then you will get reporting on the progress made through the generation of output files.
 
-The frescalo function takes a time_periods argument which states the time periods we want to compare. Here we compare two time periods (1980-1989 & 1990-1999). The function uses these dates to group records for analysis, ensuring that both startdate and enddate fall into one of the defined time periods. If only date is provided (i.e. TO_STARTDATE is absent) frescalo assumes records all have day precision.
+The frescalo function takes a time_periods argument which states the time periods we want to compare. Here we compare two time periods (1980-1989 & 1990-1999). The function uses these dates to group records for analysis, ensuring that both startdate and enddate fall into one of the defined time periods. If only a single date is provided (i.e. TO_STARTDATE is absent) frescalo assumes records all have day precision.
 
 The function you just ran returned a 'frescalo' class object to 'fres_out', try some of these methods:
 
@@ -46,11 +52,14 @@ The function you just ran returned a 'frescalo' class object to 'fres_out', try 
     
 The plot you just created provides some useful information. Top left is a map of the number of species of unicorn in each gridcell, taken from the raw data. Top right is the rescaled number of species, taking into account the uneven recording effort in the raw data. Bottom left is the distribution of recording effort (white = high effort, red = low effort). Bottom right is a histogram of species trends. This blue line represents no change with species to the right increasing. The red line is a fitted density function.
 
-The full dataset can be found in the elements of 'x'. x$trends, x$freq, x$stat and x$lm_stats. Additionally x$log contains information from frescalo's log file. x$path give the file path to where these are saved (within the working directory you specified earlier).
+The full dataset can be found in the elements of 'fres_out'. fres_out$trend, fres_out$freq, fres_out$stat and fres_out$lm_stats. Additionally fres_out$log contains information from frescalo's log file. fres_out$path give the file path to where these are saved (within the working directory you specified earlier).
 
-Also produced is an .pdf with species specific results. Navigate to the folder you specified for your output. Open 'Unicorns_frescaloXXXXXX/Frescalo/Maps_Results/Standard Frescalo Plots.pdf'. 
+Also produced is a .pdf with species specific results. Navigate to the folder you specified for your output (type sinkdir into R for the location). Open 'Unicorns_frescaloXXXXXX/Frescalo/Maps_Results/Standard Frescalo Plots.pdf'. 
 
-To run other methods, including mixed models, list-length models and Telfer we use the function sparta (you can also use this to run frescalo at the same time).
+
+### Additional methods for estimating trends using sparta
+
+The sparta function can be used to run multiple trend analysis methods at the same time, including mixed models (Roy et al., 2012), list-length (Szabo et al., 2010), relative change index (Telfer et al., 2002) and frescalo (Hill, 2012). 
 
 Try the following:
 
