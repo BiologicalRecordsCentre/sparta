@@ -26,8 +26,12 @@
   is assumed to be the start date (from which start year is
   extracted) and year is assumed to be the end date.  If
   \code{NULL} the user is prompted to select a .csv or
-  .rdata file.  SPECIFY COLOUMN HEADINGS NEEDED FOR OTHER
-  METHODS.}
+  .rdata file.  For mixed models and list length models the
+  following columns are required: 'CONCEPT', 'kmsq' and
+  'Date', optionally 'TO_STARTDATE' can be added. For basic
+  methods the following columns are required:
+  'CONCEPT','hectad' and 'Date', optionally 'TO_STARTDATE'
+  can be added.}
 
   \item{taxon_name}{A vector of strings giving the name(s)
   of data. This is used to name output files when written}
