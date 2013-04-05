@@ -68,6 +68,7 @@ data(ex_dat)
                     time_periods = data.frame(start=c(1980,1990),end=c(1989,1999)),
                     sinkdir = sinkdir,
                     Fres_weights=weights)
+ }
 }
 \references{
   Hill, Mark. Local frequency as a key to interpreting
