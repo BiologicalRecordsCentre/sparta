@@ -51,9 +51,9 @@
 #'        data data) which are to be used. Species not in your list are ignored.
 #'        This is useful if you are only interested in a subset of species, i.e. in red listing
 #' @param ignore.ireland Logical, if \code{TRUE} Irish hectads are removed. Default
-#'        is \code{TRUE}
+#'        is \code{FALSE}
 #' @param ignore.channelislands Logical, if \code{TRUE} channel island hectads are 
-#'        removed. Default is \code{TRUE}
+#'        removed. Default is \code{FALSE}
 #' @param sinkdir String giving the output directory for result
 #' @param Log Logical, if \code{TRUE} log files are created in \code{sinkdir}
 #' @param taxon_reg A lookup table that gives names to your concepts. If not given the
@@ -134,8 +134,8 @@ function(data=NULL,#your data (.rdata files) as a file path (or list of file pat
                          #desired result (i.e site must be well sampled in three diff years)
         split_yr=NULL, #First year of second time period
         species_to_include=NULL, #A species list with which to subset your data
-        ignore.ireland=T,#do you want to remove Irish hectads?
-        ignore.channelislands=T, ##do you want to remove Channel Islands (they are not UK)?
+        ignore.ireland=F,#do you want to remove Irish hectads?
+        ignore.channelislands=F, ##do you want to remove Channel Islands (they are not UK)?
         sinkdir=NULL,#where is the data going to be saved
         Log=T,#do you want a log file
         taxon_reg=NULL, #additional info about each species which is merged to results

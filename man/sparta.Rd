@@ -9,8 +9,8 @@
     Calc_D_england_only = F, Year.range = NULL,
     res = "visit", min.L = 4, min.yrs = 3,
     wellsamp = "visit", split_yr = NULL,
-    species_to_include = NULL, ignore.ireland = T,
-    ignore.channelislands = T, sinkdir = NULL, Log = T,
+    species_to_include = NULL, ignore.ireland = F,
+    ignore.channelislands = F, sinkdir = NULL, Log = T,
     taxon_reg = NULL, print_progress = T,
     time_periods = NULL, channel = NULL, Plot_Fres = TRUE,
     Fres_weights = "LC", non_benchmark_sp = NULL,
@@ -99,11 +99,11 @@
   species, i.e. in red listing}
 
   \item{ignore.ireland}{Logical, if \code{TRUE} Irish
-  hectads are removed. Default is \code{TRUE}}
+  hectads are removed. Default is \code{FALSE}}
 
   \item{ignore.channelislands}{Logical, if \code{TRUE}
   channel island hectads are removed. Default is
-  \code{TRUE}}
+  \code{FALSE}}
 
   \item{sinkdir}{String giving the output directory for
   result}

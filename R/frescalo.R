@@ -18,9 +18,9 @@
 #'        data) which are to be used. Species not in your list are ignored.
 #'        This is useful if you are only interested in a subset of species, i.e. in red listing
 #' @param ignore.ireland Logical, if \code{TRUE} Irish hectads are removed. Default
-#'        is \code{TRUE}
+#'        is \code{FALSE}
 #' @param ignore.channelislands Logical, if \code{TRUE} channel island hectads are 
-#'        removed. Default is \code{TRUE}
+#'        removed. Default is \code{FALSE}
 #' @param sinkdir String giving the output directory for result
 #' @param get_names_from_BRC Default is \code{FALSE}. if \code{TRUE} it assumes the CONCEPT 
 #'        in your data relates to a BRC concept code and the names of species will be retireve
@@ -138,8 +138,8 @@ frescalo <-
            taxon_name=NULL,#the name of your data (string) or list of names,
            #used to name your output files
            species_to_include=NULL, #A species list with which to subset your data
-           ignore.ireland=T,#do you want to remove Irish hectads?
-           ignore.channelislands=T, ##do you want to remove Channel Islands (they are not UK)?
+           ignore.ireland=F,#do you want to remove Irish hectads?
+           ignore.channelislands=F, ##do you want to remove Channel Islands (they are not UK)?
            sinkdir=NULL,#where is the data going to be saved
            taxon_reg=NULL, #additional info about each species which is merged to results
            time_periods=NULL, #a list of vector pairs used in frescalo (ie 'c((1990,1995),(1996,2000))')
@@ -272,7 +272,7 @@ frescalo <-
         write.table(fres_site_filter,sep='\n',file=fres_site_path,row.names=F,col.names=F,quote=F)
         fres_site_txt<-'fres_site_filter.txt'          
       }         
-      
+          
       if(nrow(taxa_data)==0) stop("By Zeus' beard! The data heading into frescalo has 0 rows. Make sure your time periods match your years, and your not subsetting out all your data")
       fres_return<-run_fresc_file(channel=channel,fres_data=taxa_data,output_dir=fresoutput,frescalo_path=frespath,fres_f_wts=Fres_weights_name,
                                   Plot=Plot_Fres,spp_names_file=spp_names,fres_f_nobench=non_bench_txt,fres_f_filter=fres_site_txt)

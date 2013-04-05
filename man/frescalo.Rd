@@ -3,8 +3,8 @@
 \title{Frescalo}
 \usage{
   frescalo(data = NULL, taxon_name = NULL,
-    species_to_include = NULL, ignore.ireland = T,
-    ignore.channelislands = T, sinkdir = NULL,
+    species_to_include = NULL, ignore.ireland = F,
+    ignore.channelislands = F, sinkdir = NULL,
     taxon_reg = NULL, time_periods = NULL, channel = NULL,
     Plot_Fres = TRUE, Fres_weights = "LC",
     non_benchmark_sp = NULL, get_names_from_BRC = FALSE,
@@ -30,11 +30,11 @@
   red listing}
 
   \item{ignore.ireland}{Logical, if \code{TRUE} Irish
-  hectads are removed. Default is \code{TRUE}}
+  hectads are removed. Default is \code{FALSE}}
 
   \item{ignore.channelislands}{Logical, if \code{TRUE}
   channel island hectads are removed. Default is
-  \code{TRUE}}
+  \code{FALSE}}
 
   \item{sinkdir}{String giving the output directory for
   result}
