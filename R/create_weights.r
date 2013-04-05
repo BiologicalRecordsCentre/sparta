@@ -51,7 +51,7 @@
 #'                     sinkdir = sinkdir,
 #'                     Fres_weights=weights)
 #'  }
-
+ 
 create_weights<-function(dist=NULL,
                          sim=NULL,
                          dist_sub=200,

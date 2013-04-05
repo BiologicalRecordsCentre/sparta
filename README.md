@@ -26,7 +26,7 @@ Once installed why not try out what sparta can do with the example dataset of un
     # Look at the data structure
     head(ex_dat)
     
-The data has a range of information for each observation including the location of the observation, the precision of this observation in meters and the 1km square and 10km square that these observations fall into. We also have the date range when the observation occurred (given as 'TO_STARTDATE' - 'Date') and the year of the end date.  
+The data has a range of information for each observation including the 1km square and 10km square that these observations fall into. We also have the date range when the observation occurred (given as 'TO_STARTDATE' - 'Date') and species observed (CONCEPT).  
 
 
 ### Frescalo

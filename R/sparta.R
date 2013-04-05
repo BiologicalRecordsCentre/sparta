@@ -13,7 +13,11 @@
 #'        'TO_STARTDATE' can be included, if it is this is assumed to be the start date
 #'        (from which start year is extracted) and year is assumed to be the end date.
 #'        If \code{NULL} the user is prompted to select a .csv or .rdata file.
-#'        SPECIFY COLOUMN HEADINGS NEEDED FOR OTHER METHODS.
+#'        For mixed models and list length models the following columns are required: 'CONCEPT',
+#'        'kmsq' and 'Date', optionally 'TO_STARTDATE' can be added. For basic methods
+#'        the following columns are required: 'CONCEPT','hectad' and 'Date', optionally
+#'        'TO_STARTDATE' can be added.
+#'
 #' @param taxon_name A vector of strings giving the name(s) of data. This is used to name
 #'        output files when written
 #' @param Run_models Logical, if \code{FALSE} no models are run. This overrules \code{Run_MM, 
@@ -113,414 +117,440 @@
 #' }
 
 sparta <-
-function(data=NULL,#your data (.rdata files) as a file path (or list of file paths)
-        taxon_name=NULL,#the name of your data (string) or list of names,
-                        #used to name your output files
-        Run_models=T,#do you want to run models
-        Run_MM=T,#do you want to run mixed models
-        Run_LL=T,#do you want to run list length models
-        Run_Fres=T,#do you want to run frescalo
-        Run_Basic=T, #
-        Create_persistance_table=F,#do you want to create persistance tables
-        Create_persistance_summary=F,#do you want to create persistance summary tables
-                                     #this can onlt be run if the models have been run
-        Calc_D_england_only=F,#Do you want fractal D to be calculated for England only?
-        Year.range=NULL,#used to subset data and in persistance tables
-        res='visit', #'visit' or 'kmyr' resolution for data to be modelled
-        min.L=4,#minimum list length for mixed models
-        min.yrs=3,#minimum number of years for 'well sampled' sites (mixed models)
-        wellsamp='visit',#min years had an issue with visit resolution since it was actually
-                         #including sites with three good visits. This can be changed to year to get the
-                         #desired result (i.e site must be well sampled in three diff years)
-        split_yr=NULL, #First year of second time period
-        species_to_include=NULL, #A species list with which to subset your data
-        ignore.ireland=F,#do you want to remove Irish hectads?
-        ignore.channelislands=F, ##do you want to remove Channel Islands (they are not UK)?
-        sinkdir=NULL,#where is the data going to be saved
-        Log=T,#do you want a log file
-        taxon_reg=NULL, #additional info about each species which is merged to results
-        print_progress=T,#do you want to print progress through species?
-        time_periods=NULL, #a list of vector pairs used in frescalo (ie 'c((1990,1995),(1996,2000))')
-        channel=NULL, #channel is needed to get a taxon_reg for frescalo if not given
-        Plot_Fres=TRUE,#do you want to plot the maps and do linear regression for frescalo?
-        Fres_weights='LC',#the name of the weights file in the frescalo directory to be used
-        non_benchmark_sp=NULL, 
-        Telfer_min_sq=5, #the min number of cells needed to be occupied in tp1 for Telfer to be run
-        get_names_from_BRC=FALSE, #change to TRUE is using concepts and you want frescalo to output with names
-        fres_site_filter=NULL #optional list of sites not to be included in analysis
-        ){
-
-  required.packages <- c('lme4','reshape2','sp','RODBC','gdata','ggplot2')
-  new.packages <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)) install.packages(new.packages)
-  if(is.null(data)){
-    cat("Choose .csv or .rdata file. Else assign data.frame of data to 'data'")
-    data<-choose.files()
-  } 
-  if(is.null(taxon_name)){
-    warning("'taxon_name' not given, defaulted to 'NOBODY'. If you are analysing more than one dataset you will end up overwriting your output unless you provide taxon names")
-    taxon_name<-'NOBODY'
-  }
-  if(class(data)=='character'&length(data)!=length(taxon_name)) stop("taxon_name and data are not the same length")
-  if(is.null(sinkdir)) stop("Like Odysseus I could use some directions. I need to know the where to save output, use the 'sinkdir' arguement")
-  dir.create(sinkdir,showWarnings = FALSE)
-  if(Run_Basic & is.null(time_periods)) stop('time_periods must be set for Basic trends analysis')
-  if(Run_Fres & is.null(time_periods)) stop('time_periods must be set for Frescalo')
-  if(Run_Fres & is.null(channel) & is.null(get_names_from_BRC)) stop('Frescalo needs channel to get names for concepts')
-  if(!is.null(channel)) require(RODBC)
-  if(is.null(taxon_reg)&!is.null(channel)) taxon_reg<-sqlQuery(channel, "select CONCEPT, CONCEPT_REC, NAME, NAME_ENGLISH, VALID from BRC.taxa_taxon_register where valid = 'V'")
-  if(Run_Fres) data(UK)
-  #set up frescalo path
-  if(Run_Fres) frespath<-paste(normalizePath(.Library),'\\sparta\\exec\\Frescalo_2a.exe',sep='')
-  #unpack weights file if needed
-  if(Run_Fres&class(Fres_weights)=='character'){
-    if(Fres_weights=='LC'){
-      Fres_weights_name<-'GB_LC_Wts.txt'
-      if(!file.exists(paste(dirname(frespath),'/GB_LC_Wts.txt',sep=''))){
-        data(GB_LC_Wts)
-        write.table(GB_LC_Wts,file=paste(dirname(frespath),'/GB_LC_Wts.txt',sep=''),row.names=FALSE,col.names=FALSE,quote=FALSE) 
-      }  
-    }
-    if(Fres_weights=='VP'){
-      Fres_weights_name<-'Wts.txt' 
-      if(!file.exists(paste(dirname(frespath),'/Wts.txt',sep=''))){
-        data(Wts)
-        write.table(Wts,file=paste(dirname(frespath),'/Wts.txt',sep=''),row.names=FALSE,col.names=FALSE,quote=FALSE)             
-      }  
-    }
-  }
-  if(Run_Fres&class(Fres_weights)=='data.frame'){
-    if(length(Fres_weights)!=3) stop('Fres_weights data.frame must have three columns: target, neighbour, weight')
-    if(class(Fres_weights[,3])=='factor') stop('Weights column should not be a factor, it should be numeric')
-    if(max(as.numeric(Fres_weights[,3]))>1|min(as.numeric(Fres_weights[,3]))<0) stop('Weight in Fres_weights should be between 0 and 1')
-    round(as.numeric(Fres_weights[,3]),4)
-    write.fwf(Fres_weights,colnames=FALSE,rownames=FALSE,width=c(9,9,7),file=paste(dirname(frespath),'/Custom_Wts.txt',sep=''))
-    Fres_weights_name<-'Custom_Wts.txt'         
-  }
-  
-  if(class(data)=='data.frame'){
-    length_data<-1
-  }else {
-    length_data<-length(data)
-  }
-  
-  return_object=list()
-  
-  for(i in 1:length_data){
-       
-    print(paste('Starting',taxon_name[i]))
-  
-    datecode <- format(Sys.Date(),'%y%m%d')
+  function(data=NULL,#your data (.rdata files) as a file path (or list of file paths)
+           taxon_name=NULL,#the name of your data (string) or list of names,
+           #used to name your output files
+           Run_models=T,#do you want to run models
+           Run_MM=T,#do you want to run mixed models
+           Run_LL=T,#do you want to run list length models
+           Run_Fres=T,#do you want to run frescalo
+           Run_Basic=T, #
+           Create_persistance_table=F,#do you want to create persistance tables
+           Create_persistance_summary=F,#do you want to create persistance summary tables
+           #this can onlt be run if the models have been run
+           Calc_D_england_only=F,#Do you want fractal D to be calculated for England only?
+           Year.range=NULL,#used to subset data and in persistance tables
+           res='visit', #'visit' or 'kmyr' resolution for data to be modelled
+           min.L=4,#minimum list length for mixed models
+           min.yrs=3,#minimum number of years for 'well sampled' sites (mixed models)
+           wellsamp='visit',#min years had an issue with visit resolution since it was actually
+           #including sites with three good visits. This can be changed to year to get the
+           #desired result (i.e site must be well sampled in three diff years)
+           split_yr=NULL, #First year of second time period
+           species_to_include=NULL, #A species list with which to subset your data
+           ignore.ireland=F,#do you want to remove Irish hectads?
+           ignore.channelislands=F, ##do you want to remove Channel Islands (they are not UK)?
+           sinkdir=NULL,#where is the data going to be saved
+           Log=T,#do you want a log file
+           taxon_reg=NULL, #additional info about each species which is merged to results
+           print_progress=T,#do you want to print progress through species?
+           time_periods=NULL, #a list of vector pairs used in frescalo (ie 'c((1990,1995),(1996,2000))')
+           channel=NULL, #channel is needed to get a taxon_reg for frescalo if not given
+           Plot_Fres=TRUE,#do you want to plot the maps and do linear regression for frescalo?
+           Fres_weights='LC',#the name of the weights file in the frescalo directory to be used
+           non_benchmark_sp=NULL, 
+           Telfer_min_sq=5, #the min number of cells needed to be occupied in tp1 for Telfer to be run
+           get_names_from_BRC=FALSE, #change to TRUE is using concepts and you want frescalo to output with names
+           fres_site_filter=NULL #optional list of sites not to be included in analysis
+  ){
     
-    if(Log){
-      logfilename<-paste(sinkdir,'/Log files/', taxon_name[i], '_', datecode, '.txt', sep='')
-      dir.create(dirname(logfilename),showWarnings = FALSE)
-      report(logfilename, paste('Starting models for',taxon_name[i]))
+    required.packages <- c('lme4','reshape2','sp','RODBC','gdata','ggplot2')
+    new.packages <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
+    if(length(new.packages)) install.packages(new.packages)
+    if(is.null(data)){
+      cat("Choose .csv or .rdata file. Else assign data.frame of data to 'data'")
+      data<-choose.files()
+    } 
+    if(is.null(taxon_name)){
+      warning("'taxon_name' not given, defaulted to 'NOBODY'. If you are analysing more than one dataset you will end up overwriting your output unless you provide taxon names")
+      taxon_name<-'NOBODY'
+    }
+    if(class(data)=='character'&length(data)!=length(taxon_name)) stop("taxon_name and data are not the same length")
+    if(is.null(sinkdir)) stop("Like Odysseus I could use some directions. I need to know the where to save output, use the 'sinkdir' arguement")
+    dir.create(sinkdir,showWarnings = FALSE)
+    if(Run_Basic & is.null(time_periods)) stop('time_periods must be set for Basic trends analysis')
+    if(Run_Fres & is.null(time_periods)) stop('time_periods must be set for Frescalo')
+    if(Run_Fres & is.null(channel) & is.null(get_names_from_BRC)) stop('Frescalo needs channel to get names for concepts')
+    if(!is.null(channel)) require(RODBC)
+    if(is.null(taxon_reg)&!is.null(channel)) taxon_reg<-sqlQuery(channel, "select CONCEPT, CONCEPT_REC, NAME, NAME_ENGLISH, VALID from BRC.taxa_taxon_register where valid = 'V'")
+    if(Run_Fres) data(UK)
+    #set up frescalo path
+    if(Run_Fres) frespath<-paste(normalizePath(.Library),'\\sparta\\exec\\Frescalo_2a.exe',sep='')
+    #unpack weights file if needed
+    if(Run_Fres&class(Fres_weights)=='character'){
+      if(Fres_weights=='LC'){
+        Fres_weights_name<-'GB_LC_Wts.txt'
+        if(!file.exists(paste(dirname(frespath),'/GB_LC_Wts.txt',sep=''))){
+          data(GB_LC_Wts)
+          write.table(GB_LC_Wts,file=paste(dirname(frespath),'/GB_LC_Wts.txt',sep=''),row.names=FALSE,col.names=FALSE,quote=FALSE) 
+        }  
+      }
+      if(Fres_weights=='VP'){
+        Fres_weights_name<-'Wts.txt' 
+        if(!file.exists(paste(dirname(frespath),'/Wts.txt',sep=''))){
+          data(Wts)
+          write.table(Wts,file=paste(dirname(frespath),'/Wts.txt',sep=''),row.names=FALSE,col.names=FALSE,quote=FALSE)             
+        }  
+      }
+    }
+    if(Run_Fres&class(Fres_weights)=='data.frame'){
+      if(length(Fres_weights)!=3) stop('Fres_weights data.frame must have three columns: target, neighbour, weight')
+      if(class(Fres_weights[,3])=='factor') stop('Weights column should not be a factor, it should be numeric')
+      if(max(as.numeric(Fres_weights[,3]))>1|min(as.numeric(Fres_weights[,3]))<0) stop('Weight in Fres_weights should be between 0 and 1')
+      round(as.numeric(Fres_weights[,3]),4)
+      write.fwf(Fres_weights,colnames=FALSE,rownames=FALSE,width=c(9,9,7),file=paste(dirname(frespath),'/Custom_Wts.txt',sep=''))
+      Fres_weights_name<-'Custom_Wts.txt'         
+    }
+    if(class(data)=='data.frame'){
+      length_data<-1
+    }else {
+      length_data<-length(data)
     }
     
-    if(Run_models){
-      #Read in data
-      #The important columns in this data are CONCEPT,kmsq,Date and year
-      print('loading raw data')
-      if(class(data)=='data.frame'){
-        taxa_data<-data
-        rm(data)
-      } else if(class(data)=='character'&grepl('.rdata',data[i],ignore.case=TRUE)){
-        loaded<-load(data[i])
-        if(class(data)=='character'&sum(grepl('taxa_data',loaded))==0){
-          stop('The .rdata file used does not contain an object called "taxa_data"')
-        }
-      }else if(grepl('.csv',data[i],ignore.case=TRUE)){
-        taxa_data<-read.table(data[i],header=TRUE,stringsAsFactors=FALSE,sep=',')
-        taxa_data$year<-as.numeric(taxa_data$year)
-        taxa_data$CONCEPT<-as.factor(taxa_data$CONCEPT)
-        taxa_data$Date<-as.Date(taxa_data$Date)
+    return_object=list()
+    
+    for(i in 1:length_data){
+      
+      print(paste('Starting',taxon_name[i]))
+      
+      datecode <- format(Sys.Date(),'%y%m%d')
+      
+      if(Log){
+        logfilename<-paste(sinkdir,'/Log files/', taxon_name[i], '_', datecode, '.txt', sep='')
+        dir.create(dirname(logfilename),showWarnings = FALSE)
+        report(logfilename, paste('Starting models for',taxon_name[i]))
       }
       
-      if(sum(grepl('TO_STARTDATE',colnames(taxa_data)))>0) taxa_data <- taxa_data[format(taxa_data$TO_STARTDATE,'%Y')==format(taxa_data$Date,'%Y'),]
-      if(!is.null(Year.range)) taxa_data<-taxa_data[taxa_data$year %in% Year.range,] #subset to year range
-      if(!is.null(species_to_include)) taxa_data<-taxa_data[taxa_data$CONCEPT %in% species_to_include,] #subset to species in list
-      if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data$hectad)==1)
-      if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data$hectad)==FALSE)
-      if(Log) report(logfilename, paste('Raw data loaded for', length(unique(taxa_data$CONCEPT)), 'species'))
-       
-      if(Run_Basic){
-        if(Log) report(logfilename, 'Running Basic trends analysis')
-        for(ii in 1:(length(time_periods[,1])-1)){
-          for(j in (i+1):length(time_periods[,1])){
-            time_periods_temp<-time_periods[c(ii,j),] 
-            taxon_temp<-paste(taxon_name[i],'_',ii,'_',j,sep='')
-            basic_temp<-basic_trends(taxa_data,time_periods_temp,min_sq=Telfer_min_sq,sinkdir,splityr=NULL,sp_list=species_to_include,taxon_temp)
-            colnames(basic_temp)<-paste(colnames(basic_temp),'_',ii,'_',j,sep='')
-            basic_temp$CONCEPT<-row.names(basic_temp)
-            print(paste('Basic trends for tp',ii,'vs tp',j,'done',sep=' '))
-            if(exists('basic_master')){
-              basic_master<-merge(basic_master,basic_temp,by='CONCEPT',all=TRUE)
-            }else{
-              basic_master<-basic_temp
+      if(Run_models){
+        #Read in data
+        #The important columns in this data are CONCEPT,kmsq,Date and year
+        print('loading raw data')
+        if(class(data)=='data.frame'){
+          taxa_data<-data
+          rm(data)
+        } else if(class(data)=='character'&grepl('.rdata',data[i],ignore.case=TRUE)){
+          loaded<-load(data[i])
+          if(class(data)=='character'&sum(grepl('taxa_data',loaded))==0){
+            stop('The .rdata file used does not contain an object called "taxa_data"')
+          }
+        }else if(grepl('.csv',data[i],ignore.case=TRUE)){
+          taxa_data<-read.table(data[i],header=TRUE,stringsAsFactors=FALSE,sep=',')
+          if('year' %in% names(taxa_data)) taxa_data$year <- as.numeric(taxa_data$year)
+          taxa_data$CONCEPT<-as.factor(taxa_data$CONCEPT)
+          taxa_data$Date<-as.Date(taxa_data$Date)
+        }
+        
+        
+        if(Run_MM|Run_LL) if(!'kmsq' %in% names(taxa_data)) stop('kmsq column is needed for Mixed models or List length models. If using UK grid references this can be created using the reformat_gr() function')
+        if(!'year' %in% names(taxa_data)) taxa_data$year<-as.numeric(format(taxa_data$Date,'%Y')) 
+        
+        if(!is.null(Year.range)) taxa_data<-taxa_data[taxa_data$year %in% Year.range,] #subset to year range
+        if(!is.null(species_to_include)) taxa_data<-taxa_data[taxa_data$CONCEPT %in% species_to_include,] #subset to species in list
+        if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data$hectad)==1)
+        if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data$hectad)==FALSE)
+        if(Log) report(logfilename, paste('Raw data loaded for', length(unique(taxa_data$CONCEPT)), 'species'))
+        
+        taxa_data_master<-taxa_data
+        if(Run_Basic){
+          if(Log) report(logfilename, 'Running Basic trends analysis')
+          
+          #Deal with date ranges
+          if('TO_STARTDATE' %in% colnames(taxa_data)){
+            for(ii in 1:length(time_periods[,1])){
+              taxa_data$yearnew[as.numeric(format(taxa_data$TO_STARTDATE,'%Y'))>=time_periods[ii,1][[1]] &
+                                  taxa_data$year<=time_periods[ii,2][[1]]]<-floor(rowMeans(time_periods[ii,])[[1]])
+            }
+          }else{
+            for(ii in 1:length(time_periods[,1])){
+              taxa_data$yearnew[taxa_data$year>=time_periods[ii,1][[1]] &
+                                  taxa_data$year<=time_periods[ii,2][[1]]]<-floor(rowMeans(time_periods[ii,])[[1]])
             }
           }
+          taxa_data$year<-taxa_data$yearnew
+          taxa_data<-taxa_data[!is.na(taxa_data$year),]
+          
+          for(ii in 1:(length(time_periods[,1])-1)){
+            for(j in (i+1):length(time_periods[,1])){
+              time_periods_temp<-time_periods[c(ii,j),] 
+              taxon_temp<-paste(taxon_name[i],'_',ii,'_',j,sep='')
+              basic_temp<-basic_trends(taxa_data,time_periods_temp,min_sq=Telfer_min_sq,sinkdir,splityr=NULL,sp_list=species_to_include,taxon_temp)
+              colnames(basic_temp)<-paste(colnames(basic_temp),'_',ii,'_',j,sep='')
+              basic_temp$CONCEPT<-row.names(basic_temp)
+              print(paste('Basic trends for tp',ii,'vs tp',j,'done',sep=' '))
+              if(exists('basic_master')){
+                basic_master<-merge(basic_master,basic_temp,by='CONCEPT',all=TRUE)
+              }else{
+                basic_master<-basic_temp
+              }
+            }
+          }
+          basic_master<-merge(basic_master,unique(taxa_data[c('CONCEPT')]),by='CONCEPT',all=TRUE)
+          file_name<-paste('Basic_trends_',taxon_name[i],'_',datecode,'.csv',sep='')
+          if (file.exists(file_name)){
+            file_name<-paste('Basic_trends_',taxon_name[i],'_',datecode,'_',format(Sys.time(),'%H%M'),'.csv',sep='')
+            warning(paste('Basic_trends_',taxon_name[i],'_',datecode,'.csv',' already exists.',
+                          ' The new data is saved with the time appended to the file name',sep=''),call.=FALSE,immediate.=TRUE)
+          }
+          write.csv(basic_master,file_name,row.names=FALSE)
+          if(Log) report(logfilename, 'Basic trend analysis complete')
+          
+          return_object[['basic_methods']]<-basic_master
         }
-        basic_master<-merge(basic_master,unique(taxa_data[c('CONCEPT')]),by='CONCEPT',all=TRUE)
-        file_name<-paste('Basic_trends_',taxon_name[i],'_',datecode,'.csv',sep='')
-        if (file.exists(file_name)){
-        file_name<-paste('Basic_trends_',taxon_name[i],'_',datecode,'_',format(Sys.time(),'%H%M'),'.csv',sep='')
-        warning(paste('Basic_trends_',taxon_name[i],'_',datecode,'.csv',' already exists.',
-                      ' The new data is saved with the time appended to the file name',sep=''),call.=FALSE,immediate.=TRUE)
-        }
-        write.csv(basic_master,file_name,row.names=FALSE)
-        if(Log) report(logfilename, 'Basic trend analysis complete')
         
-        return_object[['basic_methods']]<-basic_master
-      }
+        
+        if(Run_MM | Run_LL){
+          
+          taxa_data<-taxa_data_master
+          
+          #only data with year accuracy is included in these analyses 
+          if('TO_STARTDATE' %in% colnames(taxa_data)) taxa_data <- taxa_data[format(taxa_data$TO_STARTDATE,'%Y')==format(taxa_data$Date,'%Y'),]
+          
+          if(Run_MM & Run_LL){
+            if(Log) report(logfilename, 'Recasting data for List-length and mixed models')
+            print('Recasting data for List-length and mixed models')
+          } 
+          if(Run_MM & !Run_LL){
+            if(Log) report(logfilename, 'Recasting data for Mixed models')
+            print('Recasting data for Mixed models')
+          } 
+          if(!Run_MM & Run_LL){
+            if(Log) report(logfilename, 'Recasting data for List-length models')
+            print('Recasting data for List-length models')
+          } 
+          
+          if(res=='kmyr'){
+            space_time<-cast_recs(taxa_data[!is.na(taxa_data$kmsq)&!is.na(taxa_data$year),][c('CONCEPT','year','kmsq')],res)
+          }
+          if(res=='visit'){
+            space_time<-cast_recs(taxa_data[!is.na(taxa_data$Date)&!is.na(taxa_data$kmsq),][c('CONCEPT','Date','kmsq')],res)
+          }
+          
+          counter=1
+          
+          if(counter==1&!file.exists(paste(sinkdir,'/',taxon_name[i],'_ModelsL',min.L,'_',datecode,'.csv', sep=''))){
+            file_name<-paste(sinkdir,'/',taxon_name[i],'_ModelsL',min.L,'_',datecode,'.csv', sep='')
+          } else if (counter==1&file.exists(paste(sinkdir,'/',taxon_name[i],'_ModelsL',min.L,'_',datecode,'.csv', sep=''))){
+            file_name<-paste(sinkdir,'/',taxon_name[i],'_ModelsL',min.L,'_',datecode,'_',format(Sys.time(),'%H%M'),'.csv', sep='')
+            warning(paste('file ',taxon_name[i],'_ModelsL',min.L,'_',datecode,'.csv',' already exists.',
+                          ' The new data is saved with the time appended to the file name',sep=''),call.=FALSE,immediate.=TRUE)
+          }
+          
+          for (ii in unique(taxa_data$CONCEPT[!is.na(taxa_data$kmsq)&!is.na(taxa_data$year)])){
+            if(print_progress) print(paste('Modelling',ii,'- Species',counter,'of',length(unique(taxa_data$CONCEPT[!is.na(taxa_data$kmsq)&!is.na(taxa_data$year)]))))
+            y<-unique(taxa_data[taxa_data$CONCEPT==ii&!is.na(taxa_data$kmsq)&!is.na(taxa_data$year),][c('CONCEPT',colnames(space_time)[1],'kmsq')])
+            species_space_time <- merge(x=space_time,y=y,all.x=T)
+            species_space_time$CONCEPT <- as.character(species_space_time$CONCEPT)
+            species_space_time$CONCEPT[is.na(species_space_time$CONCEPT)]<-0
+            species_space_time$CONCEPT[species_space_time$CONCEPT==ii]<-1
+            if(!grepl('year',colnames(species_space_time)[1])) species_space_time$year<-format(species_space_time$Date, '%Y')
             
-      
-      if(Run_MM | Run_LL){
-       
-        if(Run_MM & Run_LL){
-          if(Log) report(logfilename, 'Recasting data for List-length and mixed models')
-          print('Recasting data for List-length and mixed models')
-        } 
-        if(Run_MM & !Run_LL){
-          if(Log) report(logfilename, 'Recasting data for Mixed models')
-          print('Recasting data for Mixed models')
-        } 
-        if(!Run_MM & Run_LL){
-          if(Log) report(logfilename, 'Recasting data for List-length models')
-          print('Recasting data for List-length models')
-        } 
-                        
-        if(res=='kmyr'){
-          space_time<-cast_recs(taxa_data[!is.na(taxa_data$kmsq)&!is.na(taxa_data$year),][c('CONCEPT','year','kmsq')],res)
+            Mod_out<-t(as.data.frame(Models(species_space_time,min.L,min.yrs,MM=Run_MM,LL=Run_LL,wellsamp=wellsamp)))
+            row.names(Mod_out)<-ii
+            Mod_out<-as.data.frame(Mod_out)
+            if(Run_MM) Mod_out$MM_trend10<-pc.change(ilt(10*Mod_out$MM_trend))
+            if(Run_LL) Mod_out$LL_trend10<-pc.change(ilt(10*Mod_out$LL_trend))
+            Mod_out$CONCEPT<-row.names(Mod_out)
+            if(!is.null(taxon_reg)) Mod_out<-merge(x=Mod_out,y=taxon_reg,by='CONCEPT') #add taxon information
+            
+            counter=counter+1
+            
+            if(file.exists(file_name)){
+              write.table(Mod_out, file=file_name, append=T,col.names=F,sep=',',row.names=FALSE)
+            }else{
+              write.table(Mod_out, file=file_name,col.names=T,sep=',',row.names=FALSE)
+            }
+            
           }
-        if(res=='visit'){
-          space_time<-cast_recs(taxa_data[!is.na(taxa_data$Date)&!is.na(taxa_data$kmsq),][c('CONCEPT','Date','kmsq')],res)
-          }
-        
-        counter=1
-        
-        if(counter==1&!file.exists(paste(sinkdir,'/',taxon_name[i],'_ModelsL',min.L,'_',datecode,'.csv', sep=''))){
-          file_name<-paste(sinkdir,'/',taxon_name[i],'_ModelsL',min.L,'_',datecode,'.csv', sep='')
-        } else if (counter==1&file.exists(paste(sinkdir,'/',taxon_name[i],'_ModelsL',min.L,'_',datecode,'.csv', sep=''))){
-          file_name<-paste(sinkdir,'/',taxon_name[i],'_ModelsL',min.L,'_',datecode,'_',format(Sys.time(),'%H%M'),'.csv', sep='')
-          warning(paste('file ',taxon_name[i],'_ModelsL',min.L,'_',datecode,'.csv',' already exists.',
-                        ' The new data is saved with the time appended to the file name',sep=''),call.=FALSE,immediate.=TRUE)
+          if(Log) report(logfilename, paste('Models fitted for', counter, 'species'))
+          
+          model_methods<-read.csv(file_name)
+          new_order<-c('CONCEPT',names(model_methods)[-length(names(model_methods))])
+          model_methods<-model_methods[new_order]
+          model_methods<-model_methods[with(model_methods, order(CONCEPT)),]
+          return_object[['model_methods']]<-model_methods
+          
+          rm(list=c('Mod_out','model_methods'))
         }
         
-        for (ii in unique(taxa_data$CONCEPT[!is.na(taxa_data$kmsq)&!is.na(taxa_data$year)])){
-          if(print_progress) print(paste('Modelling',ii,'- Species',counter,'of',length(unique(taxa_data$CONCEPT[!is.na(taxa_data$kmsq)&!is.na(taxa_data$year)]))))
-          y<-unique(taxa_data[taxa_data$CONCEPT==ii&!is.na(taxa_data$kmsq)&!is.na(taxa_data$year),][c('CONCEPT',colnames(space_time)[1],'kmsq')])
-          species_space_time <- merge(x=space_time,y=y,all.x=T)
-          species_space_time$CONCEPT <- as.character(species_space_time$CONCEPT)
-          species_space_time$CONCEPT[is.na(species_space_time$CONCEPT)]<-0
-          species_space_time$CONCEPT[species_space_time$CONCEPT==ii]<-1
-          if(!grepl('year',colnames(species_space_time)[1])) species_space_time$year<-format(species_space_time$Date, '%Y')
-        
-          Mod_out<-t(as.data.frame(Models(species_space_time,min.L,min.yrs,MM=Run_MM,LL=Run_LL,wellsamp=wellsamp)))
-          row.names(Mod_out)<-ii
-          Mod_out<-as.data.frame(Mod_out)
-          if(Run_MM) Mod_out$MM_trend10<-pc.change(ilt(10*Mod_out$MM_trend))
-          if(Run_LL) Mod_out$LL_trend10<-pc.change(ilt(10*Mod_out$LL_trend))
-          Mod_out$CONCEPT<-row.names(Mod_out)
-          if(!is.null(taxon_reg)) Mod_out<-merge(x=Mod_out,y=taxon_reg,by='CONCEPT') #add taxon information
+        if(Run_Fres){
           
-          counter=counter+1
+          taxa_data<-taxa_data_master
           
-          if(file.exists(file_name)){
-            write.table(Mod_out, file=file_name, append=T,col.names=F,sep=',',row.names=FALSE)
+          print(paste('Running Frescalo for',taxon_name[i]))
+          if(Log) report(logfilename, 'Running Frescalo')               
+          
+          #If the data has a startdate and enddate ensure the dates are within one 
+          #of the time periods, else if it just has a year, enure this is in the
+          #right time period
+          if(sum(grepl('TO_STARTDATE',colnames(taxa_data)))>0){
+            for(ii in 1:length(time_periods[,1])){
+              taxa_data$yearnew[as.numeric(format(taxa_data$TO_STARTDATE,'%Y'))>=time_periods[ii,1][[1]] &
+                                  taxa_data$year<=time_periods[ii,2][[1]]]<-rowMeans(time_periods[ii,])[[1]]
+            }
           }else{
-            write.table(Mod_out, file=file_name,col.names=T,sep=',',row.names=FALSE)
+            for(ii in 1:length(time_periods[,1])){
+              taxa_data$yearnew[taxa_data$year>=time_periods[ii,1][[1]] &
+                                  taxa_data$year<=time_periods[ii,2][[1]]]<-rowMeans(time_periods[ii,])[[1]]
+            }
+          }         
+          
+          #just hectad, concept, timeperiod
+          taxa_data<-na.omit(unique(taxa_data[c('hectad','CONCEPT','yearnew')]))
+          
+          # Setup output
+          fresoutput<-paste(sinkdir,'/',taxon_name[i],'_frescalo',datecode,sep='')
+          dir.create(fresoutput,showWarnings = FALSE)
+          
+          #create non benchmark list if needed
+          non_bench_txt<-NULL
+          if(!is.null(non_benchmark_sp)){
+            NonBenchPath<-paste(dirname(frespath),'/NonBench.txt',sep='')         
+            write.table(non_benchmark_sp,sep='\n',file=NonBenchPath,row.names=F,col.names=F,quote=F)
+            non_bench_txt<-'NonBench.txt'
           }
           
-        }
-        if(Log) report(logfilename, paste('Models fitted for', counter, 'species'))
-        
-        model_methods<-read.csv(file_name)
-        new_order<-c('CONCEPT',names(model_methods)[-length(names(model_methods))])
-        model_methods<-model_methods[new_order]
-        model_methods<-model_methods[with(model_methods, order(CONCEPT)),]
-        return_object[['model_methods']]<-model_methods
-        
-        rm(list=c('Mod_out','model_methods'))
-      }
-      
-       if(Run_Fres){
-         
-         print(paste('Running Frescalo for',taxon_name[i]))
-         if(Log) report(logfilename, 'Running Frescalo')               
-         
-         #If the data has a startdate and enddate ensure the dates are within one 
-         #of the time periods, else if it just has a year, enure this is in the
-         #right time period
-         if(sum(grepl('TO_STARTDATE',colnames(taxa_data)))>0){
-           for(ii in 1:length(time_periods[,1])){
-             taxa_data$yearnew[as.numeric(format(taxa_data$TO_STARTDATE,'%Y'))>=time_periods[ii,1][[1]] &
-                            taxa_data$year<=time_periods[ii,2][[1]]]<-rowMeans(time_periods[ii,])[[1]]
-           }
-         }else{
-           for(ii in 1:length(time_periods[,1])){
-             taxa_data$yearnew[taxa_data$year>=time_periods[ii,1][[1]] &
-                            taxa_data$year<=time_periods[ii,2][[1]]]<-rowMeans(time_periods[ii,])[[1]]
-           }
-         }         
-         
-         #just hectad, concept, timeperiod
-         taxa_data<-na.omit(unique(taxa_data[c('hectad','CONCEPT','yearnew')]))
-         
-         # Setup output
-         fresoutput<-paste(sinkdir,'/',taxon_name[i],'_frescalo',datecode,sep='')
-         dir.create(fresoutput,showWarnings = FALSE)
-         
-         #create non benchmark list if needed
-         non_bench_txt<-NULL
-         if(!is.null(non_benchmark_sp)){
-          NonBenchPath<-paste(dirname(frespath),'/NonBench.txt',sep='')         
-          write.table(non_benchmark_sp,sep='\n',file=NonBenchPath,row.names=F,col.names=F,quote=F)
-          non_bench_txt<-'NonBench.txt'
-         }
-         
-         spp_names<-NULL
-         
-         #Set up species names
-         if(get_names_from_BRC==FALSE){
-           new_names <- data.frame(SPECIES=paste('S',1:length(unique(taxa_data$CONCEPT)),sep=''),NAME=unique(taxa_data$CONCEPT))
-           spp_names <- paste(fresoutput,'/species_names.csv',sep='')
-           write.table(new_names,spp_names,sep=',',row.names=FALSE)
-           taxa_data<-merge(taxa_data,new_names,by.x='CONCEPT',by.y='NAME',all=T)
-           taxa_data<-taxa_data[c('hectad','SPECIES','yearnew')]
-           if(!is.null(non_benchmark_sp)){
+          spp_names<-NULL
+          
+          #Set up species names
+          if(get_names_from_BRC==FALSE){
+            new_names <- data.frame(SPECIES=paste('S',1:length(unique(taxa_data$CONCEPT)),sep=''),NAME=unique(taxa_data$CONCEPT))
+            spp_names <- paste(fresoutput,'/species_names.csv',sep='')
+            write.table(new_names,spp_names,sep=',',row.names=FALSE)
+            taxa_data<-merge(taxa_data,new_names,by.x='CONCEPT',by.y='NAME',all=T)
+            taxa_data<-taxa_data[c('hectad','SPECIES','yearnew')]
+            if(!is.null(non_benchmark_sp)){
               write.table(new_names$SPECIES[new_names$NAME %in% non_benchmark_sp],sep='\n',file=NonBenchPath,row.names=F,col.names=F,quote=F)
-           }
-         }
-         
-         #If needed create a site filter
-         fres_site_txt<-NULL
-         if(!is.null(fres_site_filter)){
-           fres_site_path<-paste(dirname(frespath),'/fres_site_filter.txt',sep='')         
-           write.table(fres_site_filter,sep='\n',file=fres_site_path,row.names=F,col.names=F,quote=F)
-           fres_site_txt<-'fres_site_filter.txt'          
-         }         
-             
-         if(nrow(taxa_data)==0) stop("By Zeus' beard! The data heading into frescalo has 0 rows. Make sure your time periods match your years, and your not subsetting out all your data")
-         fres_return<-run_fresc_file(channel=channel,fres_data=taxa_data,output_dir=fresoutput,frescalo_path=frespath,fres_f_wts=Fres_weights_name,
-                                    Plot=Plot_Fres,spp_names_file=spp_names,fres_f_nobench=non_bench_txt,fres_f_filter=fres_site_txt)
-         class(fres_return)<-'frescalo'
-         
-         # Calculate z-values if only two time periods
-         if(length(time_periods[,1])==2 & 'lm_stats' %in% names(fres_return)){
-           fres_lm_path<-paste(sinkdir,'/',taxon_name[i],'_frescalo',datecode,'/Frescalo/Maps_Results/Frescalo Tfactor lm stats.csv',sep='')
-           fres_lm<-read.csv(fres_lm_path)
-           trendpath<-paste(sinkdir,'/',taxon_name[i],'_frescalo',datecode,'/Frescalo/Output/Trend.txt',sep='')
-           zvalues<-fres_zvalues(trendpath)
-           lm_z<-merge(x=fres_lm,y=zvalues,by='SPECIES',all=TRUE)
-           write.csv(lm_z,fres_lm_path)
-           fres_return$lm_stats<-lm_z
-         }
-       return_object[['frescalo']]<-fres_return
-       if(Log) report(logfilename,'Frescalo complete')
-       }
-    }
-    
-    #####I HAVE NOT FUNCTIONALISED BEYOND HERE#####
-    
-    #Create persistance tables only for those species thought to be declining in models
-    if(Create_persistance_table){
-      
-      report(logfilename, paste('Creating persistance tables'))
-      #Find declining species
-      print('read in trends')
-      out_files<-dir(sinkdir)
-      out_files<-out_files[grep(paste(taxon,'_Models',sep=''),out_files)]
-      if(length(out_files)>1) stop(paste("There is more than one trends file for",taxon,'in',sinkdir))  
-    
-      trends<-read.csv(paste(sinkdir,'/',out_files,sep=''))
-      declining_sp<-trends$CONCEPT[trends$MM_trend10<0 | trends$LL_trend10<0]
-      
-      #get english hectads
-      eng.hectads<-read.csv(paste(datadir,'/','English_hectads.csv',sep=''))[,2]
-      
-      #get data, only for declining species
-      print('read in taxa data')
-      in_files<-dir(datadir)[grep(paste(taxon),dir(datadir))]
-      in_files<-in_files[grep('.rdata',in_files)]
-      if(length(in_files)>1) stop(paste("There is more than one raw data file for",taxon,'in',datadir))  
-      load(paste(datadir,'/',in_files,sep=''))
-  
-      taxa_data<-taxa_data[taxa_data$CONCEPT %in% species_to_include,] #subset to species in list
-      taxa_data<-taxa_data[taxa_data$CONCEPT %in% declining_sp,]  
-      if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data$TO_GRIDREF)==1)
-      if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data$TO_GRIDREF)==FALSE)
-      
-      #some datasets have start and end date here I restrict these to records that fall in the
-      #time periods
-      if(sum(grepl('TO_STARTDATE',colnames(taxa_data)))>0){
-  	      tp_one<-min(Year.range):(split_yr-1)
-  	      tp_two<-split_yr:max(Year.range)
-  	      taxa_data<-taxa_data[((as.numeric(format(taxa_data$TO_STARTDATE,'%Y'))%in%tp_one) & (taxa_data$year %in% tp_one))|	
-             	      ((as.numeric(format(taxa_data$TO_STARTDATE,'%Y'))%in%tp_two) & (taxa_data$year %in% tp_two)),]
-  	      taxa_data$year[taxa_data$year<split_yr]<-mean(tp_one)
-  	      taxa_data$year[taxa_data$year>=split_yr]<-mean(tp_two)
-  	  }else{
-  	      taxa_data<-taxa_data[taxa_data$year %in% Year.range,] #subset to year range
+            }
+          }
+          
+          #If needed create a site filter
+          fres_site_txt<-NULL
+          if(!is.null(fres_site_filter)){
+            fres_site_path<-paste(dirname(frespath),'/fres_site_filter.txt',sep='')         
+            write.table(fres_site_filter,sep='\n',file=fres_site_path,row.names=F,col.names=F,quote=F)
+            fres_site_txt<-'fres_site_filter.txt'          
+          }         
+          
+          if(nrow(taxa_data)==0) stop("By Zeus' beard! The data heading into frescalo has 0 rows. Make sure your time periods match your years, and your not subsetting out all your data")
+          fres_return<-run_fresc_file(channel=channel,fres_data=taxa_data,output_dir=fresoutput,frescalo_path=frespath,fres_f_wts=Fres_weights_name,
+                                      Plot=Plot_Fres,spp_names_file=spp_names,fres_f_nobench=non_bench_txt,fres_f_filter=fres_site_txt)
+          class(fres_return)<-'frescalo'
+          
+          # Calculate z-values if only two time periods
+          if(length(time_periods[,1])==2 & 'lm_stats' %in% names(fres_return)){
+            fres_lm_path<-paste(sinkdir,'/',taxon_name[i],'_frescalo',datecode,'/Frescalo/Maps_Results/Frescalo Tfactor lm stats.csv',sep='')
+            fres_lm<-read.csv(fres_lm_path)
+            trendpath<-paste(sinkdir,'/',taxon_name[i],'_frescalo',datecode,'/Frescalo/Output/Trend.txt',sep='')
+            zvalues<-fres_zvalues(trendpath)
+            lm_z<-merge(x=fres_lm,y=zvalues,by='SPECIES',all=TRUE)
+            write.csv(lm_z,fres_lm_path)
+            fres_return$lm_stats<-lm_z
+          }
+          return_object[['frescalo']]<-fres_return
+          if(Log) report(logfilename,'Frescalo complete')
+        }
       }
       
-      print('creating persistance tables')
-      persistance_table(taxa_data,eng.hectads,homedir,year_col='year',concept_col='CONCEPT',
-                        SQ_10_col='hectad',Year.range=Year.range,split_yr=split_yr,taxa=taxon)
+      #####I HAVE NOT FUNCTIONALISED BEYOND HERE#####
       
-      report(logfilename, paste('Persistance tables created for', length(declining_sp), 'species declining in models'))
-      
+      #Create persistance tables only for those species thought to be declining in models
+      if(Create_persistance_table){
+        
+        report(logfilename, paste('Creating persistance tables'))
+        #Find declining species
+        print('read in trends')
+        out_files<-dir(sinkdir)
+        out_files<-out_files[grep(paste(taxon,'_Models',sep=''),out_files)]
+        if(length(out_files)>1) stop(paste("There is more than one trends file for",taxon,'in',sinkdir))  
+        
+        trends<-read.csv(paste(sinkdir,'/',out_files,sep=''))
+        declining_sp<-trends$CONCEPT[trends$MM_trend10<0 | trends$LL_trend10<0]
+        
+        #get english hectads
+        eng.hectads<-read.csv(paste(datadir,'/','English_hectads.csv',sep=''))[,2]
+        
+        #get data, only for declining species
+        print('read in taxa data')
+        in_files<-dir(datadir)[grep(paste(taxon),dir(datadir))]
+        in_files<-in_files[grep('.rdata',in_files)]
+        if(length(in_files)>1) stop(paste("There is more than one raw data file for",taxon,'in',datadir))  
+        load(paste(datadir,'/',in_files,sep=''))
+        
+        taxa_data<-taxa_data[taxa_data$CONCEPT %in% species_to_include,] #subset to species in list
+        taxa_data<-taxa_data[taxa_data$CONCEPT %in% declining_sp,]  
+        if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data$hectad)==1)
+        if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data$hectad)==FALSE)
+        
+        #some datasets have start and end date here I restrict these to records that fall in the
+        #time periods
+        if(sum(grepl('TO_STARTDATE',colnames(taxa_data)))>0){
+          tp_one<-min(Year.range):(split_yr-1)
+          tp_two<-split_yr:max(Year.range)
+          taxa_data<-taxa_data[((as.numeric(format(taxa_data$TO_STARTDATE,'%Y'))%in%tp_one) & (taxa_data$year %in% tp_one))|	
+                                 ((as.numeric(format(taxa_data$TO_STARTDATE,'%Y'))%in%tp_two) & (taxa_data$year %in% tp_two)),]
+          taxa_data$year[taxa_data$year<split_yr]<-mean(tp_one)
+          taxa_data$year[taxa_data$year>=split_yr]<-mean(tp_two)
+        }else{
+          taxa_data<-taxa_data[taxa_data$year %in% Year.range,] #subset to year range
+        }
+        
+        print('creating persistance tables')
+        persistance_table(taxa_data,eng.hectads,homedir,year_col='year',concept_col='CONCEPT',
+                          SQ_10_col='hectad',Year.range=Year.range,split_yr=split_yr,taxa=taxon)
+        
+        report(logfilename, paste('Persistance tables created for', length(declining_sp), 'species declining in models'))
+        
         if(Create_persistance_summary){
-        print('creating persistance summary table')
-        persist_table<-read.csv(paste(homedir,'/Persistance tables/','persistance_',taxon,'_',datecode,'.csv',sep=''))
-        persist_SP<-read.csv(paste(homedir,'/Persistance tables/','speciesData_',taxon,'_',datecode,'.csv',sep=''))
-        #Add concept group
-        group_names<-unique(taxa_data[c('CONCEPT','taxon')])
-        persist_SP<-merge(x=persist_SP,y=group_names,by.x='concept',by.y='CONCEPT',all.x=TRUE,all.y=FALSE)
-        #Add concept info and trend
-        trends_merge<-trends[c('CONCEPT','MM_trend10','LL_trend10','CONCEPT_REC','NAME','NAME_ENGLISH','VALID')]
-        persist_SP<-merge(x=persist_SP,y=trends_merge,by.x='concept',by.y='CONCEPT')
+          print('creating persistance summary table')
+          persist_table<-read.csv(paste(homedir,'/Persistance tables/','persistance_',taxon,'_',datecode,'.csv',sep=''))
+          persist_SP<-read.csv(paste(homedir,'/Persistance tables/','speciesData_',taxon,'_',datecode,'.csv',sep=''))
+          #Add concept group
+          group_names<-unique(taxa_data[c('CONCEPT','taxon')])
+          persist_SP<-merge(x=persist_SP,y=group_names,by.x='concept',by.y='CONCEPT',all.x=TRUE,all.y=FALSE)
+          #Add concept info and trend
+          trends_merge<-trends[c('CONCEPT','MM_trend10','LL_trend10','CONCEPT_REC','NAME','NAME_ENGLISH','VALID')]
+          persist_SP<-merge(x=persist_SP,y=trends_merge,by.x='concept',by.y='CONCEPT')
+          
+          #Fractal/Residual D for all time
+          for (ii in unique(persist_SP$concept)){
+            temp<-subset(taxa_data,CONCEPT==ii)
+            if(Calc_D_england_only) temp<-temp[temp$hectad %in% eng.hectads,]
+            allt_10<-(length(unique(temp$hectad))*100)#area of occupied 10km squares
+            persist_SP$allt_AOO_10[persist_SP$concept==ii]<-allt_10
+            temp$SQ_100 <- gsub(pattern='[0-9]', replacement='',temp$hectad)
+            allt_100<-(length(unique(temp$SQ_100))*10000)#area of occupied 100km squares
+            persist_SP$allt_AOO_100[persist_SP$concept==ii]<-allt_100
+            persist_SP$allt_frac_D[persist_SP$concept==ii] <- 2 - (log10(allt_100) - log10(allt_10))#fractal dimension
+          }
+          
+          m1<-lm(persist_SP$allt_frac_D~persist_SP$allt_AOO_10)
+          persist_SP$allt_res_D<-m1$residuals
+          
+          #Fractal/Residual D for second time period only
+          taxa_data_tp2<-subset(taxa_data,year>=split_yr)
+          for (ii in unique(persist_SP$concept)){
+            temp<-subset(taxa_data_tp2,CONCEPT==ii)
+            if(Calc_D_england_only) temp<-temp[temp$hectad %in% eng.hectads,]
+            tp2_10<-(length(unique(temp$hectad))*100)#area of occupied 10km squares
+            persist_SP$tp2_AOO_10[persist_SP$concept==ii]<-tp2_10
+            temp$SQ_100 <- gsub(pattern='[0-9]', replacement='',temp$hectad)
+            tp2_100<-(length(unique(temp$SQ_100))*10000)#area of occupied 100km squares
+            persist_SP$tp2_AOO_100[persist_SP$concept==ii]<-tp2_100
+            persist_SP$tp2_frac_D[persist_SP$concept==ii] <- 2 - (log10(tp2_100) - log10(tp2_10))#fractal dimension
+          }
+          
+          m2<-lm(persist_SP$tp2_frac_D~persist_SP$tp2_AOO_10)
+          persist_SP$tp2_res_D<-m1$residuals
+        }  
         
-        #Fractal/Residual D for all time
-        for (ii in unique(persist_SP$concept)){
-          temp<-subset(taxa_data,CONCEPT==ii)
-          if(Calc_D_england_only) temp<-temp[temp$hectad %in% eng.hectads,]
-          allt_10<-(length(unique(temp$hectad))*100)#area of occupied 10km squares
-          persist_SP$allt_AOO_10[persist_SP$concept==ii]<-allt_10
-          temp$SQ_100 <- gsub(pattern='[0-9]', replacement='',temp$hectad)
-          allt_100<-(length(unique(temp$SQ_100))*10000)#area of occupied 100km squares
-          persist_SP$allt_AOO_100[persist_SP$concept==ii]<-allt_100
-          persist_SP$allt_frac_D[persist_SP$concept==ii] <- 2 - (log10(allt_100) - log10(allt_10))#fractal dimension
-        }
+        write.csv(persist_SP,paste(homedir,'/Persistance tables/','speciesData_',taxon,'_',datecode,'.csv',sep=''),row.names=FALSE)
+        report(logfilename, paste('Persistance summary tables finished'))
+        cat(file=logfilename, append=T, '\n') # blank line
         
-        m1<-lm(persist_SP$allt_frac_D~persist_SP$allt_AOO_10)
-        persist_SP$allt_res_D<-m1$residuals
-        
-        #Fractal/Residual D for second time period only
-        taxa_data_tp2<-subset(taxa_data,year>=split_yr)
-        for (ii in unique(persist_SP$concept)){
-          temp<-subset(taxa_data_tp2,CONCEPT==ii)
-          if(Calc_D_england_only) temp<-temp[temp$hectad %in% eng.hectads,]
-          tp2_10<-(length(unique(temp$hectad))*100)#area of occupied 10km squares
-          persist_SP$tp2_AOO_10[persist_SP$concept==ii]<-tp2_10
-          temp$SQ_100 <- gsub(pattern='[0-9]', replacement='',temp$hectad)
-          tp2_100<-(length(unique(temp$SQ_100))*10000)#area of occupied 100km squares
-          persist_SP$tp2_AOO_100[persist_SP$concept==ii]<-tp2_100
-          persist_SP$tp2_frac_D[persist_SP$concept==ii] <- 2 - (log10(tp2_100) - log10(tp2_10))#fractal dimension
-        }
-        
-        m2<-lm(persist_SP$tp2_frac_D~persist_SP$tp2_AOO_10)
-        persist_SP$tp2_res_D<-m1$residuals
-      }  
-      
-      write.csv(persist_SP,paste(homedir,'/Persistance tables/','speciesData_',taxon,'_',datecode,'.csv',sep=''),row.names=FALSE)
-      report(logfilename, paste('Persistance summary tables finished'))
-      cat(file=logfilename, append=T, '\n') # blank line
-      
-      rm(list=c('taxa_data'))
+        rm(list=c('taxa_data'))
+      }
     }
+    print('Completed')
+    return(return_object)
+    if(Log) report(logfilename,'Finished')
   }
-  print('Completed')
-  return(return_object)
-  if(Log) report(logfilename,'Finished')
-}

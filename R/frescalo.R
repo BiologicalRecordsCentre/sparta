@@ -149,7 +149,7 @@ frescalo <-
            non_benchmark_sp=NULL,#species not to be used as benchmarks 
            get_names_from_BRC=FALSE, #change to TRUE is using concepts and you want frescalo to output with names
            fres_site_filter=NULL #optional list of sites not to be included in analysis
-           ){
+  ){
     
     required.packages <- c('lme4','reshape2','sp','RODBC','gdata','ggplot2')
     new.packages <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
@@ -197,97 +197,99 @@ frescalo <-
       write.fwf(Fres_weights,colnames=FALSE,rownames=FALSE,width=c(9,9,7),file=paste(dirname(frespath),'/Custom_Wts.txt',sep=''))
       Fres_weights_name<-'Custom_Wts.txt'         
     }
-      
-      datecode <- format(Sys.Date(),'%y%m%d')
-      print('loading raw data')
-      if(class(data)=='data.frame'){
-        taxa_data<-data
-        rm(data)
-      } else if(class(data)=='character'&grepl('.rdata',data,ignore.case=TRUE)){
-        loaded<-load(data)
-        if(sum(grepl('taxa_data',loaded))==0){
-          stop('The .rdata file used does not contain an object called "taxa_data"')
-        }
-      }else if(grepl('.csv',data,ignore.case=TRUE)){
-        taxa_data<-read.table(data,header=TRUE,stringsAsFactors=FALSE,sep=',')
-        taxa_data$year<-as.numeric(taxa_data$year)
-        taxa_data$CONCEPT<-as.factor(taxa_data$CONCEPT)
-        if('Date' %in% colnames(taxa_data)) taxa_data$Date<-as.Date(taxa_data$Date)
+    
+    datecode <- format(Sys.Date(),'%y%m%d')
+    print('loading raw data')
+    if(class(data)=='data.frame'){
+      taxa_data<-data
+      rm(data)
+    } else if(class(data)=='character'&grepl('.rdata',data,ignore.case=TRUE)){
+      loaded<-load(data)
+      if(sum(grepl('taxa_data',loaded))==0){
+        stop('The .rdata file used does not contain an object called "taxa_data"')
       }
-      
-      if(!is.null(species_to_include)) taxa_data<-taxa_data[taxa_data$CONCEPT %in% species_to_include,]
-      if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data$hectad)==1)
-      if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data$hectad)==FALSE)
-            
-      print(paste('Running Frescalo for',taxon_name))
-      
-      #If the data has a startdate and enddate ensure the dates are within one 
-      #of the time periods, else if it just has a year, ensure this is in the
-      #right time period
-      if('TO_STARTDATE' %in% colnames(taxa_data)){
-        for(ii in 1:length(time_periods[,1])){
-          taxa_data$yearnew[as.numeric(format(taxa_data$TO_STARTDATE,'%Y'))>=time_periods[ii,1][[1]] &
-                              taxa_data$year<=time_periods[ii,2][[1]]]<-rowMeans(time_periods[ii,])[[1]]
-        }
-      }else{
-        for(ii in 1:length(time_periods[,1])){
-          taxa_data$yearnew[taxa_data$year>=time_periods[ii,1][[1]] &
-                              taxa_data$year<=time_periods[ii,2][[1]]]<-rowMeans(time_periods[ii,])[[1]]
-        }
-      }         
-      
-      #just hectad, concept, timeperiod
-      taxa_data<-na.omit(unique(taxa_data[c('hectad','CONCEPT','yearnew')]))
-      
-      # Setup output
-      fresoutput<-paste(sinkdir,'/',taxon_name,'_frescalo',datecode,sep='')
-      dir.create(fresoutput,showWarnings = FALSE)
-      
-      #create non benchmark list if needed
-      non_bench_txt<-NULL
+    }else if(grepl('.csv',data,ignore.case=TRUE)){
+      taxa_data<-read.table(data,header=TRUE,stringsAsFactors=FALSE,sep=',')
+      if('year' %in% names(taxa_data)) taxa_data$year <- as.numeric(taxa_data$year)
+      taxa_data$CONCEPT<-as.factor(taxa_data$CONCEPT)
+      if('Date' %in% colnames(taxa_data)) taxa_data$Date<-as.Date(taxa_data$Date)
+    }
+    
+    if(!'year' %in% names(taxa_data)) taxa_data$year<-as.numeric(format(taxa_data$Date,'%Y'))     
+    
+    if(!is.null(species_to_include)) taxa_data<-taxa_data[taxa_data$CONCEPT %in% species_to_include,]
+    if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data$hectad)==1)
+    if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data$hectad)==FALSE)
+    
+    print(paste('Running Frescalo for',taxon_name))
+    
+    #If the data has a startdate and enddate ensure the dates are within one 
+    #of the time periods, else if it just has a year, ensure this is in the
+    #right time period
+    if('TO_STARTDATE' %in% colnames(taxa_data)){
+      for(ii in 1:length(time_periods[,1])){
+        taxa_data$yearnew[as.numeric(format(taxa_data$TO_STARTDATE,'%Y'))>=time_periods[ii,1][[1]] &
+                            taxa_data$year<=time_periods[ii,2][[1]]]<-rowMeans(time_periods[ii,])[[1]]
+      }
+    }else{
+      for(ii in 1:length(time_periods[,1])){
+        taxa_data$yearnew[taxa_data$year>=time_periods[ii,1][[1]] &
+                            taxa_data$year<=time_periods[ii,2][[1]]]<-rowMeans(time_periods[ii,])[[1]]
+      }
+    }         
+    
+    #just hectad, concept, timeperiod
+    taxa_data<-na.omit(unique(taxa_data[c('hectad','CONCEPT','yearnew')]))
+    
+    # Setup output
+    fresoutput<-paste(sinkdir,'/',taxon_name,'_frescalo',datecode,sep='')
+    dir.create(fresoutput,showWarnings = FALSE)
+    
+    #create non benchmark list if needed
+    non_bench_txt<-NULL
+    if(!is.null(non_benchmark_sp)){
+      NonBenchPath<-paste(dirname(frespath),'/NonBench.txt',sep='')         
+      write.table(non_benchmark_sp,sep='\n',file=NonBenchPath,row.names=F,col.names=F,quote=F)
+      non_bench_txt<-'NonBench.txt'
+    }
+    
+    spp_names<-NULL
+    
+    #Set up species names
+    if(get_names_from_BRC==FALSE){
+      new_names <- data.frame(SPECIES=paste('S',1:length(unique(taxa_data$CONCEPT)),sep=''),NAME=unique(taxa_data$CONCEPT))
+      spp_names <- paste(fresoutput,'/species_names.csv',sep='')
+      write.table(new_names,spp_names,sep=',',row.names=FALSE)
+      taxa_data<-merge(taxa_data,new_names,by.x='CONCEPT',by.y='NAME',all=T)
+      taxa_data<-taxa_data[c('hectad','SPECIES','yearnew')]
       if(!is.null(non_benchmark_sp)){
-        NonBenchPath<-paste(dirname(frespath),'/NonBench.txt',sep='')         
-        write.table(non_benchmark_sp,sep='\n',file=NonBenchPath,row.names=F,col.names=F,quote=F)
-        non_bench_txt<-'NonBench.txt'
+        write.table(new_names$SPECIES[new_names$NAME %in% non_benchmark_sp],sep='\n',file=NonBenchPath,row.names=F,col.names=F,quote=F)
       }
-      
-      spp_names<-NULL
-      
-      #Set up species names
-      if(get_names_from_BRC==FALSE){
-        new_names <- data.frame(SPECIES=paste('S',1:length(unique(taxa_data$CONCEPT)),sep=''),NAME=unique(taxa_data$CONCEPT))
-        spp_names <- paste(fresoutput,'/species_names.csv',sep='')
-        write.table(new_names,spp_names,sep=',',row.names=FALSE)
-        taxa_data<-merge(taxa_data,new_names,by.x='CONCEPT',by.y='NAME',all=T)
-        taxa_data<-taxa_data[c('hectad','SPECIES','yearnew')]
-        if(!is.null(non_benchmark_sp)){
-          write.table(new_names$SPECIES[new_names$NAME %in% non_benchmark_sp],sep='\n',file=NonBenchPath,row.names=F,col.names=F,quote=F)
-        }
-      }
-      
-      #If needed create a site filter
-      fres_site_txt<-NULL
-      if(!is.null(fres_site_filter)){
-        fres_site_path<-paste(dirname(frespath),'/fres_site_filter.txt',sep='')         
-        write.table(fres_site_filter,sep='\n',file=fres_site_path,row.names=F,col.names=F,quote=F)
-        fres_site_txt<-'fres_site_filter.txt'          
-      }         
-          
-      if(nrow(taxa_data)==0) stop("By Zeus' beard! The data heading into frescalo has 0 rows. Make sure your time periods match your years, and your not subsetting out all your data")
-      fres_return<-run_fresc_file(channel=channel,fres_data=taxa_data,output_dir=fresoutput,frescalo_path=frespath,fres_f_wts=Fres_weights_name,
-                                  Plot=Plot_Fres,spp_names_file=spp_names,fres_f_nobench=non_bench_txt,fres_f_filter=fres_site_txt)
-      class(fres_return)<-'frescalo'
-      
-      # Calculate z-values if only two time periods & lm_stats exists
-      if(length(time_periods[,1])==2 & 'lm_stats' %in% names(fres_return)){
-        fres_lm_path<-paste(sinkdir,'/',taxon_name,'_frescalo',datecode,'/Frescalo/Maps_Results/Frescalo Tfactor lm stats.csv',sep='')
-        fres_lm<-read.csv(fres_lm_path)
-        trendpath<-paste(sinkdir,'/',taxon_name,'_frescalo',datecode,'/Frescalo/Output/Trend.txt',sep='')
-        zvalues<-fres_zvalues(trendpath)
-        lm_z<-merge(x=fres_lm,y=zvalues,by='SPECIES',all=TRUE)
-        write.csv(lm_z,fres_lm_path)
-        fres_return$lm_stats<-lm_z
-      }
-      print('frescalo complete')
-      return(fres_return)
-}
+    }
+    
+    #If needed create a site filter
+    fres_site_txt<-NULL
+    if(!is.null(fres_site_filter)){
+      fres_site_path<-paste(dirname(frespath),'/fres_site_filter.txt',sep='')         
+      write.table(fres_site_filter,sep='\n',file=fres_site_path,row.names=F,col.names=F,quote=F)
+      fres_site_txt<-'fres_site_filter.txt'          
+    }         
+    
+    if(nrow(taxa_data)==0) stop("By Zeus' beard! The data heading into frescalo has 0 rows. Make sure your time periods match your years, and your not subsetting out all your data")
+    fres_return<-run_fresc_file(channel=channel,fres_data=taxa_data,output_dir=fresoutput,frescalo_path=frespath,fres_f_wts=Fres_weights_name,
+                                Plot=Plot_Fres,spp_names_file=spp_names,fres_f_nobench=non_bench_txt,fres_f_filter=fres_site_txt)
+    class(fres_return)<-'frescalo'
+    
+    # Calculate z-values if only two time periods & lm_stats exists
+    if(length(time_periods[,1])==2 & 'lm_stats' %in% names(fres_return)){
+      fres_lm_path<-paste(sinkdir,'/',taxon_name,'_frescalo',datecode,'/Frescalo/Maps_Results/Frescalo Tfactor lm stats.csv',sep='')
+      fres_lm<-read.csv(fres_lm_path)
+      trendpath<-paste(sinkdir,'/',taxon_name,'_frescalo',datecode,'/Frescalo/Output/Trend.txt',sep='')
+      zvalues<-fres_zvalues(trendpath)
+      lm_z<-merge(x=fres_lm,y=zvalues,by='SPECIES',all=TRUE)
+      write.csv(lm_z,fres_lm_path)
+      fres_return$lm_stats<-lm_z
+    }
+    print('frescalo complete')
+    return(fres_return)
+  }
