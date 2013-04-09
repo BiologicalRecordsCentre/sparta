@@ -8,12 +8,12 @@
     taxon_reg = NULL, time_periods = NULL, channel = NULL,
     Plot_Fres = TRUE, Fres_weights = "LC",
     non_benchmark_sp = NULL, get_names_from_BRC = FALSE,
-    fres_site_filter = NULL)
+    fres_site_filter = NULL, phi = NULL, alpha = NULL)
 }
 \arguments{
   \item{data}{A dataframe object or string giving the file
   path to the location of data (either .rdata or .csv).
-  Required columns are: 'CONCEPT', 'hectad' and 'year'.
+  Required columns are: 'CONCEPT', 'hectad' and 'Date'.
   Optionally 'TO_STARTDATE' can be included, if it is this
   is assumed to be the start date (from which start year is
   extracted) and year is assumed to be the end date. If
@@ -65,15 +65,26 @@
   file can be given as a data.frame. This must have three
   columns: target cell, neighbour cell, weight.}
 
-  \item{non_benchmark_sp}{a character vector giving the
-  concepts of species not to be used as benchmarks in
-  Frescalo}
+  \item{non_benchmark_sp}{a character vector or data.frame
+  with one column, giving the concepts of species not to be
+  used as benchmarks in Frescalo. Default is \code{NULL}
+  and all sites are used.}
 
-  \item{fres_site_filter}{Optionally a character vector of
-  the names of sites to be used for in the trend analysis.
-  Sites not include in this list are not used for
-  estimating TFactors. Default is \code{NULL} and all sites
-  are used}
+  \item{fres_site_filter}{Optionally a character vector or
+  data.frame with one column, giving the names of sites to
+  be used for in the trend analysis. Sites not include in
+  this list are not used for estimating TFactors. Default
+  is \code{NULL} and all sites are used.}
+
+  \item{phi}{Target frequency of frequency-weighted mean
+  frequency. Default is 0.74 as in Hill (2011). If this
+  value is smaller than the 98.5 percentile of input phi it
+  is automatically increased and a warning message is
+  generated. This is limited to 0.50 to 0.95.}
+
+  \item{alpha}{the proportion of the expected number of
+  species in a cell to be treated as benchmarks. Default is
+  0.27 as in Hill (2011). This is limited to 0.08 to 0.50.}
 }
 \value{
   Results are saved to file and most are returned in a list
@@ -175,7 +186,9 @@
   intercept\cr - \tab \code{F_val} \tab F-value of the
   model\cr - \tab \code{F_num_df} \tab Degrees of freedom
   of the model\cr - \tab \code{F_den_df} \tab Denominator
-  degrees of freedom from the F-statistic \cr } \bold{The
+  degrees of freedom from the F-statistic\cr - \tab
+  \code{fres_trend10} \tab The slope of the model
+  represented as a percentage decadal change\cr } \bold{The
   following columns are only produced when there are only
   two time periods} \tabular{rll}{ - \tab \code{Z_VAL} \tab
   Z-value for the significance test of the trend\cr - \tab

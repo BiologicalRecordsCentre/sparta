@@ -15,13 +15,13 @@
     time_periods = NULL, channel = NULL, Plot_Fres = TRUE,
     Fres_weights = "LC", non_benchmark_sp = NULL,
     Telfer_min_sq = 5, get_names_from_BRC = FALSE,
-    fres_site_filter = NULL)
+    fres_site_filter = NULL, phi = NULL, alpha = NULL)
 }
 \arguments{
   \item{data}{A dataframe object or a vector of strings
   giving the file path to the location(s) of data this can
   be in either .rdata or .csv format.  For Frescalo
-  required columns are: 'CONCEPT', 'hectad' and 'year'.
+  required columns are: 'CONCEPT', 'hectad' and 'Date'.
   Optionally 'TO_STARTDATE' can be included, if it is this
   is assumed to be the start date (from which start year is
   extracted) and year is assumed to be the end date.  If
@@ -151,17 +151,26 @@
   concepts of species not to be used as benchmarks in
   Frescalo}
 
-  \item{get_names_from_BRC}{Default is \code{FALSE}. if
-  \code{TRUE} it assumes the CONCEPT in your data relates
-  to a BRC concept code and the names of species will be
-  retireve from the database using \code{channel} for use
-  in output.}
+  \item{non_benchmark_sp}{a character vector or data.frame
+  with one column, giving the concepts of species not to be
+  used as benchmarks in Frescalo. Default is \code{NULL}
+  and all sites are used.}
 
-  \item{fres_site_filter}{Optionally a character vector of
-  the names of sites to be used for in the trend analysis.
-  Sites not include in this list are not used for
-  estimating TFactors. Default is \code{NULL} and all sites
-  are used}
+  \item{fres_site_filter}{Optionally a character vector or
+  data.frame with one column, giving the names of sites to
+  be used for in the trend analysis. Sites not include in
+  this list are not used for estimating TFactors. Default
+  is \code{NULL} and all sites are used.}
+
+  \item{phi}{Target frequency of frequency-weighted mean
+  frequency. Default is 0.74 as in Hill (2011). If this
+  value is smaller than the 98.5 percentile of input phi it
+  is automatically increased and a warning message is
+  generated.}
+
+  \item{alpha}{the proportion of the expected number of
+  species in a cell to be treated as benchmarks. Default is
+  0.27 as in Hill (2011).}
 }
 \value{
   Results are save to file and most are returned to R.

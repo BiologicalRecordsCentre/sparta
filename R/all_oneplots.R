@@ -110,7 +110,7 @@ function(stat, trend, freq, spp_names = NULL, onefile = TRUE, onefile_name = NUL
 				if(plot){
           sp_lmstat = sp_oneplot(trend[trend$Species__ == spp_names[i_spp,1],], freq[freq$Species == spp_names[i_spp,1],], spp_names[i_spp,2])
 				} else {
-				  sp_lmstat = stat_Tfactor(trend[trend$Species__ == spp_names[i_spp,1],], spp_name = spp_names[i_spp,2])
+          sp_lmstat = stat_Tfactor(trend[trend$Species__ == spp_names[i_spp,1],], spp_name = spp_names[i_spp,2])
 				}
 				# Close stats device if onefile FALSE
 				if(plot & !onefile){
@@ -135,6 +135,7 @@ function(stat, trend, freq, spp_names = NULL, onefile = TRUE, onefile_name = NUL
 			if(plot & onefile){
 				temp = dev.off()
 			}
+    
     lm_stats<-read.csv(file = file.path(dir_path,stats_fname))
-    return(lm_stats)	
+		return(lm_stats)	
 }

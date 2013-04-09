@@ -4,14 +4,14 @@ function(trend,spp_col = "Species__", time_col = "Time______", Tfactor_col = "TF
 		trend = trend[complete.cases(trend),]
 		# Remove rows where time_col = 0
 		trend = trend[trend[,time_col] != 0,]
+		# If spp_name null then assign concept code from 1st row of trend data
+		if(is.null(spp_name)){
+		  spp_name = trend[1,spp_col]
+		} 
 		# Check that there are some rows left after removal of NAs
-		if(nrow(trend) > 0){
+    if(nrow(trend) > 0){
 			# Continue and plot
-			# If spp_name null then assign concept code from 1st row of trend data
-			if(is.null(spp_name)){
-				spp_name = trend[1,spp_col]
-			} 
-			
+					
 			# Check that there is at least one none zero Tfactor value
 			if(nrow(trend[trend[,Tfactor_col] > 0,]) > 0){
 				# Determine ylims to allow full extent of error bars to be plotted (if errorbars are to be plotted)
@@ -65,11 +65,9 @@ function(trend,spp_col = "Species__", time_col = "Time______", Tfactor_col = "TF
 						F_val = lm_summ$fstatistic[1],
 						F_num_df = lm_summ$fstatistic[2],
 						F_den_df = lm_summ$fstatistic[3],
+						fres_trend10 = pc.change(ilt(10*lm_coefs[2,1])),
 						row.names = trend[1,spp_col]
-					)
-					
-					
-					
+					)															
 				} else {
 					stat = data.frame(
 						SPECIES = trend[1,spp_col],
@@ -86,14 +84,59 @@ function(trend,spp_col = "Species__", time_col = "Time______", Tfactor_col = "TF
 						r2 = NA,
 						F_val = NA,
 						F_num_df = NA,
-						F_den_df = NA
+						F_den_df = NA,
+						fres_trend10 = NA
 					)
 				}
-
 				invisible(stat)
+			} else {
+			  # Blank Plot
+			  plot(1, type="n", xaxt = "n", yaxt = "n", xlab = "", ylab ="", bty = "n")
+			  
+			  #return NA stats
+			  stat = data.frame(
+			    SPECIES = trend[1,spp_col],
+			    NAME = spp_name, 
+			    b = NA, 
+			    a = NA, 
+			    b_std_err = NA, 
+			    b_tval = NA, 
+			    b_pval = NA, 
+			    a_std_err = NA, 
+			    a_tval = NA, 
+			    a_pval = NA,
+			    adj_r2 = NA,
+			    r2 = NA,
+			    F_val = NA,
+			    F_num_df = NA,
+			    F_den_df = NA,
+			    fres_trend10 = NA
+			  )
+			  invisible(stat)
 			}
 		} else {
 			# Blank Plot
 			plot(1, type="n", xaxt = "n", yaxt = "n", xlab = "", ylab ="", bty = "n")
+			
+      #return NA stats
+      stat = data.frame(
+			  SPECIES = trend[1,spp_col],
+			  NAME = spp_name, 
+			  b = NA, 
+			  a = NA, 
+			  b_std_err = NA, 
+			  b_tval = NA, 
+			  b_pval = NA, 
+			  a_std_err = NA, 
+			  a_tval = NA, 
+			  a_pval = NA,
+			  adj_r2 = NA,
+			  r2 = NA,
+			  F_val = NA,
+			  F_num_df = NA,
+			  F_den_df = NA,
+			  fres_trend10 = NA
+			)
+			invisible(stat)
 		}
 	}

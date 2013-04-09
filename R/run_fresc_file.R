@@ -41,16 +41,20 @@ function(
 				stop("ERROR: output directory path is not valid")
 			}
 		}
-		
-	# Create folder to store frescalo data
-		fres_dir = file.path(output_dir, "Frescalo")
-		if(!file.exists(fres_dir)){
-			dir.create(fres_dir)
-		}
 	
+  # Check phi value is within permitted range
+    if(!is.null(fres_phi_val)){
+      if(fres_phi_val>0.95|fres_phi_val<0.5) stop("phi is outside permitted range of 0.50 to 0.95")
+    }
+    
+  # Check alpha value is within permitted range
+		if(!is.null(fres_bench_val)){
+		  if(fres_bench_val>0.5|fres_bench_val<0.08) stop("alpha is outside permitted range of 0.08 to 0.50")
+		}
+  	
 		# Within folder setup input, output and maps_results folders
 			# Build paths for directories
-			fres_sub_dir = file.path(fres_dir, c("Input","Output","Maps_Results"))
+			fres_sub_dir = file.path(output_dir, c("Input","Output","Maps_Results"))
 			names(fres_sub_dir) = c("INPUT","OUTPUT","RESULTS")
 			# Create all/missing directories (hiding output from function)
 				invisible(sapply(fres_sub_dir[!file.exists(fres_sub_dir)], dir.create))
@@ -141,6 +145,8 @@ function(
 						param_temp = readLines(file.path(exe_dir,"params.txt"))
 					# Set target phi to act_phi + 0.01 to make sure rounding issues don't cause failure again
 					  new_phi = act_phi + 0.01
+            warning(paste('input value of phi',tar_phi,'is smaller than the 98.5 percentile of input phi',act_phi,'. Phi was changed to',new_phi,'and re-run'))
+            
           # make sure new phi is no greater than 0.95
             if(new_phi>0.95){
               new_phi<-0.95
@@ -171,9 +177,29 @@ function(
 						  shell(shQuote(file.path(exe_dir, "wincomm.cmd")), intern = FALSE)
 						  setwd(org_wd) 
 						}
-				}
-			}
-		}
+				  }
+			  }
+		  }else{
+		    log_out = readLines(file.path(exe_dir, fres_f_log))
+		    
+        # Look for warning in log file
+		    fres_warn = any(grepl(" [*]{3}[ ]BEWARE[ ][*]{3} ",log_out))
+		    # Find row stating actual value of phi
+		    act_txt = log_out[grep("(98.5 percentile of input phi[ ]*)([[:digit:]]{1}[.][[:digit:]]{2})",log_out)]
+		    # Find row stating target value of phi
+		    tar_txt = log_out[grep("(Target value of phi[ ]*)([[:digit:]]{1}[.][[:digit:]]{2})", log_out)]
+		    # Read value of Phi
+		    act_phi = as.numeric(gsub("(98.5 percentile of input phi[ ]*)([[:digit:]]{1}[.][[:digit:]]{2})","\\2", act_txt))
+		    # Read Target value of phi
+		    tar_phi = as.numeric(gsub("(Target value of phi[ ]*)([[:digit:]]{1}[.][[:digit:]]{2})","\\2", tar_txt))
+		    
+        if(fres_warn & act_phi > tar_phi){
+          warning('Your value of phi (',tar_phi,') is smaller than the 98.5 percentile of input phi (',act_phi,'). It is reccommended your phi be similar to this value. For more information see Hill (2011) reference in frescalo help file',sep='')
+        } else if (fres_warn){
+          warning('Frescalo has a warning message. Please check the log file [$log]')
+        }
+        
+		  }
 			
 	
 	# Copy output from Frescalo to results folder
@@ -207,7 +233,7 @@ function(
   	  }
       #Run tfactor stats without plotting
 	    lm_stats<-all_oneplots(stat = stats, trend = trend, freq = freq, spp_names = spp_names, dir_path = fres_sub_dir["RESULTS"], plot = Plot)
-	}
+  }
 	
 	# Make mapping file for NBN validation stuff (essentially freq file but quicker to load?)
 	#	write.table(freq, file = file.path(fres_sub_dir["RESULTS"],"Freq_quickload.txt"), sep="\t", col.names = TRUE, row.names = FALSE, quote=FALSE)
@@ -233,7 +259,14 @@ function(
 		}
     		  
   # Create list to return
+		if(!exists('log_out')) log_out <- readLines(file.path(exe_dir, fres_f_log))
     frescalo<-list(paths=invisible(fpaths_out),trend=trend,stat=stats,freq=freq,log=log_out)
     if(exists('lm_stats')) frescalo[["lm_stats"]] = lm_stats
+    
+  # Remove unwanted objects  
+		unwanted<-c("stats", "freq", "trend","UK","GB_LC_Wts","Wts")
+		rm(list=unwanted[unwanted %in% ls(pos = ".GlobalEnv")],pos = ".GlobalEnv")
+    		
+  # Return output
     return(frescalo)
 }

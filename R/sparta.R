@@ -9,7 +9,7 @@
 #'
 #' @param data A dataframe object or a vector of strings giving the file path to the
 #'        location(s) of data this can be in either .rdata or .csv format.
-#'        For Frescalo required columns are: 'CONCEPT', 'hectad' and 'year'. Optionally
+#'        For Frescalo required columns are: 'CONCEPT', 'hectad' and 'Date'. Optionally
 #'        'TO_STARTDATE' can be included, if it is this is assumed to be the start date
 #'        (from which start year is extracted) and year is assumed to be the end date.
 #'        If \code{NULL} the user is prompted to select a .csv or .rdata file.
@@ -79,12 +79,18 @@
 #'        in order for basic trends to be calculated for a species
 #' @param non_benchmark_sp a character vector giving the concepts of species not to be
 #'        used as benchmarks in Frescalo
-#' @param get_names_from_BRC Default is \code{FALSE}. if \code{TRUE} it assumes the CONCEPT 
-#'        in your data relates to a BRC concept code and the names of species will be retireve
-#'        from the database using \code{channel} for use in output.
-#' @param fres_site_filter Optionally a character vector of the names of sites to be used for
-#'        in the trend analysis. Sites not include in this list are not used for estimating
-#'        TFactors. Default is \code{NULL} and all sites are used
+#' @param non_benchmark_sp a character vector or data.frame with one column, giving the 
+#'        concepts of species not to be used as benchmarks in Frescalo. Default is 
+#'        \code{NULL} and all sites are used.
+#' @param fres_site_filter Optionally a character vector or data.frame with one column, giving
+#'        the names of sites to be used for in the trend analysis. Sites not include in this
+#'        list are not used for estimating TFactors. Default is \code{NULL} and all sites are
+#'        used.
+#' @param phi Target frequency of frequency-weighted mean frequency. Default is 0.74 as in
+#'        Hill (2011). If this value is smaller than the 98.5 percentile of input phi it is
+#'        automatically increased and a warning message is generated.
+#' @param alpha the proportion of the expected number of species in a cell to be treated as
+#'        benchmarks. Default is 0.27 as in Hill (2011).
 #' @return Results are save to file and most are returned to R.
 #'          
 #'         A list is returned:
@@ -151,8 +157,10 @@ sparta <-
            non_benchmark_sp=NULL, 
            Telfer_min_sq=5, #the min number of cells needed to be occupied in tp1 for Telfer to be run
            get_names_from_BRC=FALSE, #change to TRUE is using concepts and you want frescalo to output with names
-           fres_site_filter=NULL #optional list of sites not to be included in analysis
-  ){
+           fres_site_filter=NULL, #optional list of sites not to be included in analysis
+           phi = NULL, #phi value for frescalo
+           alpha = NULL #alpha value for frescalo 
+    ){
     
     required.packages <- c('lme4','reshape2','sp','RODBC','gdata','ggplot2')
     new.packages <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
@@ -161,6 +169,9 @@ sparta <-
       cat("Choose .csv or .rdata file. Else assign data.frame of data to 'data'")
       data<-choose.files()
     } 
+    if(!'POSIXct' %in% class(data$Date) & !'Date' %in% class(data$Date)){
+      stop('column Date is not in a date format. This should be of class "Date" or "POSIXct"')
+    }
     if(is.null(taxon_name)){
       warning("'taxon_name' not given, defaulted to 'NOBODY'. If you are analysing more than one dataset you will end up overwriting your output unless you provide taxon names")
       taxon_name<-'NOBODY'
@@ -173,9 +184,30 @@ sparta <-
     if(Run_Fres & is.null(channel) & is.null(get_names_from_BRC)) stop('Frescalo needs channel to get names for concepts')
     if(!is.null(channel)) require(RODBC)
     if(is.null(taxon_reg)&!is.null(channel)) taxon_reg<-sqlQuery(channel, "select CONCEPT, CONCEPT_REC, NAME, NAME_ENGLISH, VALID from BRC.taxa_taxon_register where valid = 'V'")
-    if(Run_Fres) data(UK)
-    #set up frescalo path
-    if(Run_Fres) frespath<-paste(normalizePath(.Library),'\\sparta\\exec\\Frescalo_2a.exe',sep='')
+    if(Run_Fres){
+      data(UK)
+      frespath<-paste(normalizePath(.Library),'\\sparta\\exec\\Frescalo_2a.exe',sep='')
+      if(!is.null(phi)){
+        if(phi>0.95|phi<0.5) stop("phi is outside permitted range of 0.50 to 0.95")
+      }
+      if(!is.null(alpha)){
+        if(alpha>0.5|alpha<0.08) stop("alpha is outside permitted range of 0.08 to 0.50")
+      }
+      if(class(non_benchmark_sp)=='data.frame'){
+        if(length(non_benchmark_sp)!=1){
+          stop('data.frame "non_benchmark_sp" should only have one column')
+        } else {
+          non_benchmark_sp<-as.character(non_benchmark_sp[[1]])
+        }
+      }
+      if(class(fres_site_filter)=='data.frame'){
+        if(length(fres_site_filter)!=1){
+          stop('data.frame "fres_site_filter" should only have one column')
+        } else {
+          fres_site_filter<-as.character(fres_site_filter[[1]])
+        }
+      }
+    } 
     #unpack weights file if needed
     if(Run_Fres&class(Fres_weights)=='character'){
       if(Fres_weights=='LC'){
@@ -433,17 +465,18 @@ sparta <-
           
           if(nrow(taxa_data)==0) stop("By Zeus' beard! The data heading into frescalo has 0 rows. Make sure your time periods match your years, and your not subsetting out all your data")
           fres_return<-run_fresc_file(channel=channel,fres_data=taxa_data,output_dir=fresoutput,frescalo_path=frespath,fres_f_wts=Fres_weights_name,
-                                      Plot=Plot_Fres,spp_names_file=spp_names,fres_f_nobench=non_bench_txt,fres_f_filter=fres_site_txt)
+                                      Plot=Plot_Fres,spp_names_file=spp_names,fres_f_nobench=non_bench_txt,fres_f_filter=fres_site_txt,
+                                      fres_phi_val=phi,fres_bench_val=alpha)
           class(fres_return)<-'frescalo'
           
           # Calculate z-values if only two time periods
           if(length(time_periods[,1])==2 & 'lm_stats' %in% names(fres_return)){
-            fres_lm_path<-paste(sinkdir,'/',taxon_name[i],'_frescalo',datecode,'/Frescalo/Maps_Results/Frescalo Tfactor lm stats.csv',sep='')
+            fres_lm_path<-paste(sinkdir,'/',taxon_name[i],'_frescalo',datecode,'/Maps_Results/Frescalo Tfactor lm stats.csv',sep='')
             fres_lm<-read.csv(fres_lm_path)
-            trendpath<-paste(sinkdir,'/',taxon_name[i],'_frescalo',datecode,'/Frescalo/Output/Trend.txt',sep='')
+            trendpath<-paste(sinkdir,'/',taxon_name[i],'_frescalo',datecode,'/Output/Trend.txt',sep='')
             zvalues<-fres_zvalues(trendpath)
             lm_z<-merge(x=fres_lm,y=zvalues,by='SPECIES',all=TRUE)
-            write.csv(lm_z,fres_lm_path)
+            write.csv(lm_z,fres_lm_path,row.names=FALSE)
             fres_return$lm_stats<-lm_z
           }
           return_object[['frescalo']]<-fres_return

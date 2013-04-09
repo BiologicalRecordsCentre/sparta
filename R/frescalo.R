@@ -8,7 +8,7 @@
 #'
 #' @param data A dataframe object or string giving the file path to the
 #'        location of data (either .rdata or .csv). Required columns are: 'CONCEPT',
-#'        'hectad' and 'year'. Optionally 'TO_STARTDATE' can be included, if it is this
+#'        'hectad' and 'Date'. Optionally 'TO_STARTDATE' can be included, if it is this
 #'        is assumed to be the start date (from which start year is extracted) and year
 #'        is assumed to be the end date. If \code{NULL} the user is prompted to select
 #'        a .csv or .rdata file.
@@ -36,11 +36,19 @@
 #'        , both are included in the package. Alternativly a custom weights file can be
 #'        given as a data.frame. This must have three columns: target cell, neighbour cell,
 #'        weight. 
-#' @param non_benchmark_sp a character vector giving the concepts of species not to be
-#'        used as benchmarks in Frescalo
-#' @param fres_site_filter Optionally a character vector of the names of sites to be used for
-#'        in the trend analysis. Sites not include in this list are not used for estimating
-#'        TFactors. Default is \code{NULL} and all sites are used
+#' @param non_benchmark_sp a character vector or data.frame with one column, giving the 
+#'        concepts of species not to be used as benchmarks in Frescalo. Default is 
+#'        \code{NULL} and all sites are used.
+#' @param fres_site_filter Optionally a character vector or data.frame with one column, giving
+#'        the names of sites to be used for in the trend analysis. Sites not include in this
+#'        list are not used for estimating TFactors. Default is \code{NULL} and all sites are
+#'        used.
+#' @param phi Target frequency of frequency-weighted mean frequency. Default is 0.74 as in
+#'        Hill (2011). If this value is smaller than the 98.5 percentile of input phi it is
+#'        automatically increased and a warning message is generated. This is limited to
+#'        0.50 to 0.95.
+#' @param alpha the proportion of the expected number of species in a cell to be treated as
+#'        benchmarks. Default is 0.27 as in Hill (2011). This is limited to 0.08 to 0.50.
 #' @return Results are saved to file and most are returned in a list to R.
 #' 
 #'         The list object returned is comprised of the following:
@@ -109,7 +117,8 @@
 #'          - \tab \code{r2} \tab t-value for a test of significance of the intercept\cr
 #'          - \tab \code{F_val} \tab F-value of the model\cr
 #'          - \tab \code{F_num_df} \tab Degrees of freedom of the model\cr
-#'          - \tab \code{F_den_df} \tab Denominator degrees of freedom from the F-statistic \cr
+#'          - \tab \code{F_den_df} \tab Denominator degrees of freedom from the F-statistic\cr
+#'          - \tab \code{fres_trend10} \tab The slope of the model represented as a percentage decadal change\cr
 #'          }
 #'          \bold{The following columns are only produced when there are only two time periods}
 #'          \tabular{rll}{
@@ -148,20 +157,29 @@ frescalo <-
            Fres_weights='LC',#the name of the weights file in the frescalo directory to be used
            non_benchmark_sp=NULL,#species not to be used as benchmarks 
            get_names_from_BRC=FALSE, #change to TRUE is using concepts and you want frescalo to output with names
-           fres_site_filter=NULL #optional list of sites not to be included in analysis
+           fres_site_filter=NULL, #optional list of sites not to be included in analysis
+           phi = NULL, #phi value for frescalo
+           alpha = NULL #alpha value for frescalo
   ){
-    
+    # load required packages
     required.packages <- c('lme4','reshape2','sp','RODBC','gdata','ggplot2')
     new.packages <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
     if(length(new.packages)) install.packages(new.packages)
+    # if data not supplied ask for it
     if(is.null(data)){
       cat("Choose .csv or .rdata file. Else assign data.frame of data to 'data'")
       data<-choose.files()
-    } 
+    }
+    # check Date is a date
+    if(!'POSIXct' %in% class(data$Date) & !'Date' %in% class(data$Date)){
+      stop('column Date is not in a date format. This should be of class "Date" or "POSIXct"')
+    }
+    # give a warning if taxon name not supplied
     if(is.null(taxon_name)){
       warning("'taxon_name' not given, defaulted to 'NOBODY'. If you are analysing more than one dataset you will end up overwriting your output unless you provide taxon names")
       taxon_name<-'NOBODY'
     }
+    # catch errors
     if(class(data)=='character'&length(data)!=length(taxon_name)) stop("taxon_name and data are not the same length")
     if(is.null(sinkdir)) stop("Like Odysseus I could use some directions. I need to know the where to save output, use the 'sinkdir' arguement")
     dir.create(sinkdir,showWarnings = FALSE)
@@ -169,6 +187,26 @@ frescalo <-
     if(is.null(channel) & get_names_from_BRC) stop('frescalo needs channel to get names for concepts')
     if(!is.null(channel)) require(RODBC)
     if(is.null(taxon_reg)&!is.null(channel)) taxon_reg<-sqlQuery(channel, "select CONCEPT, CONCEPT_REC, NAME, NAME_ENGLISH, VALID from BRC.taxa_taxon_register where valid = 'V'")
+    if(!is.null(phi)){
+      if(phi>0.95|phi<0.5) stop("phi is outside permitted range of 0.50 to 0.95")
+    }
+    if(!is.null(alpha)){
+      if(alpha>0.5|alpha<0.08) stop("alpha is outside permitted range of 0.08 to 0.50")
+    }
+    if(class(non_benchmark_sp)=='data.frame'){
+      if(length(non_benchmark_sp)!=1){
+        stop('data.frame "non_benchmark_sp" should only have one column')
+      } else {
+        non_benchmark_sp<-as.character(non_benchmark_sp[[1]])
+      }
+    }
+    if(class(fres_site_filter)=='data.frame'){
+      if(length(fres_site_filter)!=1){
+        stop('data.frame "fres_site_filter" should only have one column')
+      } else {
+        fres_site_filter<-as.character(fres_site_filter[[1]])
+      }
+    }
     data(UK)
     #set up frescalo path
     frespath<-paste(normalizePath(.Library),'\\sparta\\exec\\Frescalo_2a.exe',sep='')
@@ -277,19 +315,21 @@ frescalo <-
     
     if(nrow(taxa_data)==0) stop("By Zeus' beard! The data heading into frescalo has 0 rows. Make sure your time periods match your years, and your not subsetting out all your data")
     fres_return<-run_fresc_file(channel=channel,fres_data=taxa_data,output_dir=fresoutput,frescalo_path=frespath,fres_f_wts=Fres_weights_name,
-                                Plot=Plot_Fres,spp_names_file=spp_names,fres_f_nobench=non_bench_txt,fres_f_filter=fres_site_txt)
+                                Plot=Plot_Fres,spp_names_file=spp_names,fres_f_nobench=non_bench_txt,fres_f_filter=fres_site_txt,
+                                fres_phi_val=phi,fres_bench_val=alpha)
     class(fres_return)<-'frescalo'
     
     # Calculate z-values if only two time periods & lm_stats exists
     if(length(time_periods[,1])==2 & 'lm_stats' %in% names(fres_return)){
-      fres_lm_path<-paste(sinkdir,'/',taxon_name,'_frescalo',datecode,'/Frescalo/Maps_Results/Frescalo Tfactor lm stats.csv',sep='')
+      fres_lm_path<-paste(sinkdir,'/',taxon_name,'_frescalo',datecode,'/Maps_Results/Frescalo Tfactor lm stats.csv',sep='')
       fres_lm<-read.csv(fres_lm_path)
-      trendpath<-paste(sinkdir,'/',taxon_name,'_frescalo',datecode,'/Frescalo/Output/Trend.txt',sep='')
+      trendpath<-paste(sinkdir,'/',taxon_name,'_frescalo',datecode,'/Output/Trend.txt',sep='')
       zvalues<-fres_zvalues(trendpath)
       lm_z<-merge(x=fres_lm,y=zvalues,by='SPECIES',all=TRUE)
-      write.csv(lm_z,fres_lm_path)
+      write.csv(lm_z,fres_lm_path,row.names=FALSE)
       fres_return$lm_stats<-lm_z
     }
     print('frescalo complete')
+
     return(fres_return)
   }
