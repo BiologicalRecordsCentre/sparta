@@ -131,6 +131,10 @@
 #'
 #' # ii) Extract Falco subbuteo records from GBIF (use ?occurrencelist for further details)
 #' spp<-occurrencelist(scientificname="Falco subbuteo", coordinatestatus = TRUE, originisocountrycode="NL", maxresults=100)
+#' 
+#' # iii) Plot the distribution of F. subbuteo onto a map of the Netherlands
+#' plot.GIS("Netherlands", round.grid=TRUE,xlab="Long",ylab="Lat",main="Falco subbuteo",grid.div=0.5)
+#' points(spp$decimalLongitude,spp$decimalLatitude,pch=16,col="blue4",cex=0.8)
 #' }
 
 plot.GIS <-
