@@ -136,10 +136,7 @@
   existing plot (default = \code{FALSE})}
 }
 \value{
-  A dataframe is returned in a format that can be used
-  directly in frescalo() or sparta(). The dataframe has
-  three columns giving the target cell, the neighbourhood
-  cell, and the weight.
+  A data.frame giving the dimensions of the plot area.
 }
 \description{
   This function can be used to plot gis data that has been
@@ -186,7 +183,7 @@ text(city.x[4:5], city.y[4:5], labels = c("Dublin", "Belfast"), col="black", pos
 # This plot highlights that when round.grid=TRUE the real xlim and ylim for the plot are determined
 # by taking user specified values and rounding to the nearest grid division allowing given
 # coordinates to be plotted
-plot.GIS(world, main = "This is Sparta", xlim=c(15,25), ylim = c(33,43), grid.div = 10,
+plot.GIS(world, main = "This is Sparta!", xlim=c(15,25), ylim = c(33,43), grid.div = 10,
 fill.col = "lightgreen", bg.col = "lightblue", round.grid=TRUE)
 rect(15,33,25,43, border ="red", lty=2)
 points(x = 22.4303, y = 37.0765, col="red", pch=16, cex = 1.7)
