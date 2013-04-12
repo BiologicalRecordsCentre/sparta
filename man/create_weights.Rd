@@ -1,6 +1,6 @@
 \name{create_weights}
 \alias{create_weights}
-\title{create_weights}
+\title{create frescalo weights file}
 \usage{
   create_weights(dist = NULL, sim = NULL, dist_sub = 200,
     sim_sub = 100)

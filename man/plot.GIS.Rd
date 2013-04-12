@@ -1,6 +1,6 @@
 \name{plot.GIS}
 \alias{plot.GIS}
-\title{plot.GIS}
+\title{Plot GIS shape files}
 \usage{
   plot.GIS(gis_data, main = "", xlab = "", ylab = "",
     xlim = NULL, ylim = NULL, show.axis = TRUE,
@@ -10,11 +10,12 @@
     no.margin = FALSE, max.dimen = 13, cex.main = 1.2,
     cex.lab = 1, cex.axis = 0.8, blank.plot = FALSE,
     plot.shape = TRUE, additions = FALSE,
-    return.dimen = TRUE)
+    return.dimen = TRUE, dissolve = FALSE)
 }
 \arguments{
   \item{gis_data}{GIS object, or list of objects, to be
-  plotted}
+  plotted. Alternativly the name of the country (or list of
+  names) to be plotted.}
 
   \item{main}{Text variable controlling the main title
   placed on the plot - value needs to be a text string
@@ -134,6 +135,11 @@
   plot is to be created from scratch or whether components
   (i.e. axes, gridlines, outline) are to be added to an
   existing plot (default = \code{FALSE})}
+
+  \item{additions}{Logical variable determining whether
+  country polygons (if more than one is selected) should be
+  dissolved. If they are the boundaries between them are
+  not shown. Default is \code{FALSE}.}
 }
 \value{
   A data.frame giving the dimensions of the plot area.

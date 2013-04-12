@@ -1,9 +1,10 @@
-#' plot.GIS
+#' Plot GIS shape files
 #' 
 #' This function can be used to plot gis data that has been loaded from shape files
 #' using the \code{readShapePoly()} function contained in the 'maptools' R package.
 #'
-#' @param gis_data GIS object, or list of objects, to be plotted
+#' @param gis_data GIS object, or list of objects, to be plotted. Alternativly the name
+#'        of the country (or list of names) to be plotted.
 #' @param main Text variable controlling the main title placed on the plot - value
 #'        needs to be a text string (default == '', title is blank)
 #' @param xlab Text variable controlling the label for the x-axis - value needs
@@ -69,6 +70,9 @@
 #' @param additions Logical variable determining whether plot is to be created from scratch
 #'        or whether components (i.e. axes, gridlines, outline) are to be added to an existing
 #'        plot (default = \code{FALSE})
+#' @param additions Logical variable determining whether country polygons (if more than one
+#'        is selected) should be dissolved. If they are the boundaries between them are not
+#'        shown. Default is \code{FALSE}.
 #' @return A data.frame giving the dimensions of the plot area.
 #' @keywords GIS, mapping, shapefile
 #' @examples
@@ -154,8 +158,28 @@ function(
 	blank.plot = FALSE,
 	plot.shape = TRUE,
 	additions = FALSE,
-	return.dimen = TRUE
+	return.dimen = TRUE,
+  dissolve=FALSE
 ){
+  
+  required.packages <- c('maptools')
+  new.packages <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
+  if(length(new.packages)){
+    install.packages(new.packages)
+  } 
+    
+  if(class(gis_data)=='character'){
+    if(!exists('world')) data(world)
+    missing<-gis_data[!tolower(gis_data) %in% tolower(world$name)]
+    if(length(missing)!=0) stop(paste(missing,'not found in world map'))
+    if(length(gis_data!=1) & dissolve==TRUE){
+      library(maptools)
+      polygons<-world[tolower(world$name) %in% tolower(gis_data),] 
+      gis_data<-unionSpatialPolygons(polygons,rep(1, length(polygons)))
+    } else {
+      gis_data<-world[tolower(world$name) %in% tolower(gis_data),]                                                            
+    }                                                  
+  }
   
   # Determine dimesions of plot
     if(is.null(xlim)){

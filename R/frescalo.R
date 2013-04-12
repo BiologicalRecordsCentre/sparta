@@ -1,4 +1,4 @@
-#' Frescalo
+#' Frescalo trend analysis
 #' 
 #' A function for using Frescalo (Hill, 2011), a tool for analysing occurrence data when
 #' recording effort is not known. This function returns the output from Frescalo to the 
