@@ -165,7 +165,7 @@ function(
   required.packages <- c('maptools')
   new.packages <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
   if(length(new.packages)){
-    install.packages(new.packages)
+    install.packages(new.packages,dependencies=TRUE)
   } 
     
   if(class(gis_data)=='character'){
