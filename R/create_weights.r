@@ -1,4 +1,4 @@
-#' create_weights
+#' create frescalo weights file
 #' 
 #' This file creates the weights file required to run frescalo, as outlined in (Hill,
 #'  2011). For more information on frescalo see \code{\link{frescalo}}. This function

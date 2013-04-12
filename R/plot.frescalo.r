@@ -5,6 +5,8 @@ plot.frescalo<-function(x){
   if('lm_stats' %in% names(x)) lm_stats<-x$lm_stats
   stats<-x$stat
   
+  if(!exists('UK')) data(UK)
+    
   dev.new()
   
   # Setup outer margin area

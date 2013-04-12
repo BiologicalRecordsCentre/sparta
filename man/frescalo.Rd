@@ -1,6 +1,6 @@
 \name{frescalo}
 \alias{frescalo}
-\title{Frescalo}
+\title{Frescalo trend analysis}
 \usage{
   frescalo(data = NULL, taxon_name = NULL,
     species_to_include = NULL, ignore.ireland = F,
