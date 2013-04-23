@@ -120,6 +120,21 @@
 #' rect(15,33,25,43, border ="red", lty=2)
 #' points(x = 22.4303, y = 37.0765, col="red", pch=16, cex = 1.7)
 #' text(x = 22.4303, y = 37.0765, labels = "Sparta", pos = 2, cex = 1.5)
+#' 
+#' # Example 7
+#' # Plot the distribution records of Falco subbuteo in the Netherlands using data extracted from the 
+#' # Global Biodiversity Information Facility (GBIF).
+#' # i) Install and load the rgbif and ropensci packages from github
+#' install_github('rgbif', 'ropensci') 
+#' require(rgbif)
+#' library(rgbif)
+#'
+#' # ii) Extract Falco subbuteo records from GBIF (use ?occurrencelist for further details)
+#' spp<-occurrencelist(scientificname="Falco subbuteo", coordinatestatus = TRUE, originisocountrycode="NL", maxresults=100)
+#' 
+#' # iii) Plot the distribution of F. subbuteo onto a map of the Netherlands
+#' plot.GIS("Netherlands", round.grid=TRUE,xlab="Long",ylab="Lat",main="Falco subbuteo",grid.div=0.5)
+#' points(spp$decimalLongitude,spp$decimalLatitude,pch=16,col="blue4",cex=0.8)
 #' }
 
 plot.GIS <-
@@ -154,7 +169,7 @@ function(
   required.packages <- c('maptools')
   new.packages <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
   if(length(new.packages)){
-    install.packages(new.packages)
+    install.packages(new.packages,dependencies=TRUE)
   } 
     
   if(class(gis_data)=='character'){
