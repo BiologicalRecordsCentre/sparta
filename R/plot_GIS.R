@@ -4,7 +4,7 @@
 #' using the \code{readShapePoly()} function contained in the 'maptools' R package.
 #'
 #' @param gis_data GIS object, or list of objects, to be plotted. Alternativly the name
-#'        of the country (or list of names) to be plotted.
+#'        of the country (or list of names) to be plotted. Defaults to a world map
 #' @param main Text variable controlling the main title placed on the plot - value
 #'        needs to be a text string (default == '', title is blank)
 #' @param xlab Text variable controlling the label for the x-axis - value needs
@@ -51,6 +51,8 @@
 #' @param no.margin Logical variable determining whether plot should include a margin
 #'        NOTE - main title, x-labels and y-labels are written in margin so do not remove
 #'        margin if titles/labels are required (default = \code{FALSE}, plot includes a margin). 
+#' @param set.margin Logical variable. If \code{TRUE} (default), the margins are set to be of
+#'        equal size. If \code{FALSE} the margins are used as set in the R environment.
 #' @param max.dimen Numberical variable determining the maximum window dimension. Variable
 #'        determines height or width depend on whether xlim range is greater than ylim range 
 #'        (default = \code{13})      
@@ -82,28 +84,28 @@
 #' 
 #' # Example 1
 #' # plot with defaults, main plot title set to 'World Map', grid line intervals at units of 10
-#' plot.GIS(world, main = "World Map", grid.div = 10)   
+#' plot_GIS(world, main = "World Map", grid.div = 10)   
 #' 
 #' # Example 2
 #' # define a region to plot using xlim and ylim, colour plot background, and fill landmass
-#' plot.GIS(world, main = "World Map", grid.div = 10, xlim = c(-10,20), ylim = c(30,60),
+#' plot_GIS(world, main = "World Map", grid.div = 10, xlim = c(-10,20), ylim = c(30,60),
 #'          fill.col = "lightgreen", bg.col = "lightblue")
 #' 
 #' # Example 3
 #' # plot with finer scale, black, grid lines, and labelled axes
-#' plot.GIS(world, main = "World Map", grid.div = 5, grid.col = 'black', xlab = 'Longitude',
+#' plot_GIS(world, main = "World Map", grid.div = 5, grid.col = 'black', xlab = 'Longitude',
 #'          ylab = 'Latitude', xlim = c(-10,20), ylim = c(30,60), fill.col = "lightgreen",
 #'          bg.col = "lightblue")
 #' 
 #' # Example 4
 #' # plot Africa without gridlines, axes labels or margins
-#' plot.GIS(world, xlab="", ylab="", show.axis = FALSE, show.grid = FALSE, fill.col = "lightgreen",
+#' plot_GIS(world, xlab="", ylab="", show.axis = FALSE, show.grid = FALSE, fill.col = "lightgreen",
 #' no.margin = TRUE, xlim = c(-20,55), ylim = c(-40,40))
 #' 
 #' # Example 5
 #' # Plot UK with fill colour and background colour but no grid, then add points and labels
 #' # highlighting the locations of the capital cities
-#' plot.GIS(world, main="UK Capital Cities", ylim = c(48, 60), xlim = c(-10,3), show.grid = FALSE,fill.col = "lightgreen", bg.col = "lightblue")
+#' plot_GIS(world, main="UK Capital Cities", ylim = c(48, 60), xlim = c(-10,3), show.grid = FALSE,fill.col = "lightgreen", bg.col = "lightblue")
 #' city.x = c(0.1062, -3.2200, -3.1771, -6.2661, -5.9167)
 #' city.y = c(51.5171, 55.9500, 51.4780, 53.3428, 54.6000)
 #' points(city.x,city.y,pch=16, col="red")    
@@ -115,7 +117,7 @@
 #' # This plot highlights that when round.grid=TRUE the real xlim and ylim for the plot are determined
 #' # by taking user specified values and rounding to the nearest grid division allowing given
 #' # coordinates to be plotted 
-#' plot.GIS(world, main = "This is Sparta!", xlim=c(15,25), ylim = c(33,43), grid.div = 10,
+#' plot_GIS(world, main = "This is Sparta!", xlim=c(15,25), ylim = c(33,43), grid.div = 10,
 #' fill.col = "lightgreen", bg.col = "lightblue", round.grid=TRUE)
 #' rect(15,33,25,43, border ="red", lty=2)
 #' points(x = 22.4303, y = 37.0765, col="red", pch=16, cex = 1.7)
@@ -126,20 +128,19 @@
 #' # Global Biodiversity Information Facility (GBIF).
 #' # i) Install and load the rgbif and ropensci packages from github
 #' install_github('rgbif', 'ropensci') 
-#' require(rgbif)
 #' library(rgbif)
 #'
 #' # ii) Extract Falco subbuteo records from GBIF (use ?occurrencelist for further details)
 #' spp<-occurrencelist(scientificname="Falco subbuteo", coordinatestatus = TRUE, originisocountrycode="NL", maxresults=100)
 #' 
 #' # iii) Plot the distribution of F. subbuteo onto a map of the Netherlands
-#' plot.GIS("Netherlands", round.grid=TRUE,xlab="Long",ylab="Lat",main="Falco subbuteo",grid.div=0.5)
+#' plot_GIS("Netherlands", round.grid=TRUE,xlab="Long",ylab="Lat",main="Falco subbuteo",grid.div=0.5)
 #' points(spp$decimalLongitude,spp$decimalLatitude,pch=16,col="blue4",cex=0.8)
 #' }
 
-plot.GIS <-
+plot_GIS <-
 function(
-	gis_data, main = "", 
+	gis_data=NULL, main = "", 
 	xlab = "", 
 	ylab = "", 
 	xlim = NULL, 
@@ -154,7 +155,8 @@ function(
 	bg.col = "white", 
 	box.col = NA, 
 	new.window = TRUE, 
-	no.margin = FALSE, 
+	no.margin = FALSE,
+	set.margin = TRUE,
 	max.dimen = 13, 
 	cex.main = 1.2, 
 	cex.lab = 1, 
@@ -172,6 +174,8 @@ function(
     install.packages(new.packages,dependencies=TRUE)
   } 
     
+  
+  
   if(class(gis_data)=='character'){
     if(!exists('world')) data(world)
     missing<-gis_data[!tolower(gis_data) %in% tolower(world$name)]
@@ -183,6 +187,18 @@ function(
     } else {
       gis_data<-world[tolower(world$name) %in% tolower(gis_data),]                                                            
     }                                                  
+  } else if(is.null(gis_data)){
+    if(!exists('world')) data(world)
+    gis_data<-world
+    if (dissolve==TRUE){
+      library(maptools)
+      gis_data<-unionSpatialPolygons(gis_data,rep(1, length(gis_data)))
+    }
+  } else {
+    if (dissolve==TRUE){
+    library(maptools)
+    gis_data<-unionSpatialPolygons(gis_data,rep(1, length(gis_data)))
+    }
   }
   
   # Determine dimesions of plot
@@ -225,29 +241,35 @@ function(
     
 	x.rat = abs(xlim[1] - xlim[2])
 	y.rat = abs(ylim[1] - ylim[2])
-	aspect.ratio = x.rat / y.rat
+    
+  aspect.ratio = x.rat / y.rat
 	if(aspect.ratio <= 1){
 	  y.part = max.dimen - y.rat
 	  x.part = x.rat + (y.part * aspect.ratio)
 	  #dev.new(height = max.dimen, width = x.part)
 	  plot.dimen = data.frame(height = max.dimen, width = x.part)
 	} else {
-	  aspect.ratio = 1/aspect.ratio
 	  x.part = max.dimen - x.rat
-	  y.part = y.rat + (x.part * aspect.ratio)
+	  y.part = y.rat + (x.part * (1/aspect.ratio))
 	  #dev.new(height = y.part, width = max.dimen)
 	  plot.dimen = data.frame(height = y.part, width = max.dimen)
 	}
-		
+	
 	# Open new window if new.window == TRUE
     if(new.window | dev.cur() == 1){
-		dev.new(height = plot.dimen$height, width = plot.dimen$width)
+		  dev.new(height = plot.dimen$height, width = plot.dimen$width)
     }
     
 	# If function to be run in additions mode then do not run commands to create blank plot
 	if(additions == FALSE){
 		if(no.margin){
 		  par(mar = c(0,0,0,0))
+		} else if(set.margin){
+		    if(aspect.ratio >= 1){
+  		    par(mar = c(4,4*aspect.ratio,4,4*aspect.ratio))
+  		  } else {
+  		    par(mar = c(4*1/aspect.ratio,4,4*1/aspect.ratio,4))
+  		  }
 		}
 		 
 		# Set up blank plot

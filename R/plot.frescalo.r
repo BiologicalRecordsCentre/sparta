@@ -1,6 +1,6 @@
 plot.frescalo<-function(x){
   
-  options(device = "windows") #this is fix for windows for Rstudio's 1 device rule
+  options(device = "windows") #this a is fix for windows for Rstudio's 1 device rule
   
   if('lm_stats' %in% names(x)) lm_stats<-x$lm_stats
   stats<-x$stat
