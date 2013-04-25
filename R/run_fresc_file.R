@@ -240,7 +240,7 @@ function(
 		
 	# Return results file paths via invisble
 		fpaths_out = file.path(fres_sub_dir["OUTPUT"], c(fres_f_log, fres_f_stat, fres_f_freq, fres_f_trend,"Freq_quickload.txt"))
-		
+		    
   # format files for returning
     if(!exists('spp_names')) spp_names = read.table(spp_names_file, sep=",", header=TRUE, stringsAsFactors = FALSE)
     
@@ -257,7 +257,11 @@ function(
 		for(i in unique(freq$Species)){
 		  freq$Species[freq$Species==i]<-spp_names$NAME[spp_names$SPECIES==i]
 		}
-    		  
+    
+    write.table(trend,file=paste(output_dir,'/Output/Trend.csv',sep=''),sep=',',row.names=FALSE)
+		write.table(stats,file=paste(output_dir,'/Output/Stats.csv',sep=''),sep=',',row.names=FALSE)
+		write.table(freq,file=paste(output_dir,'/Output/Freq.csv',sep=''),sep=',',row.names=FALSE)
+		
   # Create list to return
 		if(!exists('log_out')) log_out <- readLines(file.path(exe_dir, fres_f_log))
     frescalo<-list(paths=invisible(fpaths_out),trend=trend,stat=stats,freq=freq,log=log_out)

@@ -17,21 +17,23 @@ function(MMdata, nsp=2, nyr=3,wellsamp='visit'){ #0.44 seconds
   if(wellsamp=='visit') i[i==T] <- is.gridcell.wellsampled(MMdata$kmsq[i], n=nyr)
   #if there is no well sampled data, capture what info you can and dont bother modelling
   if(dim(MMdata[i,])[1]==0){ 
-      coefs <- c(NA,NA,NA,NA,NA,sum(i)/length(i),sum(i),sum(as.numeric(MMdata$CONCEPT[i])))
+      coefs <- c(NA,NA,NA,NA,NA,NA,NA,NA,sum(i)/length(i),sum(i),sum(as.numeric(MMdata$CONCEPT[i])))
     }else{  
     MM <- tryCatch(glmer(as.numeric(CONCEPT) ~ I(as.numeric(year)-1990) + (1|kmsq), MMdata, subset=i, family=binomial))
     #This catches model errors, there was one in the BRYOPHYTE data
     if(class(MM)[1]=="try-error"){
-      coefs <- c(NA,NA,NA,NA,NA,NA,NA,NA)
+      coefs <- c(NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA)
     }
     if(as.numeric(MM@dims['cvg'])==65){ #catches a specific convergence error (not caught above)
-      coefs <- c(NA,NA,NA,NA,as.numeric(MM@dims['cvg']),sum(i)/length(i),sum(i),sum(as.numeric(MMdata$CONCEPT[i])))
+      coefs <- c(NA,NA,NA,NA,NA,NA,NA,as.numeric(MM@dims['cvg']),sum(i)/length(i),sum(i),sum(as.numeric(MMdata$CONCEPT[i])))
     }
     if(class(MM)[1]!="try-error" & !exists('coefs')){
       coefs <- as.numeric(summary(MM)@coefs[2,])
+      coefs <- c(coefs,as.numeric(summary(MM)@coefs[1,1:2]),as.integer(1990))
       coefs <- c(coefs,as.numeric(MM@dims['cvg']))
       coefs <- c(coefs,sum(i)/length(i),sum(i),sum(as.numeric(MMdata$CONCEPT[i])))
       }
   }  
-  return(coefs) # keep this a two step process in case we later decide to extract other info
+   # keep this a two step process in case we later decide to extract other info
+  return(coefs)
 }

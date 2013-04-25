@@ -329,6 +329,12 @@ frescalo <-
       write.csv(lm_z,fres_lm_path,row.names=FALSE)
       fres_return$lm_stats<-lm_z
     }
+    #remove .txt files
+    unlink(fres_return$paths[2:4])
+    
+    #update paths
+    fres_return$paths[2:4]<-gsub('.txt','.csv',fres_return$paths[2:4])
+    
     print('frescalo complete')
 
     return(fres_return)
