@@ -18,6 +18,8 @@
 #' @param sim_sub the number of neighbours to include after ranking by similarity. This is
 #'        the final number of site that will be included in a neighbourhood. In Hill (2011),
 #'        this is set to 100 and is the default here.
+#' @param normalise Logical. If \code{TRUE} each attribute is divided by its maximum value to 
+#'        produce vlues between 0 and 1. Default is \code{FALSE}
 #' @return A dataframe is returned in a format that can be used directly in frescalo() or 
 #'         sparta(). The dataframe has three columns giving the target cell, the neighbourhood
 #'         cell, and the weight.
@@ -55,7 +57,8 @@
 create_weights<-function(dist=NULL,
                          sim=NULL,
                          dist_sub=200,
-                         sim_sub=100){
+                         sim_sub=100,
+                         normalise=FALSE){
   
   #check that both tables exist
   if(is.null(dist) & is.null(sim)) stop("both 'dist' and 'sim' are missing, these must be supplied")
@@ -81,6 +84,14 @@ create_weights<-function(dist=NULL,
     dist<-dist[!dist[,1] %in% missing,]
     dist<-dist[!dist[,2] %in% missing,]
     sim<-sim[!sim[,1] %in% missing,]
+  }
+  
+  #normalise if required
+  if(normalise){
+    for(i in 2:length(colnames(sim))){
+      mx<-max(sim[,i])
+      sim[,i]<-sim[,i]/mx
+    }
   }
   
   #convert attribute table into a long distance table
