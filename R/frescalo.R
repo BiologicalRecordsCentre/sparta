@@ -8,7 +8,7 @@
 #'
 #' @param data A dataframe object or string giving the file path to the
 #'        location of data (either .rdata or .csv). Required columns are: 'CONCEPT',
-#'        'hectad' and 'Date'. Optionally 'TO_STARTDATE' can be included, if it is this
+#'        'hectad' and 'Date' or 'year'. Optionally 'TO_STARTDATE' can be included, if it is this
 #'        is assumed to be the start date (from which start year is extracted) and year
 #'        is assumed to be the end date. If \code{NULL} the user is prompted to select
 #'        a .csv or .rdata file.
@@ -171,7 +171,8 @@ frescalo <-
       data<-choose.files()
     }
     # check Date is a date
-    if(!'POSIXct' %in% class(data$Date) & !'Date' %in% class(data$Date)){
+    ##ADD IF COLUMN EXI
+    if('Date' %in% names(data) & !'POSIXct' %in% class(data$Date) & !'Date' %in% class(data$Date)){
       stop('column Date is not in a date format. This should be of class "Date" or "POSIXct"')
     }
     # give a warning if taxon name not supplied
