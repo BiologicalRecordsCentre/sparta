@@ -3,7 +3,7 @@
 \title{create frescalo weights file}
 \usage{
   create_weights(dist = NULL, sim = NULL, dist_sub = 200,
-    sim_sub = 100)
+    sim_sub = 100, normalise = FALSE)
 }
 \arguments{
   \item{dist}{a dataframe giving the distance between sites
@@ -27,6 +27,10 @@
   ranking by similarity. This is the final number of site
   that will be included in a neighbourhood. In Hill (2011),
   this is set to 100 and is the default here.}
+
+  \item{normalise}{Logical. If \code{TRUE} each attribute
+  is divided by its maximum value to produce vlues between
+  0 and 1. Default is \code{FALSE}}
 }
 \value{
   A dataframe is returned in a format that can be used

@@ -25,18 +25,19 @@
 #' @param Run_MM Logical, if \code{TRUE} mixed model analyses are run. Default is \code{TRUE}
 #' @param Run_LL Logical, if \code{TRUE} list-length model analyses are run. Default is \code{TRUE}
 #' @param Run_Fres Logical, if \code{TRUE} Frescalo analyses are run. Default is \code{TRUE}
-#' @param Run_Basic Logical, if \code{TRUE} mixed model analyses are run. Default is \code{TRUE}
+#' @param Run_Basic Logical, if \code{TRUE} basic trend analyses are run. This includes power law residual (plr), Telfer's change index and proportional
+#'         difference. Default is \code{TRUE}
 #' @param Create_persistance_table NOT IMPLEMENTED
 #' @param Create_persistance_summary NOT IMPLEMENTED 
 #' @param Calc_D_england_only NOT IMPLEMENTED 
 #' @param Year.range The time period over which you wish to analyse your trends. This
 #'        may or may not be the same as min(time_periods):max(time_periods). This is used
 #'        for analyses that do not use time periods, such as the mixed models and list
-#'        length models
+#'        length models.
 #' @param res The 'resolution' at which mixed models and list-length models analyse 
 #'        the data. \code{'visit'} defines visits as unique combinations of km-square and date
 #'        while \code{kmyr} defines visits as a unique combination of year km-square and
-#'        year.
+#'        year. Visit method is recommended.
 #' @param min.L The minimum list length (number of species) required from a visit for it 
 #'        to be included in the mixed model analysis. Default is 4 but should probably
 #'        be changed dependent on the dataset the analysis is being applied to
@@ -45,11 +46,9 @@
 #'        are included in the mixed model analysis. If \code{wellsamp} is \code{'year'}
 #'        then only sites with well sampled visits in \code{min.yrs} number of years are
 #'        included in mixed model analysis.
-#' @param wellsamp defines what makes a site 'well sampled' and therefore included in the mixed
-#'        model analysis. If \code{'visit'} then the site must have atleast \code{min.yrs} number
-#'        of well.sampled visits (as defined by \code{res} and \code{min.L}). If \code{wellsamp}
-#'        is \code{'year'} then only sites with well sampled visits in \code{min.yrs} number of
-#'        years are included in mixed model analysis.
+#' @param od This option allows modelling overdispersion (\code{TRUE}) in mixed models
+#' @param V This option, if \code{TRUE}, sets mixed model verbose to \code{TRUE}. Allowing
+#'        the interations of each model to be veiwed.
 #' @param split_yr USED IN PERSISTANCE TABLES, NOT IMPLEMENTED 
 #' @param species_to_include A list of vector of strings (that match your CONCEPT column in
 #'        data data) which are to be used. Species not in your list are ignored.
@@ -66,7 +65,8 @@
 #'        running mixed models and list length models. Default is \code{TRUE}
 #' @param time_periods A dataframe object with two columns. The first column contains the
 #'        start year of each time period and the second column contains the end year of 
-#'        each time period. This is required if running Frescalo or basic trends.
+#'        each time period. This is required if running Frescalo or basic trends, but
+#'        is not used in teh modelling methods.
 #' @param channel An ODBC channel, creaded using odbcConnect(), this can be used to get spp
 #'        names if get_names_from_BRC is \code{TRUE}
 #' @param Plot_Fres Logical, if \code{TRUE} maps are produced by Frescalo
@@ -91,7 +91,7 @@
 #'        automatically increased and a warning message is generated.
 #' @param alpha the proportion of the expected number of species in a cell to be treated as
 #'        benchmarks. Default is 0.27 as in Hill (2011).
-#' @return Results are save to file and most are returned to R.
+#' @return Results are saved to file and most are returned to R.
 #'          
 #'         A list is returned:
 #'         
@@ -139,9 +139,8 @@ sparta <-
            res='visit', #'visit' or 'kmyr' resolution for data to be modelled
            min.L=4,#minimum list length for mixed models
            min.yrs=3,#minimum number of years for 'well sampled' sites (mixed models)
-           wellsamp='visit',#min years had an issue with visit resolution since it was actually
-           #including sites with three good visits. This can be changed to year to get the
-           #desired result (i.e site must be well sampled in three diff years)
+           od=F, #use overdispersion in MM
+           V=F, #use verbose in MM
            split_yr=NULL, #First year of second time period
            species_to_include=NULL, #A species list with which to subset your data
            ignore.ireland=F,#do you want to remove Irish hectads?
@@ -302,10 +301,10 @@ sparta <-
           taxa_data<-taxa_data[!is.na(taxa_data$year),]
           
           for(ii in 1:(length(time_periods[,1])-1)){
-            for(j in (i+1):length(time_periods[,1])){
+            for(j in (ii+1):length(time_periods[,1])){
               time_periods_temp<-time_periods[c(ii,j),] 
               taxon_temp<-paste(taxon_name[i],'_',ii,'_',j,sep='')
-              basic_temp<-basic_trends(taxa_data,time_periods_temp,min_sq=Telfer_min_sq,sinkdir,splityr=NULL,sp_list=species_to_include,taxon_temp)
+              basic_temp<-basic_trends(taxa_data,time_periods_temp,min_sq=Telfer_min_sq,splityr=NULL,sp_list=species_to_include)
               colnames(basic_temp)<-paste(colnames(basic_temp),'_',ii,'_',j,sep='')
               basic_temp$CONCEPT<-row.names(basic_temp)
               print(paste('Basic trends for tp',ii,'vs tp',j,'done',sep=' '))
@@ -350,12 +349,7 @@ sparta <-
             print('Recasting data for List-length models')
           } 
           
-          if(res=='kmyr'){
-            space_time<-cast_recs(taxa_data[!is.na(taxa_data$kmsq)&!is.na(taxa_data$year),][c('CONCEPT','year','kmsq')],res)
-          }
-          if(res=='visit'){
-            space_time<-cast_recs(taxa_data[!is.na(taxa_data$Date)&!is.na(taxa_data$kmsq),][c('CONCEPT','Date','kmsq')],res)
-          }
+          space_time<-cast_recs(taxa_data[!is.na(taxa_data$Date)&!is.na(taxa_data$kmsq),][c('CONCEPT','Date','kmsq')],res)
           
           counter=1
           
@@ -376,11 +370,11 @@ sparta <-
             species_space_time$CONCEPT[species_space_time$CONCEPT==ii]<-1
             if(!grepl('year',colnames(species_space_time)[1])) species_space_time$year<-format(species_space_time$Date, '%Y')
             
-            Mod_out<-t(as.data.frame(Models(species_space_time,min.L,min.yrs,MM=Run_MM,LL=Run_LL,wellsamp=wellsamp)))
+            Mod_out<-t(as.data.frame(Models(species_space_time,min.L,min.yrs,MM=Run_MM,LL=Run_LL,od=F,V=F)))
             row.names(Mod_out)<-ii
             Mod_out<-as.data.frame(Mod_out)
-            if(Run_MM) Mod_out$MM_trend10<-pc.change(ilt(10*Mod_out$MM_trend))
-            if(Run_LL) Mod_out$LL_trend10<-pc.change(ilt(10*Mod_out$LL_trend))
+            #if(Run_MM) Mod_out$MM_trend10<-pc.change(ilt(10*Mod_out$MM_trend))
+            #if(Run_LL) Mod_out$LL_trend10<-pc.change(ilt(10*Mod_out$LL_trend))
             Mod_out$CONCEPT<-row.names(Mod_out)
             if(!is.null(taxon_reg)) Mod_out<-merge(x=Mod_out,y=taxon_reg,by='CONCEPT') #add taxon information
             

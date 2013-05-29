@@ -7,15 +7,15 @@
     Create_persistance_table = F,
     Create_persistance_summary = F,
     Calc_D_england_only = F, Year.range = NULL,
-    res = "visit", min.L = 4, min.yrs = 3,
-    wellsamp = "visit", split_yr = NULL,
-    species_to_include = NULL, ignore.ireland = F,
-    ignore.channelislands = F, sinkdir = NULL, Log = T,
-    taxon_reg = NULL, print_progress = T,
-    time_periods = NULL, channel = NULL, Plot_Fres = TRUE,
-    Fres_weights = "LC", non_benchmark_sp = NULL,
-    Telfer_min_sq = 5, get_names_from_BRC = FALSE,
-    fres_site_filter = NULL, phi = NULL, alpha = NULL)
+    res = "visit", min.L = 4, min.yrs = 3, od = F, V = F,
+    split_yr = NULL, species_to_include = NULL,
+    ignore.ireland = F, ignore.channelislands = F,
+    sinkdir = NULL, Log = T, taxon_reg = NULL,
+    print_progress = T, time_periods = NULL,
+    channel = NULL, Plot_Fres = TRUE, Fres_weights = "LC",
+    non_benchmark_sp = NULL, Telfer_min_sq = 5,
+    get_names_from_BRC = FALSE, fres_site_filter = NULL,
+    phi = NULL, alpha = NULL)
 }
 \arguments{
   \item{data}{A dataframe object or a vector of strings
@@ -49,8 +49,10 @@
   \item{Run_Fres}{Logical, if \code{TRUE} Frescalo analyses
   are run. Default is \code{TRUE}}
 
-  \item{Run_Basic}{Logical, if \code{TRUE} mixed model
-  analyses are run. Default is \code{TRUE}}
+  \item{Run_Basic}{Logical, if \code{TRUE} basic trend
+  analyses are run. This includes power law residual (plr),
+  Telfer's change index and proportional difference.
+  Default is \code{TRUE}}
 
   \item{Create_persistance_table}{NOT IMPLEMENTED}
 
@@ -62,13 +64,14 @@
   analyse your trends. This may or may not be the same as
   min(time_periods):max(time_periods). This is used for
   analyses that do not use time periods, such as the mixed
-  models and list length models}
+  models and list length models.}
 
   \item{res}{The 'resolution' at which mixed models and
   list-length models analyse the data. \code{'visit'}
   defines visits as unique combinations of km-square and
   date while \code{kmyr} defines visits as a unique
-  combination of year km-square and year.}
+  combination of year km-square and year. Visit method is
+  recommended.}
 
   \item{min.L}{The minimum list length (number of species)
   required from a visit for it to be included in the mixed
@@ -84,14 +87,12 @@
   well sampled visits in \code{min.yrs} number of years are
   included in mixed model analysis.}
 
-  \item{wellsamp}{defines what makes a site 'well sampled'
-  and therefore included in the mixed model analysis. If
-  \code{'visit'} then the site must have atleast
-  \code{min.yrs} number of well.sampled visits (as defined
-  by \code{res} and \code{min.L}). If \code{wellsamp} is
-  \code{'year'} then only sites with well sampled visits in
-  \code{min.yrs} number of years are included in mixed
-  model analysis.}
+  \item{od}{This option allows modelling overdispersion
+  (\code{TRUE}) in mixed models}
+
+  \item{V}{This option, if \code{TRUE}, sets mixed model
+  verbose to \code{TRUE}. Allowing the interations of each
+  model to be veiwed.}
 
   \item{split_yr}{USED IN PERSISTANCE TABLES, NOT
   IMPLEMENTED}
@@ -127,7 +128,7 @@
   The first column contains the start year of each time
   period and the second column contains the end year of
   each time period. This is required if running Frescalo or
-  basic trends.}
+  basic trends, but is not used in teh modelling methods.}
 
   \item{channel}{An ODBC channel, creaded using
   odbcConnect(), this can be used to get spp names if
@@ -173,7 +174,7 @@
   0.27 as in Hill (2011).}
 }
 \value{
-  Results are save to file and most are returned to R.
+  Results are saved to file and most are returned to R.
 
   A list is returned:
 

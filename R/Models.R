@@ -1,8 +1,8 @@
 Models <-
-function (MMdata,min.L,nyr,MM=T,LL=T,wellsamp='visit'){
+function (MMdata,min.L,nyr,MM=T,LL=T, od=F, V=F){
   # the standard MM, as year-monad (ym) resolution
   if (MM){
-    MM <- fit_LadybirdMM(MMdata, nsp=min.L, nyr,wellsamp=wellsamp)
+    MM <- fit_LadybirdMM2(MMdata, nsp=min.L, nyr, od=F, V=F)
     names(MM) <- c('trend','trendSE','zscore','p','intercept','interceptSE','yearZero','cvg','pCombosUsed','SiteDatecombos','n_Obs')
     names(MM) <- paste('MM_', names(MM), sep='')
     output <- MM
