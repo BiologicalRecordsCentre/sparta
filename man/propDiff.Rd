@@ -1,11 +1,12 @@
-\name{plr}
-\alias{plr}
-\title{Power Law Residual}
+\name{propDiff}
+\alias{propDiff}
+\title{Proportional difference}
 \usage{
-  plr(Data = NULL, time_periods = NULL, ignore.ireland = F,
-    ignore.channelislands = F, sinkdir = NULL, min_sq = 5,
-    year_col = NA, site_col = NA, sp_col = NA,
-    start_col = NA, end_col = NA)
+  propDiff(Data = NULL, time_periods = NULL,
+    ignore.ireland = F, ignore.channelislands = F,
+    sinkdir = NULL, min_sq = 5, year_col = NA,
+    site_col = NA, sp_col = NA, start_col = NA,
+    end_col = NA)
 }
 \arguments{
   \item{Data}{The data to be analysed. This should consist
@@ -65,23 +66,23 @@
   Time periods are ordered by their start year.
 }
 \description{
-  Undertakes a power law residual analysis. This method
-  compares two time periods, however this function can take
-  multiple time periods and will complete all pairwise
-  comparisons
+  This simple method gives the proportional change in the
+  number of sites occupied by comparing two time periods.
+  The function can take multiple time periods and will
+  complete all pairwise comparisons.
 }
 \examples{
 \dontrun{
  #load example dataset
  data(ex_dat)
 
- # Passing data as an R object
- plr_out <- plr(ex_dat,
-                time_periods=data.frame(start=c(1980,1990,2000),end=c(1989,1999,2009)),
-                site_col='hectad',
-                sp_col='CONCEPT',
-                start_col='TO_STARTDATE',
-                end_col='Date')
+ propDiff_out <- propDiff(ex_dat,
+                          time_periods=data.frame(start=c(1980,1990,2000),end=c(1989,1999,2009)),
+                          site_col='hectad',
+                          sp_col='CONCEPT',
+                          start_col='TO_STARTDATE',
+                          end_col='Date')
+
 }
 }
 \keyword{trends}

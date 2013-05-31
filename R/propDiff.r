@@ -1,9 +1,9 @@
-#' Power Law Residual
+#' Proportional difference
 #' 
-#' Undertakes a power law residual analysis. This method compares
-#' two time periods, however this function can take multiple time periods
-#' and will complete all pairwise comparisons
-#'
+#' This simple method gives the proportional change in the number of sites occupied by
+#' comparing two time periods. The function can take multiple time periods and will
+#' complete all pairwise comparisons.
+#' 
 #' @param Data The data to be analysed. This should consist of rows of observations
 #'        and columns indicating the species and location as well as either the year
 #'        of the observation or columns specifying the start and end dates of the
@@ -39,16 +39,16 @@
 #'  #load example dataset
 #'  data(ex_dat)
 #'  
-#'  # Passing data as an R object
-#'  plr_out <- plr(ex_dat,
-#'                 time_periods=data.frame(start=c(1980,1990,2000),end=c(1989,1999,2009)),
-#'                 site_col='hectad',
-#'                 sp_col='CONCEPT',
-#'                 start_col='TO_STARTDATE',
-#'                 end_col='Date')
+#'  propDiff_out <- propDiff(ex_dat,
+#'                           time_periods=data.frame(start=c(1980,1990,2000),end=c(1989,1999,2009)),
+#'                           site_col='hectad',
+#'                           sp_col='CONCEPT',
+#'                           start_col='TO_STARTDATE',
+#'                           end_col='Date')
+#'  
 #' }
 
-plr <- 
+propDiff <- 
   function(Data=NULL,#your data (path to .csv or .rdata, or an R object)
            time_periods=NULL,
            ignore.ireland=F,#do you want to remove Irish hectads?
@@ -101,10 +101,17 @@ plr <-
       Data<-choose.files()
     } 
     
-    analType<-'plr'
+    analType<-'propDiff'
+    
+    if(is.null(analType) & !is.null(sinkdir)){
+      warning("'analType' not given, defaulted to 'propDiff'. This is used to name your output file")
+      analType<-'propDiff'
+    } else if(is.null(analType) & is.null(sinkdir)){
+      analType<-'propDiff'
+    }
     
     if(!is.null(sinkdir)) dir.create(sinkdir,showWarnings = FALSE)
-          
+    
     print(paste('Starting',analType))
     datecode <- format(Sys.Date(),'%y%m%d')
     if(is.data.frame(Data)){
@@ -135,24 +142,24 @@ plr <-
         }
       }
     }
-
+    
     # We need to put each record into its time period
     if(!is.na(start_col) & !is.na(end_col)){
       for(ii in 1:length(time_periods[,1])){
         taxa_data$yearnew[as.numeric(format(taxa_data[start_col][[1]],'%Y'))>=time_periods[ii,1][[1]] &
-                          as.numeric(format(taxa_data[end_col][[1]],'%Y'))<=time_periods[ii,2][[1]]]<-floor(rowMeans(time_periods[ii,])[[1]])
+                            as.numeric(format(taxa_data[end_col][[1]],'%Y'))<=time_periods[ii,2][[1]]]<-floor(rowMeans(time_periods[ii,])[[1]])
       }
     }else{
       for(ii in 1:length(time_periods[,1])){
         taxa_data$yearnew[taxa_data[year_col]>=time_periods[ii,1][[1]] &
-                          taxa_data[year_col]<=time_periods[ii,2][[1]]]<-floor(rowMeans(time_periods[ii,])[[1]])
+                            taxa_data[year_col]<=time_periods[ii,2][[1]]]<-floor(rowMeans(time_periods[ii,])[[1]])
       }
     }
     
     taxa_data$year<-taxa_data$yearnew
     # Those that are not inthese time periods are removed
     taxa_data<-taxa_data[!is.na(taxa_data$year),]
-   
+    
     #rename columns
     newnames<-c('hectad','CONCEPT')
     oldnames<-c(site_col,sp_col)
@@ -164,7 +171,7 @@ plr <-
     # Remove Ireland and Channel Islands if desired
     if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data[site_col])==1)
     if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data[site_col])==FALSE)
-  
+    
     
     # For each pair of time periods go through and compare them
     # Compare the time periods
@@ -174,8 +181,8 @@ plr <-
         time_periods_temp<-time_periods[c(ii,j),] 
         taxon_temp<-paste(analType,'_',ii,'_',j,sep='')
         basic_temp<-basic_trends(taxa_data,time_periods_temp,min_sq=min_sq,
-                                 run_telfer=FALSE,run_pd=FALSE)
-        basic_temp<-as.data.frame(basic_temp$plr)
+                                 run_telfer=FALSE,run_plr=FALSE)
+        basic_temp<-as.data.frame(basic_temp$prop.diff)
         colnames(basic_temp)<-paste(analType,'_',ii,'_',j,sep='')
         basic_temp$CONCEPT<-row.names(basic_temp)
         print(paste('Basic trends for tp',ii,'vs tp',j,'done',sep=' '))
