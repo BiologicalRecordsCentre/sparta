@@ -2,32 +2,28 @@
 \alias{frescalo}
 \title{Frescalo trend analysis}
 \usage{
-  frescalo(data = NULL, taxon_name = NULL,
-    species_to_include = NULL, ignore.ireland = F,
-    ignore.channelislands = F, sinkdir = NULL,
-    taxon_reg = NULL, time_periods = NULL, channel = NULL,
-    Plot_Fres = TRUE, Fres_weights = "LC",
-    non_benchmark_sp = NULL, get_names_from_BRC = FALSE,
-    fres_site_filter = NULL, phi = NULL, alpha = NULL)
+  frescalo(Data = NULL, species_to_include = NULL,
+    ignore.ireland = F, ignore.channelislands = F,
+    sinkdir = NULL, time_periods = NULL, plot_fres = TRUE,
+    Fres_weights = "LC", non_benchmark_sp = NULL,
+    fres_site_filter = NULL, phi = NULL, alpha = NULL,
+    year_col = NA, site_col = NA, sp_col = NA,
+    start_col = NA, end_col = NA)
 }
 \arguments{
-  \item{data}{A dataframe object or string giving the file
+  \item{Data}{A dataframe object or string giving the file
   path to the location of data (either .rdata or .csv).
-  Required columns are: 'CONCEPT', 'hectad' and 'Date' or
-  'year'. Optionally 'TO_STARTDATE' can be included, if it
-  is this is assumed to be the start date (from which start
-  year is extracted) and year is assumed to be the end
-  date. If \code{NULL} the user is prompted to select a
-  .csv or .rdata file.}
+  This should consist of rows of observations and columns
+  indicating the species and location as well as either the
+  year of the observation or columns specifying the start
+  and end dates of the observation. If \code{NULL}
+  (default) the user is prompted to select a .csv or .rdata
+  file.}
 
-  \item{taxon_name}{string giving the name of data. This is
-  used to name output files when written}
-
-  \item{species_to_include}{A vector of strings (that match
-  your CONCEPT column in data) which are to be used.
-  Species not in your list are ignored.  This is useful if
-  you are only interested in a subset of species, i.e. in
-  red listing}
+  \item{species_to_include}{Optionally a character vector
+  listing the names of species to be used.  Species not in
+  your list are ignored. This is useful if you are only
+  interested in a subset of species.}
 
   \item{ignore.ireland}{Logical, if \code{TRUE} Irish
   hectads are removed. Default is \code{FALSE}}
@@ -37,25 +33,14 @@
   \code{FALSE}}
 
   \item{sinkdir}{String giving the output directory for
-  result}
-
-  \item{get_names_from_BRC}{Default is \code{FALSE}. if
-  \code{TRUE} it assumes the CONCEPT in your data relates
-  to a BRC concept code and the names of species will be
-  retireve from the database using \code{channel} for use
-  in output.}
+  results}
 
   \item{time_periods}{A dataframe object with two columns.
   The first column contains the start year of each time
   period and the second column contains the end year of
-  each time period. This is required if running Frescalo or
-  basic trends.}
+  each time period. Time periods should not overlap.}
 
-  \item{channel}{An ODBC channel, creaded using
-  odbcConnect(), this can be used to get spp names if
-  get_names_from_BRC is \code{TRUE}}
-
-  \item{Plot_Fres}{Logical, if \code{TRUE} maps are
+  \item{plot_fres}{Logical, if \code{TRUE} maps are
   produced by Frescalo}
 
   \item{Fres_weights}{'LC' specifies a weights file based
@@ -66,9 +51,10 @@
   columns: target cell, neighbour cell, weight.}
 
   \item{non_benchmark_sp}{a character vector or data.frame
-  with one column, giving the concepts of species not to be
+  with one column, giving the names of species not to be
   used as benchmarks in Frescalo. Default is \code{NULL}
-  and all sites are used.}
+  and all species are used. See Hill, 2011 for reasons why
+  some species may not be suitable benchmarks.}
 
   \item{fres_site_filter}{Optionally a character vector or
   data.frame with one column, giving the names of sites to
@@ -201,7 +187,7 @@
   analysing occurrence data when recording effort is not
   known. This function returns the output from Frescalo to
   the R session and saves it to the path specified by
-  \code{sinkdir}. By setting \code{Plot_Fres} to
+  \code{sinkdir}. By setting \code{plot_fres} to
   \code{TRUE} maps of the results will also be saved.
   Plotting the returned object gives a useful summary.
 }
@@ -209,13 +195,16 @@
 \dontrun{
 #script for testing frescalo
 #data will be written to your working directory
-
 data(ex_dat)
 
-x<-frescalo(data=ex_dat,
-         taxon_name='EXAMPLE',
-         time_periods=data.frame(start=c(1980,1990),end=c(1989,1999)),
-         sinkdir=paste(getwd(),'/example_sparta_output',sep=''))
+setwd('W:/PYWELL_SHARED/Pywell Projects/BRC/Tom August/R Packages/Trend analyses')
+
+fres_out<-frescalo(Data=ex_dat,
+                   time_periods=data.frame(start=c(1980,1990),end=c(1989,1999)),
+                   start_col='TO_STARTDATE',
+                   end_col='Date',
+                   site_col='hectad',
+                   sp_col='CONCEPT')
 }
 }
 \references{

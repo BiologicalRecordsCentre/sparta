@@ -49,7 +49,7 @@ function(gridref, gr_prec = 10000, ci_insert = TRUE, ci_origin = c(-180000,30000
 		}
 		
 	# Plot polygons
-		polygon(gr_poly$EASTING, gr_poly$NORTHING, ...)
+    polygon(gr_poly$EASTING, gr_poly$NORTHING, ...) 
 	
 	# Return gr_poly invisibly
 		invisible(data.frame(GRIDREF = rep(gridref, each = 5), gr_poly))
