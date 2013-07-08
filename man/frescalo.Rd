@@ -4,9 +4,10 @@
 \usage{
   frescalo(Data = NULL, species_to_include = NULL,
     ignore.ireland = F, ignore.channelislands = F,
-    sinkdir = NULL, time_periods = NULL, plot_fres = TRUE,
+    sinkdir = NULL, time_periods = NULL, plot_fres = FALSE,
     Fres_weights = "LC", non_benchmark_sp = NULL,
     fres_site_filter = NULL, phi = NULL, alpha = NULL,
+    trend_option = "arithmetic", NYears = 10,
     year_col = NA, site_col = NA, sp_col = NA,
     start_col = NA, end_col = NA)
 }
@@ -41,7 +42,7 @@
   each time period. Time periods should not overlap.}
 
   \item{plot_fres}{Logical, if \code{TRUE} maps are
-  produced by Frescalo}
+  produced by Frescalo. Default is \code{FALSE}.}
 
   \item{Fres_weights}{'LC' specifies a weights file based
   on landcover data for the UK and 'VP' uses a weights file
@@ -71,6 +72,19 @@
   \item{alpha}{the proportion of the expected number of
   species in a cell to be treated as benchmarks. Default is
   0.27 as in Hill (2011). This is limited to 0.08 to 0.50.}
+
+  \item{trend_option}{Set the method by which you wish to
+  calculate %change. This can currently be set to either
+  \code{'arithmetic'} (default) or \code{'geometric'}.
+  Arimthmetic calculates percentage change in a linear
+  fashion such that a decline of 50% over 50 years is equal
+  to 10% in 10 years. Using the same example a Geometric
+  trend would be 8.44% every 10 years as this work on a
+  compound rate.}
+
+  \item{NYears}{The number of years over which you want the
+  %change to be calculated (i.e.  10 gives a decadal
+  change). Default = 10}
 }
 \value{
   Results are saved to file and most are returned in a list

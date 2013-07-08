@@ -136,6 +136,10 @@ function(stat, trend, freq, spp_names = NULL, onefile = TRUE, onefile_name = NUL
 				temp = dev.off()
 			}
     
+    # pick up lm file and sort by species
     lm_stats<-read.csv(file = file.path(dir_path,stats_fname))
+    lm_stats<-lm_stats[with(lm_stats,order(NAME)),]
+		write.table(lm_stats,file = file.path(dir_path,stats_fname), col.names = TRUE, row.names = FALSE, quote=TRUE, sep=",", append = FALSE)
+		
 		return(lm_stats)	
 }

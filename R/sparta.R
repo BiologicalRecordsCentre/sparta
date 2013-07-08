@@ -361,7 +361,7 @@ sparta <-
                           ' The new data is saved with the time appended to the file name',sep=''),call.=FALSE,immediate.=TRUE)
           }
           
-          for (ii in unique(taxa_data$CONCEPT[!is.na(taxa_data$kmsq)&!is.na(taxa_data$year)])){
+          for (ii in sort(unique(taxa_data$CONCEPT[!is.na(taxa_data$kmsq)&!is.na(taxa_data$year)]))){
             if(print_progress) print(paste('Modelling',ii,'- Species',counter,'of',length(unique(taxa_data$CONCEPT[!is.na(taxa_data$kmsq)&!is.na(taxa_data$year)]))))
             y<-unique(taxa_data[taxa_data$CONCEPT==ii&!is.na(taxa_data$kmsq)&!is.na(taxa_data$year),][c('CONCEPT',colnames(space_time)[1],'kmsq')])
             species_space_time <- merge(x=space_time,y=y,all.x=T)

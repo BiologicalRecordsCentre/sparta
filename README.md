@@ -9,7 +9,6 @@ This R package includes methods used to analyse trends in unstructured occurrenc
 We have developed tutorials for a few of the functions in the package:
 
 * [frescalo](https://github.com/BiologicalRecordsCentre/sparta/wiki/frescalo) - A function for using Frescalo (Hill, 2011), a tool for analysing occurrence data when recording effort is not known.
-* [sparta](https://github.com/BiologicalRecordsCentre/sparta/wiki/sparta) - A function that implements a range of methods used to analyses trends in unstructured occurrence datasets
 * [plot_GIS](https://github.com/BiologicalRecordsCentre/sparta/wiki/plot_GIS) - A function for plotting GIS data
 * [create_weights](https://github.com/BiologicalRecordsCentre/sparta/wiki/create_weights) - A function for creating a frescalo weights file
   

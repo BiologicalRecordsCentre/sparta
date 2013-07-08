@@ -45,20 +45,21 @@
 #' @import reshape2
 #' @examples
 #' \dontrun{
+#'  library(sparta)
 #' 
 #'  # Load example dataset
 #'  data(ex_dat)
 #'  
 #'  # Passing data as an R object
-#'  telfer_out <- plrtelfer(Data=ex_dat,
-#'                          time_periods=data.frame(start=c(1980,1990,2000),end=c(1989,1999,2009)),
-#'                          min_sq=2,
-#'                          useIterations=T,
-#'                          iterations=20,
-#'                          site_col='hectad',
-#'                          sp_col='CONCEPT',
-#'                          start_col='TO_STARTDATE',
-#'                          end_col='Date')
+#'  telfer_out <- telfer(Data=ex_dat,
+#'                       time_periods=data.frame(start=c(1980,1990,2000),end=c(1989,1999,2009)),
+#'                       min_sq=2,
+#'                       useIterations=T,
+#'                       iterations=20,
+#'                       site_col='hectad',
+#'                       sp_col='CONCEPT',
+#'                       start_col='TO_STARTDATE',
+#'                       end_col='Date')
 #' 
 #' }
 #' @references Telfer, M.G., Preston, C.D., & Rothery, P. (2002) A general method for
@@ -120,7 +121,9 @@ telfer <-
     if(is.null(Data)){
       cat("Choose .csv or .rdata file. Else assign data.frame of data to 'data'")
       Data<-choose.files()
-    } 
+      if(length(Data)==0) stop('User failed to select data')
+      if(!grepl('.csv',Data) | grepl('.rdata',Data)) stop('Data file must be .csv or .rdata')
+    }
     
     analType<-'telfer'
     
@@ -139,7 +142,7 @@ telfer <-
       }
     }else if(grepl('.csv',Data,ignore.case=TRUE)){
       print('loading raw data')
-      taxa_data<-read.table(Data,header=TRUE,stringsAsFactors=FALSE,sep=',')
+      taxa_data<-read.table(Data,header=TRUE,stringsAsFactors=FALSE,sep=',',check.names=FALSE)
     }
     
     # Check column names
@@ -148,14 +151,17 @@ telfer <-
     if(length(missingColNames)>0) stop(paste(unlist(missingColNames),'is not the name of a column in data'))
     
     # Ensure date columns are dates
-    if(!is.na(start_col)&!is.na(end_col)){      
-      for( i in c(start_col,end_col)){
-        if(!'POSIXct' %in% class(taxa_data[[i]]) & !'Date' %in% class(taxa_data[[i]])){
-          warning(paste('column',i,'Date is not in a date format. This should be of class "Date" or "POSIXct", conversion attempted'))
-          taxa_data[[i]]<-as.Date(taxa_data[[i]])
-        }
-      }
+    if(!is.na(start_col)){
+      taxa_data<-colToDate(taxa_data,start_col)  
+    } 
+    if(!is.na(end_col)){
+      taxa_data<-colToDate(taxa_data,end_col)  
     }
+    if(!is.na(year_col)){
+      if(!is.numeric(taxa_data[year_col][,1])){
+        stop('column specified by year_col must be numeric') 
+      }
+    } 
     
     # We need to put each record into its time period
     if(!is.na(start_col) & !is.na(end_col)){
@@ -212,15 +218,25 @@ telfer <-
     
     # If a sink directory is given write the output to file
     if(!is.null(sinkdir)){  
-      file_name<-paste(analType,'_',datecode,'.csv',sep='')
+      file_name<-paste(analType,'_',datecode,sep='')
       orgwd<-getwd()
       setwd(sinkdir)      
-      if (file.exists(file_name)){
-        file_name<-paste(analType,'_',datecode,'_',format(Sys.time(),'%H%M'),'.csv',sep='')
-        warning(paste(analType,'_',datecode,'.csv',' already exists.',
-                      ' The new data is saved with the time appended to the file name',sep=''),call.=FALSE,immediate.=TRUE)
+      if (file.exists(paste(file_name,'.csv',sep=''))){
+        files <- dir(sinkdir)
+        files <- files[grepl(paste(analType,'_',datecode,sep=''),files)]
+        if(sum(grepl('\\(',files))>0){ # if we have indexed files already index the new file as max+1
+          files <- gsub(".csv",'',gsub(paste(analType,'_',datecode,sep=''),'',files)) #remove text from file name
+          files <- gsub("\\)",'',gsub("\\(",'',files)) # remove brackets
+          max_index <- max(as.numeric(files),na.rm=TRUE) # find the highest index number
+          new_index <- max_index + 1
+        } else {
+          new_index <- 1
+        }
+        file_name <- paste(analType,'_',datecode,'(',new_index,')',sep='')
+        warning(paste(analType,'_',datecode,' already exists.',
+                      ' The new data is indexed as (',new_index,')',sep=''))
       }
-      write.csv(basic_master,file_name,row.names=FALSE)
+      write.csv(basic_master,paste(file_name,'.csv',sep=''),row.names=FALSE)
       setwd(orgwd)
     }
     

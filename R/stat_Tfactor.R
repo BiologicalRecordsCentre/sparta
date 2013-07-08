@@ -40,7 +40,8 @@ stat_Tfactor <-
               F_num_df = lm_summ$fstatistic[2],
               F_den_df = lm_summ$fstatistic[3],
               fres_trend10 = pc.change(ilt(10*lm_coefs[2,1])),
-              row.names = trend[1,spp_col]
+              Ymin = min(spp_lm$model[time_col]),
+              Ymax = max(spp_lm$model[time_col])
             )
                     
           } else {

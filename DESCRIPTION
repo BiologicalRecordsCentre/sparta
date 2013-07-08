@@ -1,8 +1,8 @@
 Package: sparta
 Type: Package
 Title: Trend analysis for unstructured data
-Version: 0.0.19
-Date: 2013-04-24
+Version: 0.1.0
+Date: 2013-07-08
 Author: Tom August <tomaug@ceh.ac.uk>
 Maintainer: Tom August <tomaug@ceh.ac.uk>
 Description: This package includes methods used to analyse trends in unstructured

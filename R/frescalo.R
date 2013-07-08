@@ -23,7 +23,8 @@
 #' @param time_periods A dataframe object with two columns. The first column contains the
 #'        start year of each time period and the second column contains the end year of 
 #'        each time period. Time periods should not overlap.
-#' @param plot_fres Logical, if \code{TRUE} maps are produced by Frescalo
+#' @param plot_fres Logical, if \code{TRUE} maps are produced by Frescalo. Default is 
+#'        \code{FALSE}.
 #' @param Fres_weights 'LC' specifies a weights file based on landcover data
 #'        for the UK and 'VP' uses a weights file based on vascular plant data for the UK
 #'        , both are included in the package. Alternativly a custom weights file can be
@@ -43,6 +44,13 @@
 #'        0.50 to 0.95.
 #' @param alpha the proportion of the expected number of species in a cell to be treated as
 #'        benchmarks. Default is 0.27 as in Hill (2011). This is limited to 0.08 to 0.50.
+#' @param trend_option Set the method by which you wish to calculate %change. This can currently
+#'        be set to either \code{'arithmetic'} (default) or \code{'geometric'}. Arimthmetic calculates
+#'        percentage change in a linear fashion such that a decline of 50% over 50 years is
+#'        equal to 10% in 10 years. Using the same example a Geometric trend would be 8.44%
+#'        every 10 years as this work on a compound rate.
+#' @param NYears The number of years over which you want the %change to be calculated (i.e.
+#'        10 gives a decadal change). Default = 10
 #' @return Results are saved to file and most are returned in a list to R.
 #' 
 #'         The list object returned is comprised of the following:
@@ -146,12 +154,14 @@ frescalo <-
            ignore.channelislands=F, ##do you want to remove Channel Islands (they are not UK)?
            sinkdir=NULL,#where is the data going to be saved
            time_periods=NULL, #a list of vector pairs used in frescalo (ie 'c((1990,1995),(1996,2000))')
-           plot_fres=TRUE,#do you want to plot the maps and do linear regression for frescalo?
+           plot_fres=FALSE,#do you want to plot the maps and do linear regression for frescalo?
            Fres_weights='LC',#the name of the weights file in the frescalo directory to be used
            non_benchmark_sp=NULL,#species not to be used as benchmarks 
            fres_site_filter=NULL, #optional list of sites not to be included in analysis
            phi = NULL, #phi value for frescalo
            alpha = NULL, #alpha value for frescalo
+           trend_option = 'arithmetic',
+           NYears = 10,
            year_col=NA, # the name of your year column
            site_col=NA, # name of site column
            sp_col=NA, # name od species column
@@ -248,7 +258,7 @@ frescalo <-
     if(plot_fres) data(UK)
     
     # set up frescalo path
-    frespath<-paste(normalizePath(.Library),'\\sparta\\exec\\Frescalo_2a.exe',sep='')
+    frespath<-paste(normalizePath(.Library),'\\sparta\\exec\\Frescalo_2b.exe',sep='')
     
     # unpack weights file if needed
     if(class(Fres_weights)=='character'){
@@ -300,7 +310,7 @@ frescalo <-
       }
     }else if(grepl('.csv',Data,ignore.case=TRUE)){
       print('loading raw data')
-      taxa_data<-read.table(Data,header=TRUE,stringsAsFactors=FALSE,sep=',')
+      taxa_data<-read.table(Data,header=TRUE,stringsAsFactors=FALSE,sep=',',check.names=FALSE)
     }
   
     # Check column names
@@ -309,6 +319,18 @@ frescalo <-
     if(length(missingColNames)>0) stop(paste(unlist(missingColNames),'is not the name of a column in data'))
     
     # Ensure date columns are dates
+    if(!is.na(start_col)){
+        taxa_data<-colToDate(taxa_data,start_col)  
+    } 
+    if(!is.na(end_col)){
+      taxa_data<-colToDate(taxa_data,end_col)  
+    }
+    if(!is.na(year_col)){
+      if(!is.numeric(ex_dat[year_col][,1])){
+        stop('column specified by year_col must be numeric') 
+      }
+    } 
+    
     if(!is.na(start_col)&!is.na(end_col)){      
       for( i in c(start_col,end_col)){
         if(!'POSIXct' %in% class(taxa_data[[i]]) & !'Date' %in% class(taxa_data[[i]])){
@@ -364,7 +386,14 @@ frescalo <-
     if(file.exists(fresoutput)){
       files <- dir(sinkdir)
       files <- files[grepl(paste('frescalo_',datecode,sep=''),files)]
-      new_index <- length(files) + 1
+      if(sum(grepl('\\(',files))>0){ # if we have indexed files already index the new file as max+1
+        files <- gsub(".csv",'',gsub(paste('frescalo_',datecode,sep=''),'',files)) #remove text from file name
+        files <- gsub("\\)",'',gsub("\\(",'',files)) # remove brackets
+        max_index <- max(as.numeric(files),na.rm=TRUE) # find the highest index number
+        new_index <- max_index + 1
+      } else {
+        new_index <- 1
+      }
       fresoutput <- paste(fresoutput,'(',new_index,')',sep='')
       dir.create(fresoutput,showWarnings = FALSE)
       warning('sinkdir already contains frescalo output. New data saved in ', paste('frescalo_',datecode,'(',new_index,')',sep=''))
@@ -375,7 +404,7 @@ frescalo <-
     # Set up species names
     spp_names<-NULL
     # Create a lookup table of old and new names
-    new_names <- data.frame(SPECIES=paste('S',1:length(unique(taxa_data$CONCEPT)),sep=''),NAME=unique(taxa_data$CONCEPT))
+    new_names <- data.frame(SPECIES=paste('S',1:length(unique(taxa_data$CONCEPT)),sep=''),NAME=sort(unique(taxa_data$CONCEPT)))
     spp_names <- paste(fresoutput,'/species_names.csv',sep='')
     write.table(new_names,spp_names,sep=',',row.names=FALSE)
     # Merge in the new species names and use these going into frescalo
@@ -416,8 +445,18 @@ frescalo <-
       trendpath <- paste(fresoutput, '/Output/Trend.txt', sep='')
       zvalues <- fres_zvalues(trendpath)
       lm_z <- merge(x=fres_lm, y=zvalues, by='SPECIES', all=TRUE)
+      lm_z <- lm_z[with(lm_z,order(NAME)),]
       write.csv(lm_z, fres_lm_path, row.names=FALSE)
       fres_return$lm_stats <- lm_z
+    }
+   
+    if('lm_stats' %in% names(fres_return)){
+      fres_return$lm_stats[paste(NYears,'yr_change')]<-percentageChange(intercept=fres_return$lm_stats['a'],
+                                                          slope=fres_return$lm_stats['b'],
+                                                          Ymin=fres_return$lm_stats['Ymin'],
+                                                          Ymax=fres_return$lm_stats['Ymax'],
+                                                          NYears=NYears,
+                                                          option=trend_option)
     }
     
     # Remove .txt files created by frescalo. These have been converted to .csv

@@ -85,20 +85,21 @@
 }
 \examples{
 \dontrun{
+ library(sparta)
 
  # Load example dataset
  data(ex_dat)
 
  # Passing data as an R object
- telfer_out <- plrtelfer(Data=ex_dat,
-                         time_periods=data.frame(start=c(1980,1990,2000),end=c(1989,1999,2009)),
-                         min_sq=2,
-                         useIterations=T,
-                         iterations=20,
-                         site_col='hectad',
-                         sp_col='CONCEPT',
-                         start_col='TO_STARTDATE',
-                         end_col='Date')
+ telfer_out <- telfer(Data=ex_dat,
+                      time_periods=data.frame(start=c(1980,1990,2000),end=c(1989,1999,2009)),
+                      min_sq=2,
+                      useIterations=T,
+                      iterations=20,
+                      site_col='hectad',
+                      sp_col='CONCEPT',
+                      start_col='TO_STARTDATE',
+                      end_col='Date')
 
 }
 }

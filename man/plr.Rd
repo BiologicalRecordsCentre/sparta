@@ -72,6 +72,8 @@
 }
 \examples{
 \dontrun{
+ library(sparta)
+
  #load example dataset
  data(ex_dat)
 

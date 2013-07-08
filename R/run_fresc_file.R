@@ -250,6 +250,7 @@ function(
 		  trend$Species[trend$Species==i]<-spp_names$NAME[spp_names$SPECIES==i]
 		}
 		
+		
     stats<-as.data.frame(stats)
     
     freq<-as.data.frame(freq)
