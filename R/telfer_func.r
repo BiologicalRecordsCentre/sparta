@@ -142,6 +142,3 @@ GP_telfer <- function (taxa_data,time_periods,iterations=10,useIterations=TRUE,m
   }
 
 }
-
-
-  
