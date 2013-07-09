@@ -19,13 +19,13 @@ function(gridref, gr_prec = 10000, ci_insert = TRUE, ci_origin = c(-180000,30000
 		gr_poly[seq(1,by=5, length.out=gr_len),] = gr_let2num(gridref)
 		
 	# Determine other three corners and assign to every fith row in data.frame (i.e. 2nd, 7th for TL corner, 3rd, 8th for TR, etc)
-		# Top Left
+		# Top Leftprin    
 		gr_poly[seq(2,by=5, length.out=gr_len),] = gr_poly[seq(1,by=5, length.out=gr_len),] + data.frame(rep(0,gr_len),rep(gr_prec,gr_len))
 		# Top Right
 		gr_poly[seq(3,by=5, length.out=gr_len),] = gr_poly[seq(1,by=5, length.out=gr_len),] + data.frame(rep(gr_prec,gr_len),rep(gr_prec,gr_len))
 		# Bottom Right
 		gr_poly[seq(4,by=5, length.out=gr_len),] = gr_poly[seq(1,by=5, length.out=gr_len),] + data.frame(rep(gr_prec,gr_len), rep(0,gr_len))
-		
+		    
 	# Find Irish gridrefs
 		ir_inds = which(grepl("(^[[:upper:]]{1}[[:digit:]]{2}([[:upper:]]?|[[:upper:]]{2})$)|(^[[:upper:]]{1}[[:digit:]]{2,}$)", rep(gridref,each=5)) & !is.na(gr_poly$EASTING))
 		if(length(ir_inds) > 0){
@@ -50,7 +50,7 @@ function(gridref, gr_prec = 10000, ci_insert = TRUE, ci_origin = c(-180000,30000
 		
 	# Plot polygons
     polygon(gr_poly$EASTING, gr_poly$NORTHING, ...) 
-	
+	      
 	# Return gr_poly invisibly
 		invisible(data.frame(GRIDREF = rep(gridref, each = 5), gr_poly))
 }

@@ -19,16 +19,15 @@ fit_maes_trend<-function(records, time_periods=NULL, min_sp=5){
   }
   
   # Subset data to years needed
-  records<-records[records$year %in% all_years,]
+  records<-records[records$tpnew %in% all_years,]
   
   splityr <- mean(c(max(time_periods[1,]),min(time_periods[2,])))
     
   # which time period is each record in?
-  records$tp[records$yearnew<splityr & records$yearnew<splityr]<-1
-  records$tp[records$yearnew>=splityr & records$yearnew>=splityr]<-2
+  records$tp[records$tpnew<splityr & records$tpnew<splityr]<-1
+  records$tp[records$tpnew>=splityr & records$tpnew>=splityr]<-2
     
   records<-records[!is.na(records$tp),]
-
   # convert the records into a 3D array
   rc <- acast(records, Species ~ Site ~ tp, fun=occurrence, value.var=2)
 

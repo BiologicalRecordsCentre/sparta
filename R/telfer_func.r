@@ -55,10 +55,9 @@ GP_telfer <- function (taxa_data,time_periods,iterations=10,useIterations=TRUE,m
     size<-length(temp[,1])			# identify the number of cells the species occupies (species range size)
     rangesT2<-c(rangesT2,size)		# concatenate all species range sizes
   }
-  
   T2_range<-data.frame(T1_species,rangesT2) # create a dataframe of species and range size for time period 2
-
-  ### Remove species which have less than 5 grid cells in first period ###
+  
+  ### Remove species which have less than min_sq grid cells in first period ###
   T1_range_good<-T1_range[T1_range$ranges>=min_sq,]
   
   ### Link the two tables on species then identify the change in number of grid squares between time periods. ###

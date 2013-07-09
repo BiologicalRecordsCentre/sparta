@@ -60,8 +60,8 @@
 #'         coefficient, intercept, and coefficeint of log to base 2 list-length respectively
 #'         For each of these estimates the standard error (\code{SE}), Z-score (\code{zscore})
 #'         and P-value (\code{pvalue}) are given. The year used for the intercept is year 0
-#'         but the median year in the dataset, this helps to increase model stability and the
-#'         is given in column \code{yearZero}.
+#'         but the median year in the dataset, this helps to increase model stability and 
+#'         is given in column \code{yearZero}. \code{Ymin} and \code{Ymax} give the minimum and maximum years used in the model. Note these values are centered on \code{yearZero}. \code{change_} gives the percentage change dependent on the values given to \code{trend_option} and \code{NYears}.
 #'        
 #' @keywords trends, species, distribution, list, length, list-length 
 #' @examples
@@ -74,9 +74,10 @@
 #' 
 #' LL_out <- listLength(Data = ex_dat,
 #'                      year_range = c(1970,2010),
-#'                      date_col = 'Date',
 #'                      site_col = 'kmsq',
-#'                      sp_col = 'CONCEPT')
+#'                      sp_col = 'CONCEPT',
+#'                      start_col='TO_STARTDATE',
+#'                      end_col='Date')
 #' 
 #' 
 #' }
@@ -336,7 +337,7 @@ listLength <-
     Mod_out<-t(as.data.frame(LL_func(species_space_time))) # run the model
     row.names(Mod_out)<-ii
     Mod_out<-as.data.frame(Mod_out)
-    Mod_out[paste(NYears,'yr_change',sep='')]<-percentageChange(intercept=Mod_out$intercept,
+    Mod_out[paste('change_',NYears,'yr',sep='')]<-percentageChange(intercept=Mod_out$intercept,
                                                                slope=Mod_out$year,
                                                                Ymin=Mod_out$Ymin,
                                                                Ymax=Mod_out$Ymax,

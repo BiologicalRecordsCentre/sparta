@@ -65,7 +65,8 @@ function(trend,spp_col = "Species__", time_col = "Time______", Tfactor_col = "TF
 						F_val = lm_summ$fstatistic[1],
 						F_num_df = lm_summ$fstatistic[2],
 						F_den_df = lm_summ$fstatistic[3],
-						fres_trend10 = pc.change(ilt(10*lm_coefs[2,1])),
+						Ymin = min(spp_lm$model[time_col]),
+						Ymax = max(spp_lm$model[time_col]),
 						row.names = trend[1,spp_col]
 					)															
 				} else {
@@ -85,7 +86,8 @@ function(trend,spp_col = "Species__", time_col = "Time______", Tfactor_col = "TF
 						F_val = NA,
 						F_num_df = NA,
 						F_den_df = NA,
-						fres_trend10 = NA
+						Ymin = NA,
+						Ymax = NA
 					)
 				}
 				invisible(stat)
@@ -110,7 +112,8 @@ function(trend,spp_col = "Species__", time_col = "Time______", Tfactor_col = "TF
 			    F_val = NA,
 			    F_num_df = NA,
 			    F_den_df = NA,
-			    fres_trend10 = NA
+			    Ymin = NA,
+			    Ymax = NA
 			  )
 			  invisible(stat)
 			}
@@ -135,7 +138,8 @@ function(trend,spp_col = "Species__", time_col = "Time______", Tfactor_col = "TF
 			  F_val = NA,
 			  F_num_df = NA,
 			  F_den_df = NA,
-			  fres_trend10 = NA
+			  Ymin = NA,
+			  Ymax = NA
 			)
 			invisible(stat)
 		}

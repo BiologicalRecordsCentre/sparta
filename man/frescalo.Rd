@@ -42,7 +42,8 @@
   each time period. Time periods should not overlap.}
 
   \item{plot_fres}{Logical, if \code{TRUE} maps are
-  produced by Frescalo. Default is \code{FALSE}.}
+  produced by Frescalo. Default is \code{FALSE}. CURRENTLY
+  ONLY WORKS FOR UK GRID-REFERENCE DATA}
 
   \item{Fres_weights}{'LC' specifies a weights file based
   on landcover data for the UK and 'VP' uses a weights file
@@ -187,14 +188,16 @@
   model\cr - \tab \code{F_num_df} \tab Degrees of freedom
   of the model\cr - \tab \code{F_den_df} \tab Denominator
   degrees of freedom from the F-statistic\cr - \tab
-  \code{fres_trend10} \tab The slope of the model
-  represented as a percentage decadal change\cr } \bold{The
-  following columns are only produced when there are only
-  two time periods} \tabular{rll}{ - \tab \code{Z_VAL} \tab
-  Z-value for the significance test of the trend\cr - \tab
-  \code{SIG_95} \tab A logical statement indicating if the
-  trend is significant (TRUE) or non-significant (FALSE)\cr
-  }
+  \code{Ymin} \tab The earliest year in the dataset\cr -
+  \tab \code{Ymax} \tab The latest year in the dataset\cr -
+  \tab \code{change_...} \tab The percentage change
+  dependent on the values given to \code{trend_option} and
+  \code{NYears}.\cr } \bold{The following columns are only
+  produced when there are only two time periods}
+  \tabular{rll}{ - \tab \code{Z_VAL} \tab Z-value for the
+  significance test of the trend\cr - \tab \code{SIG_95}
+  \tab A logical statement indicating if the trend is
+  significant (TRUE) or non-significant (FALSE)\cr }
 }
 \description{
   A function for using Frescalo (Hill, 2011), a tool for
@@ -211,14 +214,12 @@
 #data will be written to your working directory
 data(ex_dat)
 
-setwd('W:/PYWELL_SHARED/Pywell Projects/BRC/Tom August/R Packages/Trend analyses')
-
 fres_out<-frescalo(Data=ex_dat,
                    time_periods=data.frame(start=c(1980,1990),end=c(1989,1999)),
-                   start_col='TO_STARTDATE',
-                   end_col='Date',
                    site_col='hectad',
-                   sp_col='CONCEPT')
+                   sp_col='CONCEPT',
+                   start_col='TO_STARTDATE',
+                   end_col='Date')
 }
 }
 \references{

@@ -120,7 +120,11 @@
   \code{nVisitsUsed} is similar, giving the absolute number
   of visits used, and \code{nSpeciesObs} gives the number
   of these visits when the species of interest was
-  observed.
+  observed.  \code{Ymin} and \code{Ymax} give the minimum
+  and maximum years used in the model. Note these values
+  are centered on \code{yearZero}.  \code{change_} gives
+  the percentage change dependent on the values given to
+  \code{trend_option} and \code{NYears}.
 }
 \description{
   This function undertakes a 'mixed-model' analysis as laid

@@ -111,7 +111,12 @@
   (\code{zscore}) and P-value (\code{pvalue}) are given.
   The year used for the intercept is year 0 but the median
   year in the dataset, this helps to increase model
-  stability and the is given in column \code{yearZero}.
+  stability and is given in column \code{yearZero}.
+  \code{Ymin} and \code{Ymax} give the minimum and maximum
+  years used in the model. Note these values are centered
+  on \code{yearZero}. \code{change_} gives the percentage
+  change dependent on the values given to
+  \code{trend_option} and \code{NYears}.
 }
 \description{
   This function undertakes a list-length analysis (Szabo et
@@ -131,9 +136,10 @@ data(ex_dat)
 
 LL_out <- listLength(Data = ex_dat,
                      year_range = c(1970,2010),
-                     date_col = 'Date',
                      site_col = 'kmsq',
-                     sp_col = 'CONCEPT')
+                     sp_col = 'CONCEPT',
+                     start_col='TO_STARTDATE',
+                     end_col='Date')
 
 
 }

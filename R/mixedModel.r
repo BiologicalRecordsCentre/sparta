@@ -64,7 +64,10 @@
 #'         short lists (\code{min_list}), and sites sampled in few years (\code{min_years}).
 #'         \code{nVisitsUsed} is similar, giving the absolute number of visits used, and
 #'         \code{nSpeciesObs} gives the number of these visits when the species of interest
-#'         was observed.
+#'         was observed.  \code{Ymin} and \code{Ymax} give the minimum and maximum years
+#'         used in the model. Note these values are centered on \code{yearZero}.
+#'         \code{change_} gives the percentage change dependent on the values given to
+#'         \code{trend_option} and \code{NYears}.
 #'        
 #' @keywords trends, species, distribution
 #' @examples
@@ -300,7 +303,7 @@ mixedModel <-
                                                V=verbose))) # run the model
       row.names(Mod_out)<-ii
       Mod_out<-as.data.frame(Mod_out)
-      Mod_out[paste(NYears,'yr_change',sep='')]<-percentageChange(intercept=Mod_out$intercept,
+      Mod_out[paste('change_',NYears,'yr',sep='')]<-percentageChange(intercept=Mod_out$intercept,
                                                                  slope=Mod_out$year,
                                                                  Ymin=Mod_out$Ymin,
                                                                  Ymax=Mod_out$Ymax,

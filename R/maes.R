@@ -108,6 +108,11 @@ maes <-function(Data=NULL,#your data (.rdata files) as a file path (or list of f
   if(!is.data.frame(Data)&length(Data)>1){warning('Data cannot have length > 1');warn=TRUE}
   if(warn) stop("Oops, you need to address these warnings")
 
+  # ensure time_periods is ordered chronologically (this orders by the first column - start year)
+  time_periods<-time_periods[with(time_periods, order(time_periods[,1])),]
+  # ensure the end years are all greater than the start years
+  if(TRUE %in% (time_periods[,2]<=time_periods[,1])) stop('In time_periods end years must be greater than start years')
+    
   required.packages <- c('reshape2')
   new.packages <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
   if(length(new.packages)) install.packages(new.packages)
@@ -187,12 +192,12 @@ maes <-function(Data=NULL,#your data (.rdata files) as a file path (or list of f
   # We need to put each record into its time period
   if(!is.na(start_col) & !is.na(end_col)){
     for(ii in 1:length(time_periods[,1])){
-      taxa_data$yearnew[as.numeric(format(taxa_data[start_col][[1]],'%Y'))>=time_periods[ii,1][[1]] &
+      taxa_data$tpnew[as.numeric(format(taxa_data[start_col][[1]],'%Y'))>=time_periods[ii,1][[1]] &
                           as.numeric(format(taxa_data[end_col][[1]],'%Y'))<=time_periods[ii,2][[1]]]<-floor(rowMeans(time_periods[ii,])[[1]])
     }
   }else{
     for(ii in 1:length(time_periods[,1])){
-      taxa_data$yearnew[taxa_data[year_col]>=time_periods[ii,1][[1]] &
+      taxa_data$tpnew[taxa_data[year_col]>=time_periods[ii,1][[1]] &
                           taxa_data[year_col]<=time_periods[ii,2][[1]]]<-floor(rowMeans(time_periods[ii,])[[1]])
     }
   }
@@ -201,7 +206,6 @@ maes <-function(Data=NULL,#your data (.rdata files) as a file path (or list of f
   newnames<-c('Site','Species','Start','End','Year')
   oldnames<-c(site_col,sp_col,start_col,end_col,year_col)
   taxa_data<-change_colnames(taxa_data,newnames,oldnames)
-  
   
   # For each pair of time periods go through and compare them
   # Compare the time periods

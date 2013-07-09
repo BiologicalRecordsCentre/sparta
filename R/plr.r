@@ -91,6 +91,8 @@ plr <-
     
     # ensure time_periods is ordered chronologically (this orders by the first column - start year)
     time_periods<-time_periods[with(time_periods, order(time_periods[,1])),]
+    # ensure the end years are all greater than the start years
+    if(TRUE %in% (time_periods[,2]<=time_periods[,1])) stop('In time_periods end years must be greater than start years')
     
     # Ensure reshape2 is installed
     required.packages <- c('reshape2')
@@ -185,7 +187,7 @@ plr <-
         basic_temp<-as.data.frame(basic_temp$plr)
         colnames(basic_temp)<-paste(analType,'_',ii,'_',j,sep='')
         basic_temp$CONCEPT<-row.names(basic_temp)
-        print(paste('Basic trends for tp',ii,'vs tp',j,'done',sep=' '))
+        print(paste(analType,'for tp',ii,'vs tp',j,'done',sep=' '))
         if(exists('basic_master')){
           basic_master<-merge(basic_master,basic_temp,by='CONCEPT',all=TRUE)
         }else{

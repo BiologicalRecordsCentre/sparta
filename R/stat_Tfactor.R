@@ -39,7 +39,6 @@ stat_Tfactor <-
               F_val = lm_summ$fstatistic[1],
               F_num_df = lm_summ$fstatistic[2],
               F_den_df = lm_summ$fstatistic[3],
-              fres_trend10 = pc.change(ilt(10*lm_coefs[2,1])),
               Ymin = min(spp_lm$model[time_col]),
               Ymax = max(spp_lm$model[time_col])
             )
@@ -61,7 +60,8 @@ stat_Tfactor <-
               F_val = NA,
               F_num_df = NA,
               F_den_df = NA,
-              fres_trend10 = NA,
+              Ymin = NA,
+              Ymax = NA,
               row.names = trend[1,spp_col]
             )
           }
@@ -84,7 +84,8 @@ stat_Tfactor <-
           F_val = NA,
           F_num_df = NA,
           F_den_df = NA,
-          fres_trend10 = NA,
+          Ymin = NA,
+          Ymax = NA,
           row.names = trend[1,spp_col]
         )
         invisible(stat)
@@ -106,7 +107,8 @@ stat_Tfactor <-
         F_val = NA,
         F_num_df = NA,
         F_den_df = NA,
-        fres_trend10 = NA,
+        Ymin = NA,
+        Ymax = NA,
         row.names = trend[1,spp_col]
       )
       invisible(stat)
@@ -128,7 +130,8 @@ stat_Tfactor <-
       F_val = NA,
       F_num_df = NA,
       F_den_df = NA,
-      fres_trend10 = NA,
+      Ymin = NA,
+      Ymax = NA,
       row.names = trend[1,spp_col]
     )
     invisible(stat)

@@ -24,7 +24,7 @@
 #'        start year of each time period and the second column contains the end year of 
 #'        each time period. Time periods should not overlap.
 #' @param plot_fres Logical, if \code{TRUE} maps are produced by Frescalo. Default is 
-#'        \code{FALSE}.
+#'        \code{FALSE}. CURRENTLY ONLY WORKS FOR UK GRID-REFERENCE DATA
 #' @param Fres_weights 'LC' specifies a weights file based on landcover data
 #'        for the UK and 'VP' uses a weights file based on vascular plant data for the UK
 #'        , both are included in the package. Alternativly a custom weights file can be
@@ -120,7 +120,9 @@
 #'          - \tab \code{F_val} \tab F-value of the model\cr
 #'          - \tab \code{F_num_df} \tab Degrees of freedom of the model\cr
 #'          - \tab \code{F_den_df} \tab Denominator degrees of freedom from the F-statistic\cr
-#'          - \tab \code{fres_trend10} \tab The slope of the model represented as a percentage decadal change\cr
+#'          - \tab \code{Ymin} \tab The earliest year in the dataset\cr
+#'          - \tab \code{Ymax} \tab The latest year in the dataset\cr
+#'          - \tab \code{change_...} \tab The percentage change dependent on the values given to \code{trend_option} and \code{NYears}.\cr
 #'          }
 #'          \bold{The following columns are only produced when there are only two time periods}
 #'          \tabular{rll}{
@@ -137,14 +139,12 @@
 #' #data will be written to your working directory
 #' data(ex_dat)
 #'
-#' setwd('W:/PYWELL_SHARED/Pywell Projects/BRC/Tom August/R Packages/Trend analyses')
-#'
 #' fres_out<-frescalo(Data=ex_dat,
 #'                    time_periods=data.frame(start=c(1980,1990),end=c(1989,1999)),
-#'                    start_col='TO_STARTDATE',
-#'                    end_col='Date',
 #'                    site_col='hectad',
-#'                    sp_col='CONCEPT')
+#'                    sp_col='CONCEPT',
+#'                    start_col='TO_STARTDATE',
+#'                    end_col='Date')
 #'}
 
 frescalo <-
@@ -228,6 +228,8 @@ frescalo <-
     
     # ensure time_periods is ordered chronologically (this orders by the first column - start year)
     time_periods<-time_periods[with(time_periods, order(time_periods[,1])),]
+    # ensure the end years are all greater than the start years
+    if(TRUE %in% (time_periods[,2]<=time_periods[,1])) stop('In time_periods end years must be greater than start years')
        
     # load required packages
     required.packages <- c('lme4','reshape2','sp','gdata')
@@ -438,9 +440,10 @@ frescalo <-
                                 fres_phi_val=phi,fres_bench_val=alpha)
     class(fres_return)<-'frescalo'
     
+    fres_lm_path<-paste(fresoutput,'/Maps_Results/Frescalo Tfactor lm stats.csv',sep='')
+    
     # Calculate z-values if only two time periods & lm_stats exists
     if(length(time_periods[,1])==2 & 'lm_stats' %in% names(fres_return)){
-      fres_lm_path<-paste(fresoutput,'/Maps_Results/Frescalo Tfactor lm stats.csv',sep='')
       fres_lm <- read.csv(fres_lm_path)
       trendpath <- paste(fresoutput, '/Output/Trend.txt', sep='')
       zvalues <- fres_zvalues(trendpath)
@@ -451,12 +454,13 @@ frescalo <-
     }
    
     if('lm_stats' %in% names(fres_return)){
-      fres_return$lm_stats[paste(NYears,'yr_change')]<-percentageChange(intercept=fres_return$lm_stats['a'],
+      fres_return$lm_stats[paste('change_',NYears,'yr',sep='')]<-percentageChange(intercept=fres_return$lm_stats['a'],
                                                           slope=fres_return$lm_stats['b'],
                                                           Ymin=fres_return$lm_stats['Ymin'],
                                                           Ymax=fres_return$lm_stats['Ymax'],
                                                           NYears=NYears,
                                                           option=trend_option)
+      write.csv(fres_return$lm_stats, fres_lm_path, row.names=FALSE)
     }
     
     # Remove .txt files created by frescalo. These have been converted to .csv

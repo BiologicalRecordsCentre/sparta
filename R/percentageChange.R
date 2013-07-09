@@ -22,7 +22,7 @@ percentageChange <-
       change<-100* prop.change * NYears/Yspan
     } else if(option=='geometric'){
       # otherwise it's geometric, i.e. compound interest
-      change<-100 *(((prop.change+1) ^ (N/Yspan)) - 1)      
+      change<-100 *(((prop.change+1) ^ (NYears/Yspan)) - 1)      
     }
     
     return(change)

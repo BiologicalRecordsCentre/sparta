@@ -111,6 +111,8 @@ telfer <-
     
     # ensure time_periods is ordered chronologically (this orders by the first column - start year)
     time_periods<-time_periods[with(time_periods, order(time_periods[,1])),]
+    # ensure the end years are all greater than the start years
+    if(TRUE %in% (time_periods[,2]<=time_periods[,1])) stop('In time_periods end years must be greater than start years')
     
     # Ensure reshape2 is installed
     required.packages <- c('reshape2')

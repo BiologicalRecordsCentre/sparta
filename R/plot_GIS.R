@@ -172,9 +172,7 @@ function(
   new.packages <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
   if(length(new.packages)){
     install.packages(new.packages,dependencies=TRUE)
-  } 
-    
-  
+  }   
   
   if(class(gis_data)=='character'){
     if(!exists('world')) data(world)
@@ -259,7 +257,8 @@ function(
     if(new.window | dev.cur() == 1){
 		  dev.new(height = plot.dimen$height, width = plot.dimen$width)
     }
-    
+   
+  
 	# If function to be run in additions mode then do not run commands to create blank plot
 	if(additions == FALSE){
 		if(no.margin){
@@ -274,26 +273,23 @@ function(
 		 
 		# Set up blank plot
 		plot(0, 0, xlim=xlim, ylim=ylim, xaxs='i', yaxs='i', xaxt='n', yaxt='n', xlab="",ylab="", type='n', bty="n", asp=1) # Plot covering all of uk
-		rect(xlim[1],ylim[1], xlim[2], ylim[2],col=bg.col, border = NA)
+    rect(xlim[1],ylim[1], xlim[2], ylim[2],col=bg.col, border = NA)
 	}
-    
+   
 	# If blank.plot == FALSE then continue and plot gridlines/shape data
 	if(blank.plot == FALSE){
 	
 		# Plot data from shape file(s) if plot.shape == TRUE
 		if(plot.shape){
 			# Plot GIS data onto plot
-			if(is.list(gis_data)){
+		  if(is.list(gis_data)){
 			  for(i in 1:length(gis_data)){
-				plot(gis_data[[i]], add = TRUE, col = fill.col, border = line.col)
-			  }
-			} else {
-			  plot(gis_data, add=TRUE, col = fill.col, border = line.col)
+          plot(gis_data[[i]], add = TRUE, col = fill.col, border = line.col)
+			  }        
+			} else {        
+			  plot(gis_data, add=TRUE, col = fill.col, border = line.col)        
 			}
-		}
-		
-	  
-		
+		}	  
 		# Add Axis and gridlines to plot
 		if(show.grid){
 		  #abline(h = seq(ylim[1],ylim[2], by = grid.div), v = seq(xlim[1],xlim[2], by=grid.div), col= grid.col)
@@ -316,5 +312,4 @@ function(
 	if(return.dimen){
 		invisible(plot.dimen)
 	}
-  
   }

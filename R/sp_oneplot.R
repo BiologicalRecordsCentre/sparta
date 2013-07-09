@@ -9,11 +9,12 @@ function(trend, freq, spp_name = NULL){
 		
 		par(mar = c(0,0,2,0))
 		
-		# Actual Distribution
+    # Actual Distribution
 		# Note at present this is a fudge until Mark adapts Frescalo to output original dist column
 		map_data_R(gridrefs = freq$Location[freq$Pres == 1],attribute = NULL, show.axis = FALSE, show.grid = FALSE, sq_col="darkolivegreen", sq_border = NA, bg.col = NULL, shape_data = UK)
 		mtext("(a) Actual Distribution", adj = 0.05, font = 1, cex = 0.7)
 		
+    
 		# Neighbourhood Frequency
 		map_data_R(gridrefs = freq$Location,attribute = freq$Freq__ ,breaks = seq(0.0, 1.0, 0.1), show.axis = FALSE, show.grid = FALSE, legend_pos = NULL, sq_border = NA, bg.col = NULL, shape_data = UK)
 		mtext("(b) Neighbourhood Frequency", adj = 0.05, font = 1, cex = 0.7)
@@ -22,6 +23,7 @@ function(trend, freq, spp_name = NULL){
 		map_data_R(gridrefs = freq$Location,attribute = freq$Freq_1 ,breaks = seq(0.0, 1.0, 0.1), show.axis = FALSE, show.grid = FALSE, legend_pos = NULL, sq_border = NA, bg.col = NULL,shape_data = UK)
 		mtext("(c) Adjusted Frequency",adj = 0.05, font = 1, cex = 0.7)
 		
+    
 		par(mar = c(0,0,0,0))
 		plot(1, type="n", axes = FALSE, frame.plot = FALSE, xlab ="", ylab ="")
 		legend("center",legend = c("0.0 - <0.1","0.1 - <0.2","0.2 - <0.3","0.4 - <0.5","0.5 - <0.6","0.6 - <0.7","0.7 - <0.8","0.8 - <0.9","0.9 - 1.0"), fill = rev(heat.colors(9)), title="Frequency", ncol = 3, bty="n")
