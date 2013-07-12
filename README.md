@@ -3,6 +3,12 @@
 
 This R package includes methods used to analyse trends in unstructured occurrence datasets and a range of useful functions for mapping such data in the UK. The package is currently **under development**.
 
+###News
+----------------
+
+We have just updated sparta and are in the process of writing new tutorials for GitHub. In the meantime all the information you need should be in the help files for each function e.g. (?telfer, ?mixedModel, ?listLength, ?frescalo, ?plr, ?propDiff). Note that the function sparta() is no longer supported.
+
+
 ### Tutorials
 ----------------
   

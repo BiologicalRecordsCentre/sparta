@@ -86,6 +86,21 @@
   \item{NYears}{The number of years over which you want the
   %change to be calculated (i.e.  10 gives a decadal
   change). Default = 10}
+
+  \item{year_col}{The name of the year column in
+  \code{Data}}
+
+  \item{site_col}{The name of the site column in
+  \code{Data}}
+
+  \item{sp_col}{The name of the species column in
+  \code{Data}}
+
+  \item{start_col}{The name of the start date column in
+  \code{Data}}
+
+  \item{end_col}{The name of the end date column in
+  \code{Data}}
 }
 \value{
   Results are saved to file and most are returned in a list
