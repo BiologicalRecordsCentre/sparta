@@ -2,7 +2,7 @@
 #' 
 #' This function is an aid to interpreting cvg (convergence) codes.
 #' 
-#' @param x A number indicating a cvg code
+#' @param x A number indicating a cvg code, can be a vector.
 #' @return The description of the code (x) as found in the source code of lme4.
 #'         If x is not given all code descriptions are returned as a table. 
 #' 
@@ -35,10 +35,21 @@ cvg_codes <-
     if(is.null(x)) {
       return(cvg_data)
     } else {
-      if(!x %in% cvg_data$code){
-        stop(paste('Code',x,'not found in lookup table'))
-      } else {
-        return(as.character(cvg_data$description[cvg_data$code==x]))
+      for(i in x){
+        if(!i %in% cvg_data$code){
+          if(exists('rt_obj')){
+            rt_obj <- c(rt_obj,paste('ERROR: Code',i,'not found in lookup table'))
+          } else {
+            rt_obj <- paste('ERROR: Code',i,'not found in lookup table')
+          }  
+        } else {
+          if(exists('rt_obj')){
+            rt_obj <- c(rt_obj,as.character(cvg_data$description[cvg_data$code==i]))
+          } else {
+            rt_obj <- as.character(cvg_data$description[cvg_data$code==i])
+          }         
+        }
       }
+      return(rt_obj)
     }
   }
