@@ -51,6 +51,11 @@
 #'        every 10 years as this work on a compound rate.
 #' @param NYears The number of years over which you want the %change to be calculated (i.e.
 #'        10 gives a decadal change). Default = 10
+#' @param year_col The name of the year column in \code{Data}
+#' @param site_col The name of the site column in \code{Data}
+#' @param sp_col The name of the species column in \code{Data}
+#' @param start_col The name of the start date column in \code{Data}
+#' @param end_col The name of the end date column in \code{Data}
 #' @return Results are saved to file and most are returned in a list to R.
 #' 
 #'         The list object returned is comprised of the following:
