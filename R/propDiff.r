@@ -36,11 +36,16 @@
 #' @import reshape2
 #' @examples
 #' \dontrun{
+#'  # Load the library
+#'  library(sparta)
+#' 
 #'  #load example dataset
 #'  data(ex_dat)
 #'  
-#'  propDiff_out <- propDiff(ex_dat,
+#'  # Run the proportional difference analysis
+#'  propDiff_out <- propDiff(Data=ex_dat,
 #'                           time_periods=data.frame(start=c(1980,1990,2000),end=c(1989,1999,2009)),
+#'                           min_sq=5,
 #'                           site_col='hectad',
 #'                           sp_col='CONCEPT',
 #'                           start_col='TO_STARTDATE',

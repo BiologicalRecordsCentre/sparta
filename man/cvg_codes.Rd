@@ -5,7 +5,8 @@
   cvg_codes(x = NULL)
 }
 \arguments{
-  \item{x}{A number indicating a cvg code}
+  \item{x}{A number indicating a cvg code, can be a
+  vector.}
 }
 \value{
   The description of the code (x) as found in the source

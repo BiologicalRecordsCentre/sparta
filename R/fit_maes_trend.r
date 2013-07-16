@@ -68,7 +68,7 @@ fit_maes_trend<-function(records, time_periods=NULL, min_sp=5){
   pval <- one_to_two_tail(pval)
   
   #pval is not given in the output as do not think it is reliable, yet
-  Maes <- data.frame(gridcells1=rc3[,1], relDist1=rd1, gridcells2=rc3[,2], relDist2=rd2, trend=trend) 
+  Maes <- data.frame(gridcells1=rc3[,1], relDist1=rd1, gridcells2=rc3[,2], relDist2=rd2, change=trend) 
   attr(Maes, 'nSites') <- nSites
   attr(Maes, 'wellsampled') <- length(well_sampled)
   return(Maes)

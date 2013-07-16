@@ -40,17 +40,20 @@
 #'         comparison of time period 1 and 2. \code{gridcells1} and \code{gridecells2}
 #'         give the number of cells occupied in each time period (1st and 2nd respectively)
 #'         after removing sites that do not meet the selection criteria. \code{relDist1}
-#'         and \code{relDist2} give the relative distribution, and \code{trend} gives the
+#'         and \code{relDist2} give the relative distribution, and \code{change} gives the
 #'         percentage change.
 #' 
 #' @keywords trends, species, distribution, IUCN, red list, Maes
 #' @examples
 #' \dontrun{
 #' 
+#'  # Load the library
 #'  library(sparta)
 #' 
+#'  # Load example dataset
 #'  data(ex_dat)
-#'
+#'  
+#'  # Run the analysis
 #'  Ma_out<-maes(Data=ex_dat,
 #'               time_periods=(data.frame(start=c(1980,1990,2000),end=c(1989,1999,2009))),
 #'               min_sp=1,
