@@ -140,10 +140,13 @@
 #' @import lme4 reshape2 sp RODBC
 #' @examples
 #' \dontrun{
-#' #script for testing frescalo
-#' #data will be written to your working directory
+#' # Load the library
+#' library(sparta)
+#' 
+#' # Load data
 #' data(ex_dat)
 #'
+#' # Run frescalo (data is save to the working directory as sinkdir is not given)
 #' fres_out<-frescalo(Data=ex_dat,
 #'                    time_periods=data.frame(start=c(1980,1990),end=c(1989,1999)),
 #'                    site_col='hectad',
@@ -265,7 +268,7 @@ frescalo <-
     if(plot_fres) data(UK)
     
     # set up frescalo path
-    frespath<-paste(normalizePath(.Library),'\\sparta\\exec\\Frescalo_2b.exe',sep='')
+    frespath<-paste(normalizePath(.Library),'\\sparta\\exec\\Frescalo_2c.exe',sep='')
     
     # unpack weights file if needed
     if(class(Fres_weights)=='character'){

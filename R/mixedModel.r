@@ -82,7 +82,7 @@
 #'                    year_range=c(1970,2000),
 #'                    min_list=1,
 #'                    min_years=2,
-#'                    site_col='hectad',
+#'                    site_col='kmsq',
 #'                    sp_col='CONCEPT',
 #'                    start_col='TO_STARTDATE',
 #'                    end_col='Date')
