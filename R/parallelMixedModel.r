@@ -1,5 +1,9 @@
-#' Mixed-model trend analysis
+#' Parallelised Mixed-model trend analysis
 #' 
+#' This function is identical in functio to \code{mixedModel} except that it runs the analysis
+#' using the package \code{parallel}. The only difference is that the user must specify
+#' the number of cores to be used. Additionally since warning messages from slaves are
+#' suppressed and the order of species in output may vary.\cr 
 #' This function undertakes a 'mixed-model' analysis as laid out by Roy et al (2012).
 #' This method accounts for variation in recording intensity between sites and excludes
 #' data that may introduce error into trend estimates.
@@ -51,7 +55,9 @@
 #' @param end_col The name of the end date column in \code{Data}. See \code{start_col}.
 #' @param print_progress Logical, if \code{TRUE} progress is printed to console when
 #'        running models. Default is \code{TRUE}   
-#' @return A dataframe of results are returned to R. Each row gives the results for a
+#'        cores The number of cores to be used in parallel processing. Defaults to 1 (not parallel)
+#'
+#'  @return A dataframe of results are returned to R. Each row gives the results for a
 #'         single species, with the species name given in the first column. The columns
 #'         \code{year} and \code{intercept} give the estimates of these coefficients.
 #'         The suffix \code{SE} indicates the standard error, \code{zscore} the Z-score
@@ -68,6 +74,7 @@
 #'         used in the model. Note these values are centered on \code{yearZero}.
 #'         \code{change_} gives the percentage change dependent on the values given to
 #'         \code{trend_option} and \code{NYears}.
+#'         
 #'        
 #' @keywords trends, species, distribution
 #' @examples
@@ -85,7 +92,8 @@
 #'                    site_col='kmsq',
 #'                    sp_col='CONCEPT',
 #'                    start_col='TO_STARTDATE',
-#'                    end_col='Date')
+#'                    end_col='Date',
+#'                    cores=2)
 #'
 #' }
 #' @references Roy, H.E., Adriaens, T., Isaac, N.J.B. et al. (2012) Invasive alien predator
@@ -93,7 +101,7 @@
 #'             18, 717-725.
 
 
-mixedModel <-
+parallelMixedModel <-
   function(Data=NULL,#your data (path to .csv or .rdata, or an R object)
            year_range = NULL, #for subsetting data
            ignore.ireland=F,#do you want to remove Irish hectads?
@@ -110,7 +118,11 @@ mixedModel <-
            sp_col = NA,
            start_col = NA,
            end_col = NA,
-           print_progress = TRUE){
+           print_progress = TRUE,
+           cores=1){
+    
+    #First things first we need the parallel package
+    require(parallel)
     
     # Clear warnings
     assign("last.warning", NULL, envir = baseenv())
@@ -262,6 +274,7 @@ mixedModel <-
     space_time$year <- as.numeric(format(space_time$time_period,'%Y')) # take year from date year
         
     # If sinkdir is given, write data there. If not just return it to console
+    file_name<-NULL
     if(!is.null(sinkdir)){
       dir.create(sinkdir,showWarnings = FALSE) # creates the directory if it does not exist
       org_wd<-getwd()
@@ -287,9 +300,8 @@ mixedModel <-
     }
     
     counter=1
-    
-    # Run the model species by species
-    for (ii in sort(unique(taxa_data$CONCEPT))){ # the sort ensures species are done in order
+     
+    eachSpecies<-function(ii){ # the sort ensures species are done in order
       if(print_progress) print(paste('Modelling',ii,'- Species',counter,'of',length(unique(taxa_data$CONCEPT))))
       y<-unique(taxa_data[taxa_data$CONCEPT==ii&!is.na(taxa_data$hectad)&!is.na(taxa_data$time_period),][c('CONCEPT','time_period','hectad')])
       species_space_time <- merge(x=space_time,y=y,all.x=T)
@@ -324,15 +336,26 @@ mixedModel <-
         }  
       }
       
-      # Data is aggregated in an R object
-      if(exists('Mod_out_master')){
-        Mod_out_master <- rbind(Mod_out_master,Mod_out)
-      } else {
-        Mod_out_master <- Mod_out
-      }
+#       # Data is aggregated in an R object
+#       if(exists('Mod_out_master')){
+#         Mod_out_master <- rbind(Mod_out_master,Mod_out)
+#       } else {
+#         Mod_out_master <- Mod_out
+#       }
       counter=counter+1  
+      return(Mod_out)
     }
     
-    return(Mod_out_master)
+    # Run the model species by species
+    require(parallel)
+    
+    cl <- makeCluster(cores)
+    clusterExport(cl, c('print_progress','counter','taxa_data',
+                        'space_time','min_list','min_years','od',
+                        'verbose','NYears','trend_option','sp_col',
+                        'sinkdir','file_name'),envir=environment())   
+    Mod_out_master<-parLapplyLB(cl, sort(unique(taxa_data$CONCEPT)), eachSpecies)    
+    
+    return(do.call("rbind", Mod_out_master))
     
   }

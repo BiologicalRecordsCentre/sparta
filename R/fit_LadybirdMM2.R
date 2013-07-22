@@ -15,7 +15,7 @@ function(indata, nsp=2, nyr=3, od=F, V=F){
     
   #if there is no well sampled data, capture what info you can and dont bother modelling
   if(nrow(data)==0){ 
-      coefs <- c(rep(NA,8),length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)))
+      coefs <- c(rep(NA,10),length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)))
     }else{
       
     MMdata <- dcast(data, year + hectad ~ ., fun=length, value.var='L') #how many lists for each year?
