@@ -9,7 +9,7 @@
     trend_option = "arithmetic", NYears = 10,
     date_col = NA, site_col = NA, sp_col = NA,
     start_col = NA, end_col = NA, print_progress = TRUE,
-    cores = 2)
+    cores = 1)
 }
 \arguments{
   \item{Data}{A dataframe object or string giving the file
@@ -99,7 +99,8 @@
 
   \item{print_progress}{Logical, if \code{TRUE} progress is
   printed to console when running models. Default is
-  \code{TRUE}}
+  \code{TRUE} cores The number of cores to be used in
+  parallel processing. Defaults to 1 (not parallel)}
 }
 \value{
   A dataframe of results are returned to R. Each row gives
@@ -125,14 +126,24 @@
   and maximum years used in the model. Note these values
   are centered on \code{yearZero}.  \code{change_} gives
   the percentage change dependent on the values given to
-  \code{trend_option} and \code{NYears}.
+  \code{trend_option} and \code{NYears}.\cr \cr If
+  \code{sinkdir} is given them a log file is created in the
+  same directory.  This can be used to check on progress of
+  the analysis since when using parallel print statements
+  are not returned to the console.
 }
 \description{
-  This function undertakes a 'mixed-model' analysis as laid
-  out by Roy et al (2012). This method accounts for
-  variation in recording intensity between sites and
-  excludes data that may introduce error into trend
-  estimates.
+  This function is identical in functio to
+  \code{mixedModel} except that it runs the analysis using
+  the package \code{parallel}. The only difference is that
+  the user must specify the number of cores to be used.
+  Additionally since warning messages from slaves are
+  suppressed and the order of species in output may
+  vary.\cr This function undertakes a 'mixed-model'
+  analysis as laid out by Roy et al (2012). This method
+  accounts for variation in recording intensity between
+  sites and excludes data that may introduce error into
+  trend estimates.
 }
 \examples{
 \dontrun{
@@ -149,7 +160,8 @@ MM_out<-mixedModel(Data=ex_dat,
                    site_col='kmsq',
                    sp_col='CONCEPT',
                    start_col='TO_STARTDATE',
-                   end_col='Date')
+                   end_col='Date',
+                   cores=2)
 
 }
 }

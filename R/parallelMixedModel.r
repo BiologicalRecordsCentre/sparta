@@ -73,7 +73,10 @@
 #'         was observed.  \code{Ymin} and \code{Ymax} give the minimum and maximum years
 #'         used in the model. Note these values are centered on \code{yearZero}.
 #'         \code{change_} gives the percentage change dependent on the values given to
-#'         \code{trend_option} and \code{NYears}.
+#'         \code{trend_option} and \code{NYears}.\cr
+#'         \cr If \code{sinkdir} is given them a log file is created in the same directory.
+#'         This can be used to check on progress of the analysis since when using parallel
+#'         print statements are not returned to the console.
 #'         
 #'        
 #' @keywords trends, species, distribution
@@ -300,9 +303,18 @@ parallelMixedModel <-
     }
     
     counter=1
-     
+   
     eachSpecies<-function(ii){ # the sort ensures species are done in order
-      if(print_progress) print(paste('Modelling',ii,'- Species',counter,'of',length(unique(taxa_data$CONCEPT))))
+      if(!is.null(sinkdir)){
+        # Count the number of species that have already been done
+        if(file.exists(paste(sinkdir,'/log.txt',sep=''))){
+          Nsp<-nrow(read.table(paste(sinkdir,'/log.txt',sep='')))+1
+        } else {
+          Nsp <- 1
+        }
+        write(paste('Modelling',ii,'- Species',Nsp,'of',length(unique(taxa_data$CONCEPT)),Sys.time()),
+                  file=paste(sinkdir,'/log.txt',sep=''), append=TRUE)
+      }
       y<-unique(taxa_data[taxa_data$CONCEPT==ii&!is.na(taxa_data$hectad)&!is.na(taxa_data$time_period),][c('CONCEPT','time_period','hectad')])
       species_space_time <- merge(x=space_time,y=y,all.x=T)
       species_space_time$CONCEPT <- as.character(species_space_time$CONCEPT)
@@ -336,25 +348,25 @@ parallelMixedModel <-
         }  
       }
       
-#       # Data is aggregated in an R object
-#       if(exists('Mod_out_master')){
-#         Mod_out_master <- rbind(Mod_out_master,Mod_out)
-#       } else {
-#         Mod_out_master <- Mod_out
-#       }
       counter=counter+1  
       return(Mod_out)
     }
-    
-    # Run the model species by species
-    require(parallel)
-    
+
+    # Create Cluster
     cl <- makeCluster(cores)
+    # Export data to cluster
     clusterExport(cl, c('print_progress','counter','taxa_data',
                         'space_time','min_list','min_years','od',
                         'verbose','NYears','trend_option','sp_col',
-                        'sinkdir','file_name'),envir=environment())   
+                        'sinkdir','file_name'),envir=environment())
+    # Update on progress
+    print('Running models...')
+    
+    # Run parallel process
     Mod_out_master<-parLapplyLB(cl, sort(unique(taxa_data$CONCEPT)), eachSpecies)    
+    
+    # Stop the cluster
+    stopCluster(cl)
     
     return(do.call("rbind", Mod_out_master))
     
