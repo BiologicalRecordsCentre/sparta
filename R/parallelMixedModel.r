@@ -34,12 +34,12 @@
 #'        of 'Mixed-Models_' and the date in yymmdd format (i.e. 'Mixed-Models_130702.csv').
 #'        If a file of this name already exists in the directory specified the file name will be
 #'        appended with an index number (i.e. 'Mixed-Models_130702(1).csv').
-#' @param trend_option Set the method by which you wish to calculate %change. This can currently
+#' @param trend_option Set the method by which you wish to calculate percentage change. This can currently
 #'        be set to either \code{'arithmetic'} (default) or \code{'geometric'}. Arimthmetic calculates
-#'        percentage change in a linear fashion such that a decline of 50% over 50 years is
-#'        equal to 10% in 10 years. Using the same example a Geometric trend would be 8.44%
+#'        percentage change in a linear fashion such that a decline of 50\% over 50 years is
+#'        equal to 10\% in 10 years. Using the same example a Geometric trend would be 8.44\%
 #'        every 10 years as this work on a compound rate.
-#' @param NYears The number of years over which you want the %change to be calculated (i.e.
+#' @param NYears The number of years over which you want the percentage change to be calculated (i.e.
 #'        10 gives a decadal change). Default = 10        
 #' @param date_col The name of the date column in \code{Data}. This column must be a date and
 #'        should be in date format. If it isn't, a conversion is attempted. This column defines the

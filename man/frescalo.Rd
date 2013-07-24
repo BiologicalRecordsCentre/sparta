@@ -75,17 +75,17 @@
   0.27 as in Hill (2011). This is limited to 0.08 to 0.50.}
 
   \item{trend_option}{Set the method by which you wish to
-  calculate %change. This can currently be set to either
-  \code{'arithmetic'} (default) or \code{'geometric'}.
-  Arimthmetic calculates percentage change in a linear
-  fashion such that a decline of 50% over 50 years is equal
-  to 10% in 10 years. Using the same example a Geometric
-  trend would be 8.44% every 10 years as this work on a
-  compound rate.}
+  calculate percentage change. This can currently be set to
+  either \code{'arithmetic'} (default) or
+  \code{'geometric'}. Arimthmetic calculates percentage
+  change in a linear fashion such that a decline of 50\%
+  over 50 years is equal to 10\% in 10 years. Using the
+  same example a Geometric trend would be 8.44\% every 10
+  years as this work on a compound rate.}
 
   \item{NYears}{The number of years over which you want the
-  %change to be calculated (i.e.  10 gives a decadal
-  change). Default = 10}
+  percentage change to be calculated (i.e.  10 gives a
+  decadal change). Default = 10}
 
   \item{year_col}{The name of the year column in
   \code{Data}}

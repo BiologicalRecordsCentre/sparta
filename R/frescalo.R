@@ -44,12 +44,12 @@
 #'        0.50 to 0.95.
 #' @param alpha the proportion of the expected number of species in a cell to be treated as
 #'        benchmarks. Default is 0.27 as in Hill (2011). This is limited to 0.08 to 0.50.
-#' @param trend_option Set the method by which you wish to calculate %change. This can currently
+#' @param trend_option Set the method by which you wish to calculate percentage change. This can currently
 #'        be set to either \code{'arithmetic'} (default) or \code{'geometric'}. Arimthmetic calculates
-#'        percentage change in a linear fashion such that a decline of 50% over 50 years is
-#'        equal to 10% in 10 years. Using the same example a Geometric trend would be 8.44%
+#'        percentage change in a linear fashion such that a decline of 50\% over 50 years is
+#'        equal to 10\% in 10 years. Using the same example a Geometric trend would be 8.44\%
 #'        every 10 years as this work on a compound rate.
-#' @param NYears The number of years over which you want the %change to be calculated (i.e.
+#' @param NYears The number of years over which you want the percentage change to be calculated (i.e.
 #'        10 gives a decadal change). Default = 10
 #' @param year_col The name of the year column in \code{Data}
 #' @param site_col The name of the site column in \code{Data}
