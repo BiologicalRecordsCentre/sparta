@@ -352,7 +352,7 @@ snowMixedModel <-
     
     # Create Cluster
     sfSetMaxCPUs(hosts) # ensure that snowfall can cope with this many hosts
-    sfInit(parallel=TRUE,type="MPI",cpus=length(hosts),useRscript=TRUE) # initialise the connection
+    sfInit(parallel=TRUE,type="MPI",cpus=hosts,useRscript=TRUE) # initialise the connection
     
     # Export data to cluster
     sfExportAll()

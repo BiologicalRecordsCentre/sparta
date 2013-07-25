@@ -353,7 +353,7 @@ parallelMixedModel <-
     # Create Cluster
     cl <- makeCluster(cores)
     # Export data to cluster
-    clusterExport(cl, c('print_progress','counter','taxa_data',
+    clusterExport(cl, c('print_progress','taxa_data',
                         'space_time','min_list','min_years','od',
                         'verbose','NYears','trend_option','sp_col',
                         'sinkdir','file_name'),envir=environment())
