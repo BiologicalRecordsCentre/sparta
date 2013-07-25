@@ -1,15 +1,15 @@
-\name{parallelMixedModel}
-\alias{parallelMixedModel}
-\title{Parallelised Mixed-model trend analysis}
+\name{snowMixedModel}
+\alias{snowMixedModel}
+\title{Parallelised Mixed-model trend analysis using Snowfall}
 \usage{
-  parallelMixedModel(Data = NULL, year_range = NULL,
+  snowMixedModel(Data = NULL, year_range = NULL,
     ignore.ireland = F, ignore.channelislands = F,
     min_list = 2, min_years = 3, od = FALSE,
     verbose = FALSE, sinkdir = NULL,
     trend_option = "arithmetic", NYears = 10,
     date_col = NA, site_col = NA, sp_col = NA,
     start_col = NA, end_col = NA, print_progress = TRUE,
-    cores = 1)
+    hosts = 1)
 }
 \arguments{
   \item{Data}{A dataframe object or string giving the file
@@ -101,8 +101,8 @@
   printed to console when running models. Default is
   \code{TRUE}}
 
-  \item{cores}{The number of cores to be used in parallel
-  processing. Defaults to 1 (not parallel)}
+  \item{hosts}{The number of hosts/cores to be used in
+  parallel processing. Defaults to 1 (not parallel)}
 }
 \value{
   A dataframe of results are returned to R. Each row gives
@@ -137,8 +137,8 @@
 \description{
   This function is identical in function to
   \code{mixedModel} except that it runs the analysis using
-  the package \code{parallel}. The only difference is that
-  the user must specify the number of cores to be used.
+  the package \code{snowfall}. The only difference is that
+  the user must specify the number of hosts to be used.
   Additionally since warning messages from slaves are
   suppressed and the order of species in output may
   vary.\cr This function undertakes a 'mixed-model'
@@ -155,7 +155,7 @@ library(sparta)
 #load example dataset
 data(ex_dat)
 
-MM_out<-parallelMixedModel(Data=ex_dat,
+MM_out<-snowMixedModel(Data=ex_dat,
                    year_range=c(1970,2000),
                    min_list=1,
                    min_years=2,
@@ -163,7 +163,7 @@ MM_out<-parallelMixedModel(Data=ex_dat,
                    sp_col='CONCEPT',
                    start_col='TO_STARTDATE',
                    end_col='Date',
-                   cores=2)
+                   hosts=2)
 
 }
 }
