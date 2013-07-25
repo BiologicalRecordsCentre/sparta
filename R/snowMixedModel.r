@@ -1,8 +1,8 @@
-#' Parallelised Mixed-model trend analysis
+#' Parallelised Mixed-model trend analysis using Snowfall
 #' 
 #' This function is identical in function to \code{mixedModel} except that it runs the analysis
-#' using the package \code{parallel}. The only difference is that the user must specify
-#' the number of cores to be used. Additionally since warning messages from slaves are
+#' using the package \code{snowfall}. The only difference is that the user must specify
+#' the number of hosts to be used. Additionally since warning messages from slaves are
 #' suppressed and the order of species in output may vary.\cr 
 #' This function undertakes a 'mixed-model' analysis as laid out by Roy et al (2012).
 #' This method accounts for variation in recording intensity between sites and excludes
@@ -55,7 +55,7 @@
 #' @param end_col The name of the end date column in \code{Data}. See \code{start_col}.
 #' @param print_progress Logical, if \code{TRUE} progress is printed to console when
 #'        running models. Default is \code{TRUE}   
-#' @param cores The number of cores to be used in parallel processing. Defaults to 1 (not parallel)
+#' @param hosts The number of hosts/cores to be used in parallel processing. Defaults to 1 (not parallel)
 #'
 #'  @return A dataframe of results are returned to R. Each row gives the results for a
 #'         single species, with the species name given in the first column. The columns
@@ -88,7 +88,7 @@
 #' #load example dataset
 #' data(ex_dat)
 #' 
-#' MM_out<-parallelMixedModel(Data=ex_dat,
+#' MM_out<-snowMixedModel(Data=ex_dat,
 #'                    year_range=c(1970,2000),
 #'                    min_list=1,
 #'                    min_years=2,
@@ -96,7 +96,7 @@
 #'                    sp_col='CONCEPT',
 #'                    start_col='TO_STARTDATE',
 #'                    end_col='Date',
-#'                    cores=2)
+#'                    hosts=2)
 #'
 #' }
 #' @references Roy, H.E., Adriaens, T., Isaac, N.J.B. et al. (2012) Invasive alien predator
@@ -104,7 +104,7 @@
 #'             18, 717-725.
 
 
-parallelMixedModel <-
+snowMixedModel <-
   function(Data=NULL,#your data (path to .csv or .rdata, or an R object)
            year_range = NULL, #for subsetting data
            ignore.ireland=F,#do you want to remove Irish hectads?
@@ -122,10 +122,10 @@ parallelMixedModel <-
            start_col = NA,
            end_col = NA,
            print_progress = TRUE,
-           cores=1){
+           hosts=1){
     
-    #First things first we need the parallel package
-    require(parallel)
+    #First things first we need the snowfall package
+    require(snowfall)
     
     # Clear warnings
     assign("last.warning", NULL, envir = baseenv())
@@ -275,7 +275,7 @@ parallelMixedModel <-
     # set the year column
     # when using year scale time_period could be a numeric or a date
     space_time$year <- as.numeric(format(space_time$time_period,'%Y')) # take year from date year
-        
+    
     # If sinkdir is given, write data there. If not just return it to console
     file_name<-NULL
     if(!is.null(sinkdir)){
@@ -302,8 +302,8 @@ parallelMixedModel <-
       setwd(org_wd) # Set our directory back to where it was
     }
     
-   
-    eachSpecies<-function(ii){ # the sort ensures species are done in order
+    
+    eachSpecies<-function(ii){ 
       if(!is.null(sinkdir)){
         # Count the number of species that have already been done
         if(file.exists(paste(sinkdir,'/log.txt',sep=''))){
@@ -312,7 +312,7 @@ parallelMixedModel <-
           Nsp <- 1
         }
         write(paste('Modelling',ii,'- Species',Nsp,'of',length(unique(taxa_data$CONCEPT)),Sys.time()),
-                  file=paste(sinkdir,'/log.txt',sep=''), append=TRUE)
+              file=paste(sinkdir,'/log.txt',sep=''), append=TRUE)
       }
       y<-unique(taxa_data[taxa_data$CONCEPT==ii&!is.na(taxa_data$hectad)&!is.na(taxa_data$time_period),][c('CONCEPT','time_period','hectad')])
       species_space_time <- merge(x=space_time,y=y,all.x=T)
@@ -327,11 +327,11 @@ parallelMixedModel <-
       row.names(Mod_out)<-ii
       Mod_out<-as.data.frame(Mod_out)
       Mod_out[paste('change_',NYears,'yr',sep='')]<-percentageChange(intercept=Mod_out$intercept,
-                                                                 slope=Mod_out$year,
-                                                                 Ymin=Mod_out$Ymin,
-                                                                 Ymax=Mod_out$Ymax,
-                                                                 NYears=NYears,
-                                                                 option=trend_option)
+                                                                     slope=Mod_out$year,
+                                                                     Ymin=Mod_out$Ymin,
+                                                                     Ymax=Mod_out$Ymax,
+                                                                     NYears=NYears,
+                                                                     option=trend_option)
       Mod_out<-cbind(row.names(Mod_out),Mod_out)
       names(Mod_out)[1] <- sp_col
       
@@ -349,23 +349,20 @@ parallelMixedModel <-
       
       return(Mod_out)
     }
-
+    
     # Create Cluster
-    cl <- makeCluster(cores)
+    sfSetMaxCPUs(length(hosts)) # ensure that snowfall can cope with this many hosts
+    sfInit(parallel=TRUE,type="MPI",cpus=length(hosts),useRscript=TRUE) # initialise the connection
+    
     # Export data to cluster
-    clusterExport(cl, c('print_progress','counter','taxa_data',
-                        'space_time','min_list','min_years','od',
-                        'verbose','NYears','trend_option','sp_col',
-                        'sinkdir','file_name'),envir=environment())
-    # Update on progress
-    print('Running models...')
+    sfExportAll()
     
-    # Run parallel process
-    Mod_out_master<-parLapplyLB(cl, sort(unique(taxa_data$CONCEPT)), eachSpecies)    
+    # Give list to repeat over
+    r <- sfClusterApplyLB(sort(unique(taxa_data$CONCEPT)), eachSpecies)
+    rdf <-do.call("rbind", r)
     
-    # Stop the cluster
-    stopCluster(cl)
-    
-    return(do.call("rbind", Mod_out_master))
+    write.table(rdf,file=file_name,col.names=TRUE,row.names=FALSE,sep=',')
+    # R dumps memory at completion to a file in your working directory, this ensures that file is not large
+    rm(list=ls())
     
   }
