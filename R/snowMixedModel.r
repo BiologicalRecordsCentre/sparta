@@ -335,18 +335,6 @@ snowMixedModel <-
       Mod_out<-cbind(row.names(Mod_out),Mod_out)
       names(Mod_out)[1] <- sp_col
       
-      #Mod_out$CONCEPT<-row.names(Mod_out)
-      
-      # writing the data out as we go preserves it in case of a crash
-#       # but is only done if the a sink directory is set
-#       if(!is.null(sinkdir)){
-#         if(file.exists(file_name)){
-#           write.table(Mod_out, file=file_name, append=T,col.names=F,sep=',',row.names=FALSE)
-#         }else{
-#           write.table(Mod_out, file=file_name,col.names=T,sep=',',row.names=FALSE)
-#         }  
-#       }
-#       
       return(Mod_out)
     }
     
@@ -365,5 +353,8 @@ snowMixedModel <-
     write.table(rdf, file=file_name, col.names=TRUE, row.names=FALSE, sep=',')
     # R dumps memory at completion to a file in your working directory, this ensures that file is not large
     rm(list=ls())
+    
+    # Stop snowfall cluster
+    sfStop()
     
   }
