@@ -336,7 +336,7 @@ frescalo <-
       taxa_data<-colToDate(taxa_data,end_col)  
     }
     if(!is.na(year_col)){
-      if(!is.numeric(ex_dat[year_col][,1])){
+      if(!is.numeric(Data[year_col][,1])){
         stop('column specified by year_col must be numeric') 
       }
     } 
