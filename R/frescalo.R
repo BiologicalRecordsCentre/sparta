@@ -11,7 +11,8 @@
 #'        observations and columns indicating the species and location as well as
 #'        either the year of the observation or columns specifying the start and end
 #'        dates of the observation. If \code{NULL} (default) the user is prompted to select
-#'        a .csv or .rdata file.
+#'        a .csv or .rdata file. If using a dataframe it is important that date columns are in
+#'        a date format. If using a .csv dates are assumed to be in the format dd/mm/yyyy.
 #' @param species_to_include Optionally a character vector listing the names of species to be used.
 #'        Species not in your list are ignored. This is useful if you are only interested in a
 #'        subset of species.
@@ -200,7 +201,7 @@ frescalo <-
       }
     }
     if(is.null(time_periods)){warning('time_periods must be given');warn=TRUE}
-    if(!is.data.frame(Data)&length(Data)>1){warning('Data cannot have length > 1');warn=TRUE}
+    if(!is.null(Data)&!is.data.frame(Data)&length(Data)>1){warning('Data cannot have length > 1');warn=TRUE}
     # Frescalo specific warnings    
     if(!is.null(phi)){
       if(phi>0.95|phi<0.5){
@@ -313,16 +314,15 @@ frescalo <-
       taxa_data<-Data
       rm(Data)
     } else if(is.character(Data)&grepl('.rdata',Data,ignore.case=TRUE)){
-      print('loading raw data')
       loaded<-load(Data)
       if(is.character(Data)&sum(grepl('taxa_data',loaded))==0){
         stop('The .rdata file used does not contain an object called "taxa_data"')
       }
     }else if(grepl('.csv',Data,ignore.case=TRUE)){
-      print('loading raw data')
       taxa_data<-read.table(Data,header=TRUE,stringsAsFactors=FALSE,sep=',',check.names=FALSE)
     }
   
+        
     # Check column names
     new.colnames<-na.omit(c(site_col,sp_col,year_col,start_col,end_col))
     missingColNames<-new.colnames[!new.colnames %in% names(taxa_data)]
@@ -336,7 +336,7 @@ frescalo <-
       taxa_data<-colToDate(taxa_data,end_col)  
     }
     if(!is.na(year_col)){
-      if(!is.numeric(Data[year_col][,1])){
+      if(!is.numeric(taxa_data[year_col][,1])){
         stop('column specified by year_col must be numeric') 
       }
     } 
