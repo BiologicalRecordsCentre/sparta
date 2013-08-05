@@ -18,6 +18,9 @@
 #' @param min_list The minimum list length (number of species) required from a visit for it 
 #'        to be included in the mixed model analysis. Default is 2 (as in Roy et al, 2010)
 #'        but should be changed dependent on the distribution of list lengths in the data.
+#'        By setting this value to 'median' you can chose to set min_list to the median list
+#'        length (or 2 if the median list length is less than 2). If using this method the min_list
+#'        used can be extracted from the object returned by retrieving the attribute min_list.
 #' @param min_years This variable defines the minimum number of years in which a site must have
 #'        well sampled visits (defined by \code{min_list}) to be included in te analysis. The 
 #'        default is set to 3 as in Roy et al (2010).
@@ -261,6 +264,15 @@ mixedModel <-
     # when using year scale time_period could be a numeric or a date
     space_time$year <- as.numeric(format(space_time$time_period,'%Y')) # take year from date year
           
+    # If calculating min_list from data do it now
+    if(!is.numeric(min_list) & min_list != 'median') stop('min_list must be numeric or "median"')
+    median_list_used<-FALSE
+    if(min_list == 'median'){
+      median_list_used<-TRUE
+      min_list<-median(space_time$L)
+      if(min_list<2) min_list <- 2
+    }
+    
     # If sinkdir is given, write data there. If not just return it to console
     if(!is.null(sinkdir)){
       dir.create(sinkdir,showWarnings = FALSE) # creates the directory if it does not exist
@@ -333,6 +345,10 @@ mixedModel <-
       counter=counter+1  
     }
     
+    if(median_list_used){
+      print(paste('min_list set to',min_list,'using median method'))
+      attr(Mod_out_master,'min_list') <- min_list
+    } 
     return(Mod_out_master)
     
   }

@@ -34,7 +34,12 @@
   species) required from a visit for it to be included in
   the mixed model analysis. Default is 2 (as in Roy et al,
   2010) but should be changed dependent on the distribution
-  of list lengths in the data.}
+  of list lengths in the data.  By setting this value to
+  'median' you can chose to set min_list to the median list
+  length (or 2 if the median list length is less than 2).
+  If using this method the min_list used can be extracted
+  from the object returned by retrieving the attribute
+  min_list.}
 
   \item{min_years}{This variable defines the minimum number
   of years in which a site must have well sampled visits

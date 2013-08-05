@@ -22,6 +22,9 @@
 #' @param min_list The minimum list length (number of species) required from a visit for it 
 #'        to be included in the mixed model analysis. Default is 2 (as in Roy et al, 2010)
 #'        but should be changed dependent on the distribution of list lengths in the data.
+#'        By setting this value to 'median' you can chose to set min_list to the median list
+#'        length (or 2 if the median list length is less than 2). If using this method the min_list
+#'        is written into the file name.
 #' @param min_years This variable defines the minimum number of years in which a site must have
 #'        well sampled visits (defined by \code{min_list}) to be included in te analysis. The 
 #'        default is set to 3 as in Roy et al (2010).
@@ -276,27 +279,36 @@ snowMixedModel <-
     # when using year scale time_period could be a numeric or a date
     space_time$year <- as.numeric(format(space_time$time_period,'%Y')) # take year from date year
     
+    # If calculating min_list from data do it now
+    if(!is.numeric(min_list) & min_list != 'median') stop('min_list must be numeric or "median"')
+    median_list_used<-FALSE
+    if(min_list == 'median'){
+      median_list_used<-TRUE
+      min_list<-median(space_time$L)
+      if(min_list<2) min_list <- 2
+    }
+    
     # If sinkdir is given, write data there. If not just return it to console
     file_name<-NULL
     if(!is.null(sinkdir)){
       dir.create(sinkdir,showWarnings = FALSE) # creates the directory if it does not exist
       org_wd<-getwd()
       setwd(sinkdir)
-      file_name<-paste(sinkdir,'/Mixed-Models_',datecode,'.csv', sep='')
+      file_name<-paste(sinkdir,'/Mixed-Models_ML', min_list,'_', datecode,'.csv', sep='')
       # If the filename we want already exists create a new filename with a number
       # after it
       if(file.exists(file_name)){
         files <- dir(sinkdir)
-        files <- files[grepl(paste('Mixed-Models_',datecode,sep=''),files)]
+        files <- files[grepl(paste('Mixed-Models_ML',min_list,'_', datecode,sep=''),files)]
         if(sum(grepl('\\(',files))>0){ # if we have indexed files already index the new file as max+1
-          files <- gsub(".csv",'',gsub(paste('Mixed-Models_',datecode,sep=''),'',files)) #remove text from file name
+          files <- gsub(".csv",'',gsub(paste('Mixed-Models_ML',min_list,'_', datecode,sep=''),'',files)) #remove text from file name
           files <- gsub("\\)",'',gsub("\\(",'',files)) # remove brackets
           max_index <- max(as.numeric(files),na.rm=TRUE) # find the highest index number
           new_index <- max_index + 1
         } else { # if we dont have any indexed files it is numbered as 1
           new_index <- 1
         }
-        file_name <- paste(sinkdir,'/Mixed-Models_',datecode,'(',new_index,').csv', sep='')
+        file_name <- paste(sinkdir,'/Mixed-Models_ML',min_list,'_', datecode,'(',new_index,').csv', sep='')
         warning('sinkdir already contains Mixed-Models data from today. New data saved as ', paste('Mixed-Models_',datecode,'(',new_index,').csv', sep=''))
       }   
       setwd(org_wd) # Set our directory back to where it was
@@ -349,6 +361,11 @@ snowMixedModel <-
     print('Starting models')
     r <- sfClusterApplyLB(sort(unique(taxa_data$CONCEPT)), eachSpecies)
     rdf <-do.call("rbind", r)
+    
+    if(median_list_used){
+      print(paste('min_list set to',min_list,'using median method'))
+      attr(rdf,'min_list') <- min_list
+    }     
     
     write.table(rdf, file=file_name, col.names=TRUE, row.names=FALSE, sep=',')
     
