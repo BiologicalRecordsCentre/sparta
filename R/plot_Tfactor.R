@@ -123,7 +123,7 @@ function(trend,spp_col = "Species__", time_col = "Time______", Tfactor_col = "TF
 			
       #return NA stats
       stat = data.frame(
-			  SPECIES = trend[1,spp_col],
+			  SPECIES = spp_name,
 			  NAME = spp_name, 
 			  b = NA, 
 			  a = NA, 

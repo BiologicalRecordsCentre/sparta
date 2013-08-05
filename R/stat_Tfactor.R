@@ -115,7 +115,7 @@ stat_Tfactor <-
     }
   }else{
     stat = data.frame(
-      SPECIES = trend[1,spp_col],
+      SPECIES = NA,
       NAME = spp_name, 
       b = NA, 
       a = NA, 
@@ -132,7 +132,7 @@ stat_Tfactor <-
       F_den_df = NA,
       Ymin = NA,
       Ymax = NA,
-      row.names = trend[1,spp_col]
+      row.names = spp_name
     )
     invisible(stat)
   }
