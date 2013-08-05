@@ -238,7 +238,7 @@ frescalo <-
     # ensure time_periods is ordered chronologically (this orders by the first column - start year)
     time_periods<-time_periods[with(time_periods, order(time_periods[,1])),]
     # ensure the end years are all greater than the start years
-    if(TRUE %in% (time_periods[,2]<=time_periods[,1])) stop('In time_periods end years must be greater than start years')
+    if(TRUE %in% (time_periods[,2]<time_periods[,1])) stop('In time_periods end years must be greater than or equal to start years')
        
     # load required packages
     required.packages <- c('lme4','reshape2','sp','gdata')
@@ -356,12 +356,12 @@ frescalo <-
     if(!is.na(start_col) & !is.na(end_col)){
       for(ii in 1:length(time_periods[,1])){
         taxa_data$yearnew[as.numeric(format(taxa_data[start_col][[1]],'%Y'))>=time_periods[ii,1][[1]] &
-                            as.numeric(format(taxa_data[end_col][[1]],'%Y'))<=time_periods[ii,2][[1]]]<-floor(rowMeans(time_periods[ii,])[[1]])
+                            as.numeric(format(taxa_data[end_col][[1]],'%Y'))<=time_periods[ii,2][[1]]]<-rowMeans(time_periods[ii,])[[1]]
       }
     }else{
       for(ii in 1:length(time_periods[,1])){
         taxa_data$yearnew[taxa_data[year_col]>=time_periods[ii,1][[1]] &
-                            taxa_data[year_col]<=time_periods[ii,2][[1]]]<-floor(rowMeans(time_periods[ii,])[[1]])
+                            taxa_data[year_col]<=time_periods[ii,2][[1]]]<-rowMeans(time_periods[ii,])[[1]]
       }
     }
     

@@ -19,7 +19,7 @@
   year of the observation or columns specifying the start
   and end dates of the observation. If \code{NULL}
   (default) the user is prompted to select a .csv or .rdata
-  file. If using a dataframe it is importent that date
+  file. If using a dataframe it is important that date
   columns are in a date format. If using a .csv dates are
   assumed to be in the format dd/mm/yyyy.}
 

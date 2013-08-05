@@ -351,10 +351,10 @@ snowMixedModel <-
     rdf <-do.call("rbind", r)
     
     write.table(rdf, file=file_name, col.names=TRUE, row.names=FALSE, sep=',')
-    # R dumps memory at completion to a file in your working directory, this ensures that file is not large
-    rm(list=ls())
     
     # Stop snowfall cluster
     sfStop()
     
+    # R dumps memory at completion to a file in your working directory, this ensures that file is not large
+    rm(list=ls())
   }

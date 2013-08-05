@@ -260,7 +260,7 @@ mixedModel <-
     # set the year column
     # when using year scale time_period could be a numeric or a date
     space_time$year <- as.numeric(format(space_time$time_period,'%Y')) # take year from date year
-        
+          
     # If sinkdir is given, write data there. If not just return it to console
     if(!is.null(sinkdir)){
       dir.create(sinkdir,showWarnings = FALSE) # creates the directory if it does not exist
