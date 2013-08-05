@@ -316,16 +316,10 @@ snowMixedModel <-
     
     
     eachSpecies<-function(ii){ 
-      if(!is.null(sinkdir)){
-        # Count the number of species that have already been done
-        if(file.exists(paste(sinkdir,'/log.txt',sep=''))){
-          Nsp<-nrow(read.table(paste(sinkdir,'/log.txt',sep='')))+1
-        } else {
-          Nsp <- 1
-        }
-        write(paste('Modelling',ii,'- Species',Nsp,'of',length(unique(taxa_data$CONCEPT)),Sys.time()),
-              file=paste(sinkdir,'/log.txt',sep=''), append=TRUE)
-      }
+      
+      write(paste('Modelling',ii,'- Species',Nsp,'of',length(unique(taxa_data$CONCEPT)),Sys.time()),
+            file=paste(sinkdir,'/log.txt',sep=''), append=TRUE)
+      
       y<-unique(taxa_data[taxa_data$CONCEPT==ii&!is.na(taxa_data$hectad)&!is.na(taxa_data$time_period),][c('CONCEPT','time_period','hectad')])
       species_space_time <- merge(x=space_time,y=y,all.x=T)
       species_space_time$CONCEPT <- as.character(species_space_time$CONCEPT)
