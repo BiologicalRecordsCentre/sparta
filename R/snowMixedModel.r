@@ -317,7 +317,7 @@ snowMixedModel <-
     
     eachSpecies<-function(ii){ 
       
-      write(paste('Modelling',ii,'- Species',Nsp,'of',length(unique(taxa_data$CONCEPT)),Sys.time()),
+      write(paste('Modelling',ii,Sys.time()),
             file=paste(sinkdir,'/log.txt',sep=''), append=TRUE)
       
       y<-unique(taxa_data[taxa_data$CONCEPT==ii&!is.na(taxa_data$hectad)&!is.na(taxa_data$time_period),][c('CONCEPT','time_period','hectad')])
