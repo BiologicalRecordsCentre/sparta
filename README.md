@@ -1,12 +1,14 @@
 # sparta
 ========
 
-This R package includes methods used to analyse trends in unstructured occurrence datasets and a range of useful functions for mapping such data in the UK. The package is currently **under development**.
+This R package includes methods used to analyse trends in unstructured occurrence datasets and a range of useful functions for mapping such data in the UK. The package is currently **under development**. Note that frescalo currently uses an .exe compiled only for windows.
 
 ###News
 ----------------
 
-We have just updated sparta and are in the process of writing new tutorials for GitHub. In the meantime all the information you need should be in the help files for each function e.g. (?telfer, ?mixedModel, ?listLength, ?frescalo, ?plr, ?propDiff). Note that the function sparta() is no longer supported.
+We have been made aware that some users of windows 7 have had issues with the frescalo function. We are currnetly in the processes of addressing this. In the meantime it will function correctly on XP. 
+
+We have updated sparta, all methods now have their own function (e.g. ?telfer, ?mixedModel, ?listLength, ?frescalo, ?plr, ?propDiff). Note that the function sparta() is no longer supported.
 
 
 ### Tutorials
@@ -16,6 +18,7 @@ We have developed tutorials for a few of the functions in the package:
 
 * [create_weights](https://github.com/BiologicalRecordsCentre/sparta/wiki/create_weights) - A function for creating a frescalo weights file  
 * [frescalo](https://github.com/BiologicalRecordsCentre/sparta/wiki/frescalo) - A function for using Frescalo (Hill, 2011), a tool for analysing occurrence data when recording effort is not known.
+* [maes](https://github.com/BiologicalRecordsCentre/sparta/wiki/maes) - A function applying the [Maes et al, (2012)](http://www.sciencedirect.com/science/article/pii/S0006320711004393) method to estimate a percentage change in distribution area.
 * [mixedModel](https://github.com/BiologicalRecordsCentre/sparta/wiki/mixedModel) - A function for using the mixed model analysis used by Roy *et al* (2011)
 * [plot_GIS](https://github.com/BiologicalRecordsCentre/sparta/wiki/plot_GIS) - A function for plotting GIS data
 * [plr](https://github.com/BiologicalRecordsCentre/sparta/wiki/plr) - A function for undertaking a Power Law Residuals analysis for comparing two time periods.
