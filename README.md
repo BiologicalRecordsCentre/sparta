@@ -6,9 +6,7 @@ This R package includes methods used to analyse trends in unstructured occurrenc
 ###News
 ----------------
 
-We have been made aware that some users of windows 7 have had issues with the frescalo function. We are currnetly in the processes of addressing this. In the meantime it will function correctly on XP. 
-
-We have updated sparta, all methods now have their own function (e.g. ?telfer, ?mixedModel, ?listLength, ?frescalo, ?plr, ?propDiff). Note that the function sparta() is no longer supported.
+We have been made aware that some users of windows 7 have had issues with the frescalo function. We are currently in the processes of addressing this. In the meantime it will function correctly on XP. 
 
 
 ### Tutorials
