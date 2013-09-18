@@ -153,6 +153,9 @@ telfer <-
     missingColNames<-new.colnames[!new.colnames %in% names(taxa_data)]
     if(length(missingColNames)>0) stop(paste(unlist(missingColNames),'is not the name of a column in data'))
     
+    # Remove columns that are not needed
+    taxa_data <- taxa_data[,names(taxa_data) %in% new.colnames]
+    
     # Ensure date columns are dates
     if(!is.na(start_col)){
       taxa_data<-colToDate(taxa_data,start_col)  

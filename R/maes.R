@@ -159,9 +159,8 @@ maes <-function(Data=NULL,#your data (.rdata files) as a file path (or list of f
   missingColNames<-new.colnames[!new.colnames %in% names(taxa_data)]
   if(length(missingColNames)>0) stop(paste(paste(unlist(missingColNames),collapse = ' and '),'is/are not the name of a column(s) in data'))
   
-  # Keep columns from dataset that we need, drop the rest
-  col_names <- na.omit(c(site_col,sp_col,start_col,end_col,year_col)) # get column names
-  taxa_data <- taxa_data[,names(taxa_data) %in% col_names]
+  # Remove columns that are not needed
+  taxa_data <- taxa_data[,names(taxa_data) %in% new.colnames]
   
   # remove NAs
   # It is important NAs are not included in the analysis. These may arise where
