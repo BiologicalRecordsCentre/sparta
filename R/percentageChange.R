@@ -1,5 +1,5 @@
 percentageChange <-
-  function(intercept=NULL, Ymin=NULL, Ymax=NULL, slope=NULL, NYears=10, option='arithmetic'){
+  function(intercept=NULL, Ymin=NULL, Ymax=NULL, slope=NULL, NYears=10, option='arithmetic', probability = TRUE){
     
     if(is.null(intercept)) stop('No intercept value given')
     if(is.null(slope)) stop('No slope value given')
@@ -10,9 +10,13 @@ percentageChange <-
     Yspan <- 1 + Ymax - Ymin
    
     # calculate the change in p(occupied) in the first and last years
-    init <- ilt(intercept+slope*Ymin)
-    final <- ilt(intercept+slope*Ymax)
-    
+    if(probability){ #when doing probabilities ilt must be used
+      init <- ilt(intercept+slope*Ymin)
+      final <- ilt(intercept+slope*Ymax)
+    } else { # some methods such as Frescalo arent producing probabilities
+      init <- intercept+slope*Ymin
+      final <- intercept+slope*Ymax
+    }
     # calculate the total change as a proportion of the initial
     prop.change <- (final - init) / init
     #attr(prop.change, 'span') <- Yspan

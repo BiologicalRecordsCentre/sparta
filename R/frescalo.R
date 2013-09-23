@@ -242,7 +242,7 @@ frescalo <-
        
     # load required packages
     required.packages <- c('lme4','reshape2','sp','gdata')
-    if(plot_fres) required.packages <- c(required.packages,'ggplot')
+    if(plot_fres) required.packages <- c(required.packages,'ggplot2')
     new.packages <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
     if(length(new.packages)) install.packages(new.packages)
     
@@ -470,7 +470,8 @@ frescalo <-
                                                           Ymin=fres_return$lm_stats['Ymin'],
                                                           Ymax=fres_return$lm_stats['Ymax'],
                                                           NYears=NYears,
-                                                          option=trend_option)
+                                                          option=trend_option,
+                                                          probability = FALSE)
       write.csv(fres_return$lm_stats, fres_lm_path, row.names=FALSE)
     }
     
