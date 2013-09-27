@@ -464,7 +464,8 @@ frescalo <-
       fres_return$lm_stats <- lm_z
     }
    
-    if('lm_stats' %in% names(fres_return)){
+    # Calculate percentage change if more than two time periods & lm_stats exists
+    if(length(time_periods[,1]) > 2 & 'lm_stats' %in% names(fres_return)){
       fres_return$lm_stats[paste('change_',NYears,'yr',sep='')]<-percentageChange(intercept=fres_return$lm_stats['a'],
                                                           slope=fres_return$lm_stats['b'],
                                                           Ymin=fres_return$lm_stats['Ymin'],
