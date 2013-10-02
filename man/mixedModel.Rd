@@ -115,9 +115,6 @@
   \code{pvalue} the P-value. \code{yearZero} gives the year
   used for the intercept (i.e. that year whose value is set
   to 0). This helps to increase model stability.
-  \code{cvg_code} gives the convergence code for each of
-  the models. A value of 4 indicates a good model, other
-  values can be looked up using cvg_codes().
   \code{pVisitsUsed} gives the proportion of all visits
   (unique combinations of date and site) used in the
   modelling after removing short lists (\code{min_list}),
@@ -129,7 +126,9 @@
   and maximum years used in the model. Note these values
   are centered on \code{yearZero}.  \code{change_} gives
   the percentage change dependent on the values given to
-  \code{trend_option} and \code{NYears}.
+  \code{trend_option} and \code{NYears}. \code{errorMsg}
+  captures error messages returne by lme4 during the
+  running of models.
 }
 \description{
   This function undertakes a 'mixed-model' analysis as laid

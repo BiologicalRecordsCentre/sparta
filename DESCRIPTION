@@ -1,12 +1,12 @@
 Package: sparta
 Type: Package
 Title: Trend analysis for unstructured data
-Version: 0.1.17
-Date: 2013-07-09
+Version: 0.1.18
+Date: 2013-10-02
 Author: Tom August <tomaug@ceh.ac.uk>
 Maintainer: Tom August <tomaug@ceh.ac.uk>
 Description: This package includes methods used to analyse trends in unstructured
              occurrence datasets such as those collected by volunteer recording
              schemes.
 License: 
-Depends: R (>= 2.15.1), lme4,reshape2,sp,gdata
+Depends: R (>= 2.15.1), lme4 (>= 1.0), reshape2, sp, gdata

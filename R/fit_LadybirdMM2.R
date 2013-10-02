@@ -15,7 +15,7 @@ function(indata, nsp=2, nyr=3, od=F, V=F){
     
   #if there is no well sampled data, capture what info you can and dont bother modelling
   if(nrow(data)==0){ 
-      coefs <- c(rep(NA,10),length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)))
+      coefs <- c(rep(NA,9),length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)), 'Error : no data in well sampled sites')
     }else{
       
     MMdata <- dcast(data, year + hectad ~ ., fun=length, value.var='L') #how many lists for each year?
@@ -31,26 +31,28 @@ function(indata, nsp=2, nyr=3, od=F, V=F){
 
     if(od){
       MMdata$obs <- 1:nrow(MMdata)
-      MM <- tryCatch(glmer(cbind(nVR, failures) ~ cYr + (1|hectad) + (1|obs), data=MMdata, family=binomial, verbose=V))
+      MM <- try(glmer(cbind(nVR, failures) ~ cYr + (1|hectad) + (1|obs), data=MMdata, family=binomial, verbose=V),silent=TRUE)
     } else {
-      MM <- tryCatch(glmer(cbind(nVR, failures) ~ cYr + (1|hectad), data=MMdata, family=binomial, verbose=V))      
+      MM <- try(glmer(cbind(nVR, failures) ~ cYr + (1|hectad), data=MMdata, family=binomial, verbose=V),silent=TRUE)      
     }
     
     if(class(MM)[1]=="try-error"){
-      coefs <- rep(NA,13)
+      coefs <- c(rep(NA,9),length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)))
+      coefs <- c(coefs, MM[1])
     }
     if(sum(as.numeric(data$CONCEPT))==0){ #ie if there are no observations
-      coefs <- c(rep(NA,10),length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)))
+      coefs <- c(rep(NA,9),length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)),'Error : no data in well sampled sites')
     }
-    if(as.numeric(MM@dims['cvg'])==65){ #catches a specific convergence error (not caught above)
-      coefs <- c(rep(NA,9),as.numeric(MM@dims['cvg']),length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)))
-    }
+#     if(as.numeric(MM@dims['cvg'])==65){ #catches a specific convergence error (not caught above)
+#       coefs <- c(rep(NA,9),as.numeric(MM@dims['cvg']),length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)))
+#     }
     if(class(MM)[1]!="try-error" & !exists('coefs')){
-      coefs <- as.numeric(summary(MM)@coefs[2,])
-      coefs <- c(coefs,as.numeric(summary(MM)@coefs[1,1:2]),median(unique(as.numeric(MMdata$year))))
+      coefs <- as.numeric(summary(MM)$coefficients[2,])
+      coefs <- c(coefs,as.numeric(summary(MM)$coefficients[1,1:2]),median(unique(as.numeric(MMdata$year))))
       coefs <- c(coefs,min(MM@frame[,2]),max(MM@frame[,2]))
-      coefs <- c(coefs,as.numeric(MM@dims['cvg']))
+      #coefs <- c(coefs,as.numeric(MM@dims['cvg']))
       coefs <- c(coefs,length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)))
+      coefs <- c(coefs, NA)
       }
   }  
    # keep this a two step process in case we later decide to extract other info
