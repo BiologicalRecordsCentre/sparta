@@ -18,9 +18,7 @@ function(stat_path = NULL, trend_path = NULL, freq_path = NULL, initial_dir = "~
 			# Read file
 				if(is.null(sep)){
 					# Read majority of data (skip 1st line)
-					stats <<- read.fwf(f_path, widths = c(10,7,7,7,7,8,8,10,10,5), header=FALSE, stringsAsFactors = FALSE, strip.white = TRUE, skip = 1, na.strings = c("NA", "*******", "-1.#IO","1.#R", "-1.$"), comment.char = "")
-					# Read in column names from 1st line
-					names(stats) <<- read.table(f_path, skip = 0, nrows = 1, stringsAsFactors = FALSE)[1,]
+					stats <<- read.table(f_path, header=TRUE, stringsAsFactors = FALSE, strip.white = TRUE, na.strings = c("NA", "*******", "-1.#IO","1.#R", "-1.$"), comment.char = "", sep=',')
 				} else {
 					stats <<- read.table(f_path, sep=sep, header=TRUE, stringsAsFactors = FALSE, strip.white = TRUE, na.strings = c("NA", "*******", "-1.#IO","1.#R", "-1.$"), comment.char = "")
 				}
@@ -51,9 +49,7 @@ function(stat_path = NULL, trend_path = NULL, freq_path = NULL, initial_dir = "~
 			# Read file
 				if(is.null(sep)){
 					# Read majority of data (skip 1st line)
-					trend <<- read.fwf(f_path, widths=c(9,12,8,7,7,7,7,7,7), header=FALSE, stringsAsFactors = FALSE, strip.white = TRUE, skip = 1, na.strings = c("NA", "-1.#IO", "1.#R", "*******", "********", "1.#QO", "-1.$"), comment.char = "")
-					# Read in column names from 1st line
-					names(trend) <<- read.table(f_path, skip = 0, nrows = 1, stringsAsFactors = FALSE)[1,]
+					trend <<- read.table(f_path, header=TRUE, stringsAsFactors = FALSE, strip.white = TRUE, na.strings = c("NA", "-1.#IO", "1.#R", "*******", "********", "1.#QO", "-1.$"), comment.char = "", sep = ',')
 				} else {
 					trend <<- read.table(f_path, sep=sep, header=TRUE, stringsAsFactors = FALSE, strip.white = TRUE, na.strings = c("NA", "*******", "-1.#IO","1.#R", "-1.$", "1.#QO"), comment.char = "")
 				}
@@ -84,9 +80,7 @@ function(stat_path = NULL, trend_path = NULL, freq_path = NULL, initial_dir = "~
 			# Read file
 				if(is.null(sep)){
 					# Read majority of data (skip 1st line)
-					freq <<- read.fwf(f_path, widths=c(10,10,6,8,8,8,6,8), header=FALSE, stringsAsFactors = FALSE, strip.white = TRUE, skip = 1, na.strings = c("NA", "*******", "1.#INF", "1.#QNB", "********"), comment.char = "")
-					# Read in column names from 1st line
-					names(freq) <<- read.table(f_path, skip = 0, nrows = 1, stringsAsFactors = FALSE)[1,]
+					freq <<- read.table(f_path, header=TRUE, stringsAsFactors = FALSE, strip.white = TRUE, na.strings = c("NA", "*******", "1.#INF", "1.#QNB", "********"), comment.char = "", sep=',')
 				} else {
 					freq <<- read.table(f_path, sep=sep, header=TRUE, stringsAsFactors = FALSE, strip.white = TRUE, na.strings = c("NA", "*******", "-1.#IO","1.#R", "-1.$", "1.#INF", "1.#QNB", "********"), comment.char = "")
 				}

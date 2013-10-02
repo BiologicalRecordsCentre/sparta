@@ -71,9 +71,9 @@
 #'          - \tab \code{Time} \tab Time period, specified as a class (e.g. 1970); times need not be numeric and are indexed as character strings\cr
 #'          - \tab \code{TFactor} \tab Time factor, the estimated relative frequency of species at the time\cr
 #'          - \tab \code{St_Dev} \tab Standard deviation of the time factor, given that spt (defined below) is a weighted sum of binomial variates\cr
-#'          - \tab \code{Count} \tab Number of occurrences of species at the time period\cr
-#'          - \tab \code{spt} \tab Number of occurrences, given reduced weight of locations having very low sampling effort\cr
-#'          - \tab \code{est} \tab Estimated number of occurrences; this should be equal to spt if the algorithm has converged\cr
+#'          - \tab \code{X} \tab Number of occurrences of species at the time period\cr
+#'          - \tab \code{Xspt} \tab Number of occurrences, given reduced weight of locations having very low sampling effort\cr
+#'          - \tab \code{Xest} \tab Estimated number of occurrences; this should be equal to spt if the algorithm has converged\cr
 #'          - \tab \code{N>0.00} \tab Number of locations with non-zero probability of the species occurring\cr
 #'          - \tab \code{N>0.98} \tab Number of locations for which the probability of occurrence was estimated as greater than 0.98\cr
 #'          }
@@ -269,7 +269,7 @@ frescalo <-
     if(plot_fres) data(UK)
     
     # set up frescalo path
-    frespath<-paste(normalizePath(find.package('sparta')),'\\exec\\Frescalo_2c.exe',sep='')
+    frespath<-paste(normalizePath(find.package('sparta')),'\\exec\\Frescalo_3.exe',sep='')
     
     # unpack weights file if needed
     if(class(Fres_weights)=='character'){
