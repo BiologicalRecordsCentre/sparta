@@ -269,7 +269,7 @@ frescalo <-
     if(plot_fres) data(UK)
     
     # set up frescalo path
-    frespath<-paste(normalizePath(find.package('sparta')),'\\exec\\Frescalo_3.exe',sep='')
+    frespath<-paste(normalizePath(find.package('sparta')),'\\exec\\Frescalo_3a.exe',sep='')
     
     # unpack weights file if needed
     if(class(Fres_weights)=='character'){
