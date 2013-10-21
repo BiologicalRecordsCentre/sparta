@@ -269,7 +269,10 @@ frescalo <-
     if(plot_fres) data(UK)
     
     # set up frescalo path
-    frespath<-paste(normalizePath(find.package('sparta')),'\\exec\\Frescalo_3a.exe',sep='')
+    OS <- Sys.info()[['sysname']]
+    if(OS == 'Windows') frespath<-paste(normalizePath(find.package('sparta')),'/exec/Frescalo_3a.exe',sep='')
+    if(OS == 'Linux') frespath<-paste(normalizePath(find.package('sparta')),'/exec/Frescalo_3a_linux.exe',sep='')
+    if(OS == 'Darwin') stop('Frescalo is not yet available for Mac. Email the maintiainer a complaint')
     
     # unpack weights file if needed
     if(class(Fres_weights)=='character'){
