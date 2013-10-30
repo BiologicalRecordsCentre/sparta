@@ -24,15 +24,15 @@ GP_telfer <- function (taxa_data,time_periods,iterations=10,useIterations=TRUE,m
   T2 <- taxa_data[taxa_data$year>splityr,]
   
   # remove gridcells that are only found in one time period
-  T1cells <- unique(T1$hectad)
-  T2cells <- unique(T2$hectad)
+  T1cells <- unique(T1$site)
+  T2cells <- unique(T2$site)
   allGood <- T1cells[T1cells %in% T2cells]
-  T1 <- T1[T1$hectad %in% allGood,]
-  T2 <- T2[T2$hectad %in% allGood,]
+  T1 <- T1[T1$site %in% allGood,]
+  T2 <- T2[T2$site %in% allGood,]
 
   # Change to GP format (2 col, $species and $gcell)
-  T1 <- unique(T1[c('CONCEPT','hectad')])
-  T2 <- unique(T2[c('CONCEPT','hectad')])
+  T1 <- unique(T1[c('CONCEPT','site')])
+  T2 <- unique(T2[c('CONCEPT','site')])
   names(T1) <- c('species','gcell')
   names(T2) <- c('species','gcell')
   

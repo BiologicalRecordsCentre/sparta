@@ -1,15 +1,15 @@
-\name{snowMixedModel}
-\alias{snowMixedModel}
-\title{Parallelised Mixed-model trend analysis using Snowfall}
+\name{parallelWSS}
+\alias{parallelWSS}
+\title{Parallelised well sampled sites (WSS) trend analysis}
 \usage{
-  snowMixedModel(Data = NULL, year_range = NULL,
+  parallelWSS(Data = NULL, year_range = NULL,
     ignore.ireland = F, ignore.channelislands = F,
     min_list = 2, min_years = 3, od = FALSE,
     verbose = FALSE, sinkdir = NULL,
     trend_option = "arithmetic", NYears = 10,
     date_col = NA, site_col = NA, sp_col = NA,
     start_col = NA, end_col = NA, print_progress = TRUE,
-    hosts = 1)
+    cores = 1)
 }
 \arguments{
   \item{Data}{A dataframe object or string giving the file
@@ -33,13 +33,14 @@
 
   \item{min_list}{The minimum list length (number of
   species) required from a visit for it to be included in
-  the mixed model analysis. Default is 2 (as in Roy et al,
-  2010) but should be changed dependent on the distribution
-  of list lengths in the data.  By setting this value to
+  the WSS analysis. Default is 2 (as in Roy et al, 2010)
+  but should be changed dependent on the distribution of
+  list lengths in the data.  By setting this value to
   'median' you can chose to set min_list to the median list
   length (or 2 if the median list length is less than 2).
-  If using this method the min_list is written into the
-  file name.}
+  If using this method the min_list used can be extracted
+  from the object returned by retrieving the attribute
+  min_list.}
 
   \item{min_years}{This variable defines the minimum number
   of years in which a site must have well sampled visits
@@ -48,20 +49,20 @@
   (2010).}
 
   \item{od}{This option allows modelling overdispersion
-  (\code{TRUE}) in mixed models.  Default is \code{FALSE}.}
+  (\code{TRUE}) in WSS models.  Default is \code{FALSE}.}
 
-  \item{verbose}{This option, if \code{TRUE}, sets mixed
-  model verbose allowing the interations of each model to
-  be veiwed.}
+  \item{verbose}{This option, if \code{TRUE}, sets models
+  to verbose allowing the interations of each model to be
+  veiwed.}
 
   \item{sinkdir}{An optional argument specifying the file
   path where output should be saved.  If the folder does
   not exist it will be created. Files are titled as a
-  concatenation of 'Mixed-Models_' and the date in yymmdd
-  format (i.e. 'Mixed-Models_130702.csv').  If a file of
-  this name already exists in the directory specified the
-  file name will be appended with an index number (i.e.
-  'Mixed-Models_130702(1).csv').}
+  concatenation of 'WSS_' and the date in yymmdd format
+  (i.e. 'WSS_130702.csv').  If a file of this name already
+  exists in the directory specified the file name will be
+  appended with an index number (i.e.
+  'WSS_130702(1).csv').}
 
   \item{trend_option}{Set the method by which you wish to
   calculate percentage change. This can currently be set to
@@ -105,8 +106,8 @@
   printed to console when running models. Default is
   \code{TRUE}}
 
-  \item{hosts}{The number of hosts/cores to be used in
-  parallel processing. Defaults to 1 (not parallel)}
+  \item{cores}{The number of cores to be used in parallel
+  processing. Defaults to 1 (not parallel)}
 }
 \value{
   A dataframe of results are returned to R. Each row gives
@@ -139,17 +140,16 @@
   are not returned to the console.
 }
 \description{
-  This function is identical in function to
-  \code{mixedModel} except that it runs the analysis using
-  the package \code{snowfall}. The only difference is that
-  the user must specify the number of hosts to be used.
-  Additionally since warning messages from slaves are
-  suppressed and the order of species in output may
-  vary.\cr This function undertakes a 'mixed-model'
-  analysis as laid out by Roy et al (2012). This method
-  accounts for variation in recording intensity between
-  sites and excludes data that may introduce error into
-  trend estimates.
+  This function is identical in function to \code{WSS}
+  except that it runs the analysis using the package
+  \code{parallel}. The only difference is that the user
+  must specify the number of cores to be used. Additionally
+  warning messages from slaves are suppressed and the order
+  of species in output may vary.\cr This function
+  undertakes a 'Well sampled site' analysis as laid out by
+  Roy et al (2012). This method accounts for variation in
+  recording intensity between sites and excludes data that
+  may introduce error into trend estimates.
 }
 \examples{
 \dontrun{
@@ -159,7 +159,7 @@ library(sparta)
 #load example dataset
 data(ex_dat)
 
-MM_out<-snowMixedModel(Data=ex_dat,
+MM_out<-parallelWSS(Data=ex_dat,
                    year_range=c(1970,2000),
                    min_list=1,
                    min_years=2,
@@ -167,7 +167,7 @@ MM_out<-snowMixedModel(Data=ex_dat,
                    sp_col='CONCEPT',
                    start_col='TO_STARTDATE',
                    end_col='Date',
-                   hosts=2)
+                   cores=2)
 
 }
 }

@@ -11,8 +11,8 @@
   \item{longitude}{a vector of numerics giving longitudes}
 
   \item{out_projection}{a string giving the desired output
-  projection. Defaults to \code{"OSGB"}. ASK COLIN WHAT
-  OTHER VARIENTS ARE AVAILABLE.}
+  projection, either \code{"OSGB"} or \code{"OSNI"}.
+  Defaults to \code{"OSGB"}.}
 
   \item{return_type}{a string defining what information the
   funtion should return. If \code{"both"} (default), grid

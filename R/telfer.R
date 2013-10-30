@@ -187,7 +187,7 @@ telfer <-
     taxa_data<-taxa_data[!is.na(taxa_data$year),]
     
     #rename columns
-    newnames<-c('hectad','CONCEPT')
+    newnames<-c('site','CONCEPT')
     oldnames<-c(site_col,sp_col)
     taxa_data<-change_colnames(taxa_data,newnames,oldnames)
     

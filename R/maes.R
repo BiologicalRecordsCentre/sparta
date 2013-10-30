@@ -185,8 +185,8 @@ maes <-function(Data=NULL,#your data (.rdata files) as a file path (or list of f
     }
   }
     
-  if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data$Site)==1)
-  if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data$Site)==FALSE)
+  if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data[site_col])==1)
+  if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data[site_col])==FALSE)
   
   # ensure time_periods is ordered chronologically (this orders by the first column - start year)
   time_periods<-time_periods[with(time_periods, order(time_periods[,1])),]

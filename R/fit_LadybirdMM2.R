@@ -7,6 +7,9 @@ function(indata, nsp=2, nyr=3, od=F, V=F){
   if(class(indata$year)!='numeric') indata$year<-as.numeric(indata$year)
   if(class(indata$CONCEPT)!='numeric') indata$CONCEPT<-as.numeric(indata$CONCEPT)
   
+  #Ensure data is unique
+  indata <- unique(indata)
+  
   #subset the data: remove the short lists (defined by nsp)
   data <- subset(indata, L>=nsp)
   
@@ -18,10 +21,10 @@ function(indata, nsp=2, nyr=3, od=F, V=F){
       coefs <- c(rep(NA,9),length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)), 'Error : no data in well sampled sites')
     }else{
       
-    MMdata <- dcast(data, year + hectad ~ ., fun=length, value.var='L') #how many lists for each year?
+    MMdata <- dcast(data, year + site ~ ., fun=length, value.var='L') #how many lists for each year?
     names(MMdata)[ncol(MMdata)] <- 'nVis'  
     
-    MMdata$nVR <- as.numeric(acast(data, year + hectad ~ ., fun=sum, value.var='CONCEPT'))
+    MMdata$nVR <- as.numeric(acast(data, year + site ~ ., fun=sum, value.var='CONCEPT'))
     
     # to fit a binomial model, we define a new column containing the number of visits without an observaiton of the focal
     MMdata$failures <- with(MMdata, nVis - nVR)
@@ -31,9 +34,9 @@ function(indata, nsp=2, nyr=3, od=F, V=F){
 
     if(od){
       MMdata$obs <- 1:nrow(MMdata)
-      MM <- try(glmer(cbind(nVR, failures) ~ cYr + (1|hectad) + (1|obs), data=MMdata, family=binomial, verbose=V),silent=TRUE)
+      MM <- try(glmer(cbind(nVR, failures) ~ cYr + (1|site) + (1|obs), data=MMdata, family=binomial, verbose=V),silent=TRUE)
     } else {
-      MM <- try(glmer(cbind(nVR, failures) ~ cYr + (1|hectad), data=MMdata, family=binomial, verbose=V),silent=TRUE)      
+      MM <- try(glmer(cbind(nVR, failures) ~ cYr + (1|site), data=MMdata, family=binomial, verbose=V),silent=TRUE)      
     }
     
     if(class(MM)[1]=="try-error"){

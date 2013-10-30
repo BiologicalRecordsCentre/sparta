@@ -375,7 +375,7 @@ frescalo <-
     taxa_data<-taxa_data[!is.na(taxa_data$yearnew),]
     
     #rename columns
-    newnames<-c('hectad','CONCEPT')
+    newnames<-c('site','CONCEPT')
     oldnames<-c(site_col,sp_col)
     taxa_data<-change_colnames(taxa_data,newnames,oldnames)
     
@@ -387,12 +387,12 @@ frescalo <-
     if(!is.null(species_to_include)) taxa_data<-taxa_data[taxa_data$CONCEPT %in% species_to_include,]
     
     # remove irish and/or channel islands data if desired
-    if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data$hectad)==1)
-    if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data$hectad)==FALSE)
+    if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data$site)==1)
+    if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data$site)==FALSE)
         
-    # retain only the columns we need (hectad, concept, timeperiod)
+    # retain only the columns we need (site, concept, timeperiod)
     # at the same time keep only unique rows
-    taxa_data<-na.omit(unique(taxa_data[c('hectad','CONCEPT','yearnew')]))
+    taxa_data<-na.omit(unique(taxa_data[c('site','CONCEPT','yearnew')]))
     
     # Setup output
     datecode <- format(Sys.Date(),'%y%m%d')
@@ -425,7 +425,7 @@ frescalo <-
     write.table(new_names,spp_names,sep=',',row.names=FALSE)
     # Merge in the new species names and use these going into frescalo
     taxa_data<-merge(taxa_data,new_names,by.x='CONCEPT',by.y='NAME',all=T)
-    taxa_data<-taxa_data[c('hectad','SPECIES','yearnew')]
+    taxa_data<-taxa_data[c('site','SPECIES','yearnew')]
        
     # Create non benchmark list if needed
     non_bench_txt<-NULL

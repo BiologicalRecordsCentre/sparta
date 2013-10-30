@@ -217,7 +217,7 @@ listLength <-
   }   
      
   #rename columns
-  newnames<-c('hectad','CONCEPT','TO_STARTDATE','Date','visit')
+  newnames<-c('site','CONCEPT','TO_STARTDATE','Date','visit')
   oldnames<-c(site_col,sp_col,start_col,end_col,date_col)
   taxa_data<-change_colnames(taxa_data,newnames,oldnames)
   
@@ -275,14 +275,14 @@ listLength <-
   }
   
   # ignore irish and channel island sites if desired  
-  if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data$hectad)==1)
-  if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data$hectad)==FALSE)
+  if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data$site)==1)
+  if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data$site)==FALSE)
   
   print('Recasting data...')
     
   # Work out the list lengths
   require(reshape2)
-  space_time <- dcast(taxa_data[c('CONCEPT','time_period','hectad')], time_period + hectad ~ ., value.var='CONCEPT', fun=LenUniq)
+  space_time <- dcast(taxa_data[c('CONCEPT','time_period','site')], time_period + site ~ ., value.var='CONCEPT', fun=LenUniq)
   names(space_time)[ncol(space_time)] <- 'L' # this is the column with the list length in it
   
   # add year column here to space_time, this saves on computation
@@ -328,7 +328,7 @@ listLength <-
   # Run the model species by species
   for (ii in sort(unique(taxa_data$CONCEPT))){ # the sort ensures species are done in order
     if(print_progress) print(paste('Modelling',ii,'- Species',counter,'of',length(unique(taxa_data$CONCEPT))))
-    y<-unique(taxa_data[taxa_data$CONCEPT==ii&!is.na(taxa_data$hectad)&!is.na(taxa_data$time_period),][c('CONCEPT','time_period','hectad')])
+    y<-unique(taxa_data[taxa_data$CONCEPT==ii&!is.na(taxa_data$site)&!is.na(taxa_data$time_period),][c('CONCEPT','time_period','site')])
     species_space_time <- merge(x=space_time,y=y,all.x=T)
     species_space_time$CONCEPT <- as.character(species_space_time$CONCEPT)
     species_space_time$CONCEPT[is.na(species_space_time$CONCEPT)]<-0

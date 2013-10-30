@@ -5,8 +5,8 @@
 #'        the same length as gridref. precision is given in meters as a numeric
 #'        i.e. 10km square = 10000, 1km square = 1000. If NULL then the function
 #'        tries to work out the precision itself.
-#' @param projection specifies the projection of the output. ASK COLIN WHAT VALUES
-#'        THIS CAN HAVE.
+#' @param projection specifies the projection of the input and can either be \code{"OSGB"} 
+#'        or \code{"OSNI"}. Defaults to \code{"OSGB"}
 #' @param centre If \code{TRUE} the coordinates for the centre of the cell are given
 #'        else if \code{FALSE} the coordinates for the bottom left corner are given. 
 #' @return A dataframe of results are returned
@@ -16,7 +16,8 @@
 #' gr2gps_latlon('SU616896')
 
 gr2gps_latlon <-
-function(gridref, precision = NULL, projection = NULL, centre = TRUE){
+function(gridref, precision = NULL, projection = 'OSGB', centre = TRUE){
+  
   # NOTE FOR UTM30 gridrefs then no need to use helmert transformation as lat long are already in correct projection
   data(datum_vars)
   data(helmert_trans_vars)

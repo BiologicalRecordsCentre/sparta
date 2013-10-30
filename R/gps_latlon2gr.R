@@ -4,8 +4,8 @@
 #' 
 #' @param latitude a vector of numerics giving latitudes
 #' @param longitude a vector of numerics giving longitudes
-#' @param out_projection a string giving the desired output projection. Defaults to
-#'        \code{"OSGB"}. ASK COLIN WHAT OTHER VARIENTS ARE AVAILABLE. 
+#' @param out_projection a string giving the desired output projection, either \code{"OSGB"}
+#'        or \code{"OSNI"}. Defaults to \code{"OSGB"}.
 #' @param return_type a string defining what information the funtion should return. If
 #'        \code{"both"} (default), grid reference and easting/northing are returned. If 
 #'        \code{"en"}, only easting and northing are returned. If \code{gr}, only grid
@@ -18,6 +18,11 @@
 
 gps_latlon2gr <-
 function(latitude, longitude, out_projection = "OSGB", return_type = "both"){
+  
+  #Load data needed
+  data(datum_vars)
+  data(helmert_trans_vars)
+  
   # Determine number of coordinates
   n_coords = length(latitude)
   # Check lengths are the same if not stop

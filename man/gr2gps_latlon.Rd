@@ -3,7 +3,7 @@
 \title{Covert grid reference to latitude and longitude}
 \usage{
   gr2gps_latlon(gridref, precision = NULL,
-    projection = NULL, centre = TRUE)
+    projection = "OSGB", centre = TRUE)
 }
 \arguments{
   \item{gridref}{a vector of strings giving grid references
@@ -15,8 +15,9 @@
   square = 10000, 1km square = 1000. If NULL then the
   function tries to work out the precision itself.}
 
-  \item{projection}{specifies the projection of the output.
-  ASK COLIN WHAT VALUES THIS CAN HAVE.}
+  \item{projection}{specifies the projection of the input
+  and can either be \code{"OSGB"} or \code{"OSNI"}.
+  Defaults to \code{"OSGB"}}
 
   \item{centre}{If \code{TRUE} the coordinates for the
   centre of the cell are given else if \code{FALSE} the

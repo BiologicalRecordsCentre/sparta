@@ -4,6 +4,9 @@ function(records,time_periods,min_sq=5,splityr=NULL,sp_list=NULL,
   
   require(reshape2)
   
+  #Ensure data is unique
+  records <- unique(records)
+  
   # Create a vector of all the years to include
   for (i in 1:length(row.names(time_periods))) {
     run<-time_periods[i,1]:time_periods[i,2]

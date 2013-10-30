@@ -19,6 +19,8 @@ fit_maes_trend <- function(records, time_periods = NULL, min_sp = 5){
     )
   )
   
+  #Ensure data is unique
+  records <- unique(records)
   
   # Subset data to years needed
   records <- records[records$tpnew %in% all_years, ]

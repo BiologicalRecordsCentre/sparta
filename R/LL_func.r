@@ -5,6 +5,9 @@ LL_func <-
     medianYear <- median(unique(as.numeric(MMdata$year)))
     MMdata$cYr <- MMdata$year - medianYear
     
+    #Ensure data is unique
+    MMdata <- unique(MMdata)
+    
     #Concept is numeric, as we are looking at presence and absence of the target species
     LLM <- glm(as.numeric(CONCEPT) ~ cYr + log2(L), binomial, data=MMdata, subset = L>0)
     Ymin <- min(LLM$data['year']) 

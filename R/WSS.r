@@ -1,6 +1,6 @@
-#' Mixed-model trend analysis
+#' Well sampled sites (WSS) trend analysis
 #' 
-#' This function undertakes a 'mixed-model' analysis as laid out by Roy et al (2012).
+#' This function undertakes a 'well sampled sites' analysis as laid out by Roy et al (2012).
 #' This method accounts for variation in recording intensity between sites and excludes
 #' data that may introduce error into trend estimates.
 #' 
@@ -16,7 +16,7 @@
 #' @param ignore.channelislands If \code{TRUE} data from hectads in the Channel Islands
 #'        are removed.
 #' @param min_list The minimum list length (number of species) required from a visit for it 
-#'        to be included in the mixed model analysis. Default is 2 (as in Roy et al, 2010)
+#'        to be included in the WSS analysis. Default is 2 (as in Roy et al, 2010)
 #'        but should be changed dependent on the distribution of list lengths in the data.
 #'        By setting this value to 'median' you can chose to set min_list to the median list
 #'        length (or 2 if the median list length is less than 2). If using this method the min_list
@@ -24,15 +24,15 @@
 #' @param min_years This variable defines the minimum number of years in which a site must have
 #'        well sampled visits (defined by \code{min_list}) to be included in te analysis. The 
 #'        default is set to 3 as in Roy et al (2010).
-#' @param od This option allows modelling overdispersion (\code{TRUE}) in mixed models.
+#' @param od This option allows modelling overdispersion (\code{TRUE}) in models.
 #'        Default is \code{FALSE}.
-#' @param verbose This option, if \code{TRUE}, sets mixed model verbose allowing the 
+#' @param verbose This option, if \code{TRUE}, sets models to verbose, allowing the 
 #'        interations of each model to be veiwed.
 #' @param sinkdir An optional argument specifying  the file path where output should be saved.
 #'        If the folder does not exist it will be created. Files are titled as a concatenation
-#'        of 'Mixed-Models_' and the date in yymmdd format (i.e. 'Mixed-Models_130702.csv').
+#'        of 'WSS_' and the date in yymmdd format (i.e. 'WSS_130702.csv').
 #'        If a file of this name already exists in the directory specified the file name will be
-#'        appended with an index number (i.e. 'Mixed-Models_130702(1).csv').
+#'        appended with an index number (i.e. 'WSS_130702(1).csv').
 #' @param trend_option Set the method by which you wish to calculate percentage change. This can currently
 #'        be set to either \code{'arithmetic'} (default) or \code{'geometric'}. Arimthmetic calculates
 #'        percentage change in a linear fashion such that a decline of 50\% over 50 years is
@@ -80,14 +80,14 @@
 #' #load example dataset
 #' data(ex_dat)
 #' 
-#' MM_out<-mixedModel(Data=ex_dat,
-#'                    year_range=c(1970,2000),
-#'                    min_list=1,
-#'                    min_years=2,
-#'                    site_col='kmsq',
-#'                    sp_col='CONCEPT',
-#'                    start_col='TO_STARTDATE',
-#'                    end_col='Date')
+#' MM_out<-WSS(Data=ex_dat,
+#'             year_range=c(1970,2000),
+#'             min_list=1,
+#'             min_years=2,
+#'             site_col='kmsq',
+#'             sp_col='CONCEPT',
+#'             start_col='TO_STARTDATE',
+#'             end_col='Date')
 #'
 #' }
 #' @references Roy, H.E., Adriaens, T., Isaac, N.J.B. et al. (2012) Invasive alien predator
@@ -95,7 +95,7 @@
 #'             18, 717-725.
 
 
-mixedModel <-
+WSS <-
   function(Data=NULL,#your data (path to .csv or .rdata, or an R object)
            year_range = NULL, #for subsetting data
            ignore.ireland=F,#do you want to remove Irish hectads?
@@ -216,7 +216,7 @@ mixedModel <-
     }   
     
     #rename columns
-    newnames<-c('hectad','CONCEPT','TO_STARTDATE','Date','visit')
+    newnames<-c('site','CONCEPT','TO_STARTDATE','Date','visit')
     oldnames<-c(site_col,sp_col,start_col,end_col,date_col)
     taxa_data<-change_colnames(taxa_data,newnames,oldnames)
     
@@ -247,14 +247,14 @@ mixedModel <-
     }
     
     # ignore irish and channel island sites if desired  
-    if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data$hectad)==1)
-    if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data$hectad)==FALSE)
+    if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data$site)==1)
+    if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data$site)==FALSE)
     
     print('Recasting data...')
     
     # Work out the list lengths
     require(reshape2)
-    space_time <- dcast(taxa_data[c('CONCEPT','time_period','hectad')], time_period + hectad ~ ., value.var='CONCEPT', fun=LenUniq)
+    space_time <- dcast(taxa_data[c('CONCEPT','time_period','site')], time_period + site ~ ., value.var='CONCEPT', fun=LenUniq)
     names(space_time)[ncol(space_time)] <- 'L' # this is the column with the list length in it
     
     # add year column here to space_time, this saves on computation
@@ -276,22 +276,22 @@ mixedModel <-
       dir.create(sinkdir,showWarnings = FALSE) # creates the directory if it does not exist
       org_wd<-getwd()
       setwd(sinkdir)
-      file_name<-paste(sinkdir,'/Mixed-Models_',datecode,'.csv', sep='')
+      file_name<-paste(sinkdir,'/WSS_',datecode,'.csv', sep='')
       # If the filename we want already exists create a new filename with a number
       # after it
       if(file.exists(file_name)){
         files <- dir(sinkdir)
-        files <- files[grepl(paste('Mixed-Models_',datecode,sep=''),files)]
+        files <- files[grepl(paste('WSS_',datecode,sep=''),files)]
         if(sum(grepl('\\(',files))>0){ # if we have indexed files already index the new file as max+1
-          files <- gsub(".csv",'',gsub(paste('Mixed-Models_',datecode,sep=''),'',files)) #remove text from file name
+          files <- gsub(".csv",'',gsub(paste('WSS_',datecode,sep=''),'',files)) #remove text from file name
           files <- gsub("\\)",'',gsub("\\(",'',files)) # remove brackets
           max_index <- max(as.numeric(files),na.rm=TRUE) # find the highest index number
           new_index <- max_index + 1
         } else { # if we dont have any indexed files it is numbered as 1
           new_index <- 1
         }
-        file_name <- paste(sinkdir,'/Mixed-Models_',datecode,'(',new_index,').csv', sep='')
-        warning('sinkdir already contains Mixed-Models data from today. New data saved as ', paste('Mixed-Models_',datecode,'(',new_index,').csv', sep=''))
+        file_name <- paste(sinkdir,'/WSS_',datecode,'(',new_index,').csv', sep='')
+        warning('sinkdir already contains WSS data from today. New data saved as ', paste('WSS_',datecode,'(',new_index,').csv', sep=''))
       }   
       setwd(org_wd) # Set our directory back to where it was
     }
@@ -301,16 +301,17 @@ mixedModel <-
     # Run the model species by species
     for (ii in sort(unique(taxa_data$CONCEPT))){ # the sort ensures species are done in order
       if(print_progress) print(paste('Modelling',ii,'- Species',counter,'of',length(unique(taxa_data$CONCEPT))))
-      y<-unique(taxa_data[taxa_data$CONCEPT==ii&!is.na(taxa_data$hectad)&!is.na(taxa_data$time_period),][c('CONCEPT','time_period','hectad')])
+      y<-unique(taxa_data[taxa_data$CONCEPT==ii&!is.na(taxa_data$site)&!is.na(taxa_data$time_period),][c('CONCEPT','time_period','site')])
       species_space_time <- merge(x=space_time,y=y,all.x=T)
       species_space_time$CONCEPT <- as.character(species_space_time$CONCEPT)
       species_space_time$CONCEPT[is.na(species_space_time$CONCEPT)]<-0
       species_space_time$CONCEPT[species_space_time$CONCEPT==ii]<-1
-      Mod_out<-t(as.data.frame(mixedModel_func(MMdata=species_space_time,
+      Mod_out<-t(as.data.frame(WSS_func(MMdata=species_space_time,
                                                min.L=min_list,
                                                nyr=min_years,
                                                od=od,
-                                               V=verbose))) # run the model
+                                               V=verbose)
+                               ,stringsAsFactors = FALSE)) # run the model
       row.names(Mod_out)<-ii
       Mod_out<-as.data.frame(Mod_out)
       Mod_out[paste('change_',NYears,'yr',sep='')]<-percentageChange(intercept=Mod_out$intercept,
@@ -342,6 +343,12 @@ mixedModel <-
       }
       counter=counter+1  
     }
+    
+    # Because of the way the dataframe has been constructed some columns are chr
+    # but should be num, I correct that here
+    for(i in 2:13){
+      Mod_out_master[,i]<-as.numeric(Mod_out_master[,i])
+    }    
     
     if(median_list_used){
       print(paste('min_list set to',min_list,'using median method'))

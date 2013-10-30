@@ -1,15 +1,13 @@
-\name{parallelMixedModel}
-\alias{parallelMixedModel}
-\title{Parallelised Mixed-model trend analysis}
+\name{WSS}
+\alias{WSS}
+\title{Well sampled sites (WSS) trend analysis}
 \usage{
-  parallelMixedModel(Data = NULL, year_range = NULL,
-    ignore.ireland = F, ignore.channelislands = F,
-    min_list = 2, min_years = 3, od = FALSE,
-    verbose = FALSE, sinkdir = NULL,
+  WSS(Data = NULL, year_range = NULL, ignore.ireland = F,
+    ignore.channelislands = F, min_list = 2, min_years = 3,
+    od = FALSE, verbose = FALSE, sinkdir = NULL,
     trend_option = "arithmetic", NYears = 10,
     date_col = NA, site_col = NA, sp_col = NA,
-    start_col = NA, end_col = NA, print_progress = TRUE,
-    cores = 1)
+    start_col = NA, end_col = NA, print_progress = TRUE)
 }
 \arguments{
   \item{Data}{A dataframe object or string giving the file
@@ -33,9 +31,9 @@
 
   \item{min_list}{The minimum list length (number of
   species) required from a visit for it to be included in
-  the mixed model analysis. Default is 2 (as in Roy et al,
-  2010) but should be changed dependent on the distribution
-  of list lengths in the data.  By setting this value to
+  the WSS analysis. Default is 2 (as in Roy et al, 2010)
+  but should be changed dependent on the distribution of
+  list lengths in the data.  By setting this value to
   'median' you can chose to set min_list to the median list
   length (or 2 if the median list length is less than 2).
   If using this method the min_list used can be extracted
@@ -49,20 +47,20 @@
   (2010).}
 
   \item{od}{This option allows modelling overdispersion
-  (\code{TRUE}) in mixed models.  Default is \code{FALSE}.}
+  (\code{TRUE}) in models.  Default is \code{FALSE}.}
 
-  \item{verbose}{This option, if \code{TRUE}, sets mixed
-  model verbose allowing the interations of each model to
-  be veiwed.}
+  \item{verbose}{This option, if \code{TRUE}, sets models
+  to verbose, allowing the interations of each model to be
+  veiwed.}
 
   \item{sinkdir}{An optional argument specifying the file
   path where output should be saved.  If the folder does
   not exist it will be created. Files are titled as a
-  concatenation of 'Mixed-Models_' and the date in yymmdd
-  format (i.e. 'Mixed-Models_130702.csv').  If a file of
-  this name already exists in the directory specified the
-  file name will be appended with an index number (i.e.
-  'Mixed-Models_130702(1).csv').}
+  concatenation of 'WSS_' and the date in yymmdd format
+  (i.e. 'WSS_130702.csv').  If a file of this name already
+  exists in the directory specified the file name will be
+  appended with an index number (i.e.
+  'WSS_130702(1).csv').}
 
   \item{trend_option}{Set the method by which you wish to
   calculate percentage change. This can currently be set to
@@ -105,9 +103,6 @@
   \item{print_progress}{Logical, if \code{TRUE} progress is
   printed to console when running models. Default is
   \code{TRUE}}
-
-  \item{cores}{The number of cores to be used in parallel
-  processing. Defaults to 1 (not parallel)}
 }
 \value{
   A dataframe of results are returned to R. Each row gives
@@ -119,9 +114,6 @@
   \code{pvalue} the P-value. \code{yearZero} gives the year
   used for the intercept (i.e. that year whose value is set
   to 0). This helps to increase model stability.
-  \code{cvg_code} gives the convergence code for each of
-  the models. A value of 4 indicates a good model, other
-  values can be looked up using cvg_codes().
   \code{pVisitsUsed} gives the proportion of all visits
   (unique combinations of date and site) used in the
   modelling after removing short lists (\code{min_list}),
@@ -133,24 +125,16 @@
   and maximum years used in the model. Note these values
   are centered on \code{yearZero}.  \code{change_} gives
   the percentage change dependent on the values given to
-  \code{trend_option} and \code{NYears}.\cr \cr If
-  \code{sinkdir} is given them a log file is created in the
-  same directory.  This can be used to check on progress of
-  the analysis since when using parallel print statements
-  are not returned to the console.
+  \code{trend_option} and \code{NYears}. \code{errorMsg}
+  captures error messages returne by lme4 during the
+  running of models.
 }
 \description{
-  This function is identical in function to
-  \code{mixedModel} except that it runs the analysis using
-  the package \code{parallel}. The only difference is that
-  the user must specify the number of cores to be used.
-  Additionally since warning messages from slaves are
-  suppressed and the order of species in output may
-  vary.\cr This function undertakes a 'mixed-model'
-  analysis as laid out by Roy et al (2012). This method
-  accounts for variation in recording intensity between
-  sites and excludes data that may introduce error into
-  trend estimates.
+  This function undertakes a 'well sampled sites' analysis
+  as laid out by Roy et al (2012). This method accounts for
+  variation in recording intensity between sites and
+  excludes data that may introduce error into trend
+  estimates.
 }
 \examples{
 \dontrun{
@@ -160,15 +144,14 @@ library(sparta)
 #load example dataset
 data(ex_dat)
 
-MM_out<-parallelMixedModel(Data=ex_dat,
-                   year_range=c(1970,2000),
-                   min_list=1,
-                   min_years=2,
-                   site_col='kmsq',
-                   sp_col='CONCEPT',
-                   start_col='TO_STARTDATE',
-                   end_col='Date',
-                   cores=2)
+MM_out<-WSS(Data=ex_dat,
+            year_range=c(1970,2000),
+            min_list=1,
+            min_years=2,
+            site_col='kmsq',
+            sp_col='CONCEPT',
+            start_col='TO_STARTDATE',
+            end_col='Date')
 
 }
 }
