@@ -158,7 +158,7 @@ library(sparta)
 #load example dataset
 data(ex_dat)
 
-MM_out<-snowWSS(Data=ex_dat,
+WSS_out<-snowWSS(Data=ex_dat,
                    year_range=c(1970,2000),
                    min_list=1,
                    min_years=2,

@@ -91,7 +91,7 @@
 #' #load example dataset
 #' data(ex_dat)
 #' 
-#' MM_out<-parallelWSS(Data=ex_dat,
+#' WSS_out<-parallelWSS(Data=ex_dat,
 #'                    year_range=c(1970,2000),
 #'                    min_list=1,
 #'                    min_years=2,
@@ -382,6 +382,12 @@ parallelWSS <-
     stopCluster(cl)
     
     Mod_out_master <- do.call("rbind", Mod_out_master)
+    
+    # Because of the way the dataframe has been constructed some columns are chr
+    # but should be num, I correct that here
+    for(i in 2:13){
+      Mod_out_master[,i]<-as.numeric(Mod_out_master[,i])
+    }  
     
     if(median_list_used){
       print(paste('min_list set to',min_list,'using median method'))

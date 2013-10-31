@@ -91,7 +91,7 @@
 #' #load example dataset
 #' data(ex_dat)
 #' 
-#' MM_out<-snowWSS(Data=ex_dat,
+#' WSS_out<-snowWSS(Data=ex_dat,
 #'                    year_range=c(1970,2000),
 #'                    min_list=1,
 #'                    min_years=2,
@@ -358,7 +358,13 @@ snowWSS <-
     print('Starting models')
     r <- sfClusterApplyLB(sort(unique(taxa_data$CONCEPT)), eachSpecies)
     rdf <-do.call("rbind", r)
-    
+        
+    # Because of the way the dataframe has been constructed some columns are chr
+    # but should be num, I correct that here
+    for(i in 2:13){
+      rdf[,i]<-as.numeric(rdf[,i])
+    }    
+        
     if(median_list_used){
       print(paste('min_list set to',min_list,'using median method'))
       attr(rdf,'min_list') <- min_list
