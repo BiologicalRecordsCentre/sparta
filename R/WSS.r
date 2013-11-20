@@ -261,7 +261,21 @@ WSS <-
     # set the year column
     # when using year scale time_period could be a numeric or a date
     space_time$year <- as.numeric(format(space_time$time_period,'%Y')) # take year from date year
-          
+    
+    
+    ## FILTER TO WELL SAMPLED SITES
+    space_time <- unique(space_time)
+    total_vis <- length(space_time$L)
+    
+    #subset the data: remove the short lists (defined by nsp)
+    space_time <- subset(space_time, L >= min_list)
+    
+    # of these visits, which are on well-sampled sites?
+    space_time <- subset(space_time, is.gridcell.wellsampled2(space_time, n = min_years))
+    total_WSS_vis <- length(space_time$L)
+    prop_vis_used <- total_WSS_vis/total_vis
+    
+    
     # If calculating min_list from data do it now
     if(!is.numeric(min_list) & min_list != 'median') stop('min_list must be numeric or "median"')
     median_list_used<-FALSE
@@ -302,15 +316,22 @@ WSS <-
     for (ii in sort(unique(taxa_data$CONCEPT))){ # the sort ensures species are done in order
       if(print_progress) print(paste('Modelling',ii,'- Species',counter,'of',length(unique(taxa_data$CONCEPT))))
       y<-unique(taxa_data[taxa_data$CONCEPT==ii&!is.na(taxa_data$site)&!is.na(taxa_data$time_period),][c('CONCEPT','time_period','site')])
-      species_space_time <- merge(x=space_time,y=y,all.x=T)
+      species_space_time <- merge(x = space_time, y = y, all.x = T, all.y = F)
       species_space_time$CONCEPT <- as.character(species_space_time$CONCEPT)
-      species_space_time$CONCEPT[is.na(species_space_time$CONCEPT)]<-0
-      species_space_time$CONCEPT[species_space_time$CONCEPT==ii]<-1
+      species_space_time$CONCEPT[is.na(species_space_time$CONCEPT)] <- 0
+      species_space_time$CONCEPT[species_space_time$CONCEPT == ii] <- 1
+      
+      #### Remove this code
+#       print(head(y))
+#       print(head(space_time))
+#       print(head(species_space_time))
+#       space_time <<- space_time
+      ####
+      
       Mod_out<-t(as.data.frame(WSS_func(MMdata=species_space_time,
-                                               min.L=min_list,
-                                               nyr=min_years,
-                                               od=od,
-                                               V=verbose)
+                                        od=od,
+                                        V=verbose,
+                                        pvis = prop_vis_used)
                                ,stringsAsFactors = FALSE)) # run the model
       row.names(Mod_out)<-ii
       Mod_out<-as.data.frame(Mod_out)

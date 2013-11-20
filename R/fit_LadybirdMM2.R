@@ -1,24 +1,24 @@
 fit_LadybirdMM2 <-
-function(indata, nsp=2, nyr=3, od=F, V=F){ 
+function(indata, od=F, V=F, pvis=NA){ 
   
   #07/05/2013: Updated with NI code 
   
   require(lme4)
-  if(class(indata$year)!='numeric') indata$year<-as.numeric(indata$year)
-  if(class(indata$CONCEPT)!='numeric') indata$CONCEPT<-as.numeric(indata$CONCEPT)
+  if(class(indata$year)!='numeric') indata$year <- as.numeric(indata$year)
+  if(class(indata$CONCEPT)!='numeric') indata$CONCEPT <- as.numeric(indata$CONCEPT)
   
   #Ensure data is unique
-  indata <- unique(indata)
+  data <- unique(indata)
   
-  #subset the data: remove the short lists (defined by nsp)
-  data <- subset(indata, L>=nsp)
-  
-  # of these visits, which are on well-sampled sites?
-  data <- subset(data, is.gridcell.wellsampled2(data, n=nyr))
+#   #subset the data: remove the short lists (defined by nsp)
+#   data <- subset(indata, L >= nsp)
+#   
+#   # of these visits, which are on well-sampled sites?
+#   data <- subset(data, is.gridcell.wellsampled2(data, n = nyr))
     
   #if there is no well sampled data, capture what info you can and dont bother modelling
   if(nrow(data)==0){ 
-      coefs <- c(rep(NA,9),length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)), 'Error : no data in well sampled sites')
+      coefs <- c(rep(NA,9),pvis,length(data$L),sum(as.numeric(data$CONCEPT)), 'Error : no data in well sampled sites')
     }else{
       
     MMdata <- dcast(data, year + site ~ ., fun=length, value.var='L') #how many lists for each year?
@@ -40,11 +40,11 @@ function(indata, nsp=2, nyr=3, od=F, V=F){
     }
     
     if(class(MM)[1]=="try-error"){
-      coefs <- c(rep(NA,9),length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)))
+      coefs <- c(rep(NA,9),pvis,length(data$L),sum(as.numeric(data$CONCEPT)))
       coefs <- c(coefs, MM[1])
     }
     if(sum(as.numeric(data$CONCEPT))==0){ #ie if there are no observations
-      coefs <- c(rep(NA,9),length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)),'Error : no data in well sampled sites')
+      coefs <- c(rep(NA,9),pvis,length(data$L),sum(as.numeric(data$CONCEPT)),'Error : no data in well sampled sites')
     }
 #     if(as.numeric(MM@dims['cvg'])==65){ #catches a specific convergence error (not caught above)
 #       coefs <- c(rep(NA,9),as.numeric(MM@dims['cvg']),length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)))
@@ -54,7 +54,7 @@ function(indata, nsp=2, nyr=3, od=F, V=F){
       coefs <- c(coefs,as.numeric(summary(MM)$coefficients[1,1:2]),median(unique(as.numeric(MMdata$year))))
       coefs <- c(coefs,min(MM@frame[,2]),max(MM@frame[,2]))
       #coefs <- c(coefs,as.numeric(MM@dims['cvg']))
-      coefs <- c(coefs,length(data$L)/length(indata$L),length(data$L),sum(as.numeric(data$CONCEPT)))
+      coefs <- c(coefs,pvis,length(data$L),sum(as.numeric(data$CONCEPT)))
       coefs <- c(coefs, NA)
       }
   }  
