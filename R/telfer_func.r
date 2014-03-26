@@ -116,7 +116,8 @@ GP_telfer <- function (taxa_data,time_periods,iterations=10,useIterations=TRUE,m
     
     for (i in rep_loop){  								# start loop
       
-      V_<- (c_+d_) / (total.cell.1*spp_table$fitted_proportions*(1-spp_table$fitted_proportions))	# work out the variance (modification of the binomial proportion variance structure)
+      # c_ + d_ should not be in brackets as they were in a previous version
+      V_<- c_ + d_ / (total.cell.1*spp_table$fitted_proportions*(1-spp_table$fitted_proportions))	# work out the variance (modification of the binomial proportion variance structure)
       inv_sq_V<-1/(V_^2)										# take the inverse of variance squared.
       
       m4<-lm(sq_residual_m1~NP_test,weight=inv_sq_V,data=spp_table)	# run the new model weighting by the inverse variance identifeid above.
