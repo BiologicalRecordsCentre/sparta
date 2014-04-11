@@ -166,7 +166,7 @@ WSS <-
       if(!grepl('.csv',Data) | grepl('.rdata',Data)) stop('Data file must be .csv or .rdata')
     }
     
-    analType<-'Mixed model'
+    analType<-'Well Sampled Site analysis'
     
     print(paste('Starting',analType))
     datecode <- format(Sys.Date(),'%y%m%d')
