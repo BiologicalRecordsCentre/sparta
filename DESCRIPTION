@@ -9,4 +9,4 @@ Description: This package includes methods used to analyse trends in unstructure
              occurrence datasets such as those collected by volunteer recording
              schemes.
 License: 
-Depends: R (>= 2.15.1), lme4 (>= 1.0), reshape2, sp, gdata
+Depends: R (>= 2.15.1), lme4 (>= 1.0), plyr, sp, reshape2
