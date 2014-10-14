@@ -267,15 +267,6 @@ WSS <-
     space_time <- unique(space_time)
     total_vis <- length(space_time$L)
     
-    #subset the data: remove the short lists (defined by nsp)
-    space_time <- subset(space_time, L >= min_list)
-    
-    # of these visits, which are on well-sampled sites?
-    space_time <- subset(space_time, is.gridcell.wellsampled2(space_time, n = min_years))
-    total_WSS_vis <- length(space_time$L)
-    prop_vis_used <- total_WSS_vis/total_vis
-    
-    
     # If calculating min_list from data do it now
     if(!is.numeric(min_list) & min_list != 'median') stop('min_list must be numeric or "median"')
     median_list_used<-FALSE
@@ -285,6 +276,14 @@ WSS <-
       if(min_list<2) min_list <- 2
     }
     
+    #subset the data: remove the short lists (defined by nsp)
+    space_time <- subset(space_time, L >= min_list)
+    
+    # of these visits, which are on well-sampled sites?
+    space_time <- subset(space_time, is.gridcell.wellsampled2(space_time, n = min_years))
+    total_WSS_vis <- length(space_time$L)
+    prop_vis_used <- total_WSS_vis/total_vis
+      
     # If sinkdir is given, write data there. If not just return it to console
     if(!is.null(sinkdir)){
       dir.create(sinkdir,showWarnings = FALSE) # creates the directory if it does not exist
