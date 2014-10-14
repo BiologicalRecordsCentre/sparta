@@ -6,7 +6,7 @@ This R package includes methods used to analyse trends in unstructured occurrenc
 ###News
 ----------------
 
-We have been made aware that some users of windows 7 have had issues with the frescalo function. We are currently in the processes of addressing this. In the meantime it will function correctly on XP. 
+We are in the process of re-writing much of sparta to add in things we learnt from our recent publication (Statistics for citizen science: extracting signals of change from noisy ecological data. 2014. Nick J. B. Isaac, Arco J. van Strien, Tom A. August, Marnix P. de Zeeuw and David B. Roy). Once the re-write is complete the package will go on CRAN.
 
 
 ### Tutorials
