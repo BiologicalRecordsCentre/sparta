@@ -277,10 +277,10 @@ frescalo <-
     # unpack weights file if needed
     if(class(Fres_weights)=='character'){
       if(Fres_weights=='LC'){
-        Fres_weights_name<-'GB_LC_Wts.txt'
-        if(!file.exists(paste(dirname(frespath),'/GB_LC_Wts.txt',sep=''))){
-          data(GB_LC_Wts)
-          write.table(GB_LC_Wts,file=paste(dirname(frespath),'/GB_LC_Wts.txt',sep=''),row.names=FALSE,col.names=FALSE,quote=FALSE) 
+        Fres_weights_name<-'UK_LC_Wts.txt'
+        if(!file.exists(paste(dirname(frespath),'/UK_LC_Wts.txt',sep=''))){
+          data(UK_LC_Wts)
+          write.table(UK_LC_Wts,file=paste(dirname(frespath),'/UK_LC_Wts.txt',sep=''),row.names=FALSE,col.names=FALSE,quote=FALSE) 
         }  
       }
       if(Fres_weights=='VP'){
