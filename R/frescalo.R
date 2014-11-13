@@ -26,11 +26,12 @@
 #'        each time period. Time periods should not overlap.
 #' @param plot_fres Logical, if \code{TRUE} maps are produced by Frescalo. Default is 
 #'        \code{FALSE}. CURRENTLY ONLY WORKS FOR UK GRID-REFERENCE DATA
-#' @param Fres_weights 'LC' specifies a weights file based on landcover data
-#'        for the UK and 'VP' uses a weights file based on vascular plant data for the UK
+#' @param Fres_weights 'LC*' specifies a weights files based on landcover data.
+#'        The suffix specifies the extend ('LCUK', 'LCNI' or 'LCGB'). 'VP' uses a weights
+#'        file based on vascular plant data for the UK
 #'        , both are included in the package. Alternativly a custom weights file can be
 #'        given as a data.frame. This must have three columns: target cell, neighbour cell,
-#'        weight. 
+#'        weight. Default is 'LCGB'
 #' @param non_benchmark_sp a character vector or data.frame with one column, giving the 
 #'        names of species not to be used as benchmarks in Frescalo. Default is 
 #'        \code{NULL} and all species are used. See Hill, 2011 for reasons why some
@@ -164,7 +165,7 @@ frescalo <-
            sinkdir=NULL,#where is the data going to be saved
            time_periods=NULL, #a list of vector pairs used in frescalo (ie 'c((1990,1995),(1996,2000))')
            plot_fres=FALSE,#do you want to plot the maps and do linear regression for frescalo?
-           Fres_weights='LC',#the name of the weights file in the frescalo directory to be used
+           Fres_weights='LCGB',#the name of the weights file in the frescalo directory to be used
            non_benchmark_sp=NULL,#species not to be used as benchmarks 
            fres_site_filter=NULL, #optional list of sites not to be included in analysis
            phi = NULL, #phi value for frescalo
@@ -276,11 +277,25 @@ frescalo <-
     
     # unpack weights file if needed
     if(class(Fres_weights)=='character'){
-      if(Fres_weights=='LC'){
+      if(Fres_weights=='LCUK'){
         Fres_weights_name<-'UK_LC_Wts.txt'
         if(!file.exists(paste(dirname(frespath),'/UK_LC_Wts.txt',sep=''))){
           data(UK_LC_Wts)
           write.table(UK_LC_Wts,file=paste(dirname(frespath),'/UK_LC_Wts.txt',sep=''),row.names=FALSE,col.names=FALSE,quote=FALSE) 
+        }  
+      }      
+      if(Fres_weights=='LCGB'){
+        Fres_weights_name<-'GB_LC_Wts.txt'
+        if(!file.exists(paste(dirname(frespath),'/GB_LC_Wts.txt',sep=''))){
+          data(GB_LC_Wts)
+          write.table(GB_LC_Wts,file=paste(dirname(frespath),'/GB_LC_Wts.txt',sep=''),row.names=FALSE,col.names=FALSE,quote=FALSE) 
+        }  
+      }
+      if(Fres_weights=='LCNI'){
+        Fres_weights_name<-'NI_LC_Wts.txt'
+        if(!file.exists(paste(dirname(frespath),'/NI_LC_Wts.txt',sep=''))){
+          data(NI_LC_Wts)
+          write.table(NI_LC_Wts,file=paste(dirname(frespath),'/NI_LC_Wts.txt',sep=''),row.names=FALSE,col.names=FALSE,quote=FALSE) 
         }  
       }
       if(Fres_weights=='VP'){
