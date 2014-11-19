@@ -195,8 +195,8 @@ telfer <-
     if(!is.na(sp_col))taxa_data$CONCEPT<-as.factor(taxa_data$CONCEPT)
     
     # Remove Ireland and Channel Islands if desired
-    if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data[site_col])==1)
-    if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data[site_col])==FALSE)
+    if(ignore.ireland) taxa_data <- subset(taxa_data, regexpr('^[A-Z]{2}', taxa_data$site)==1)
+    if(ignore.channelislands) taxa_data <- subset(taxa_data, grepl('^[Ww][[:alpha:]]{1}', taxa_data$site)==FALSE)
     
     # For each pair of time periods go through and compare them
     # Compare the time periods
