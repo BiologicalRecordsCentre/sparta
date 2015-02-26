@@ -1,7 +1,5 @@
 context("Test createWeights")
 
-library(sparta)
-
 #small dataset
 set.seed(seed = 128)
 n <- 10 #number of sites

@@ -32,7 +32,7 @@ function(latitude, longitude, out_projection = "OSGB", return_type = "both"){
   
   
   # Convert to Cartesian
-  org_cart = LatLong_Cartesian(latitude, longitude, "UTM30")
+  org_cart = LatLong_Cartesian(latitude, longitude, "UTM30", datum_vars)
   
   # At some point should set up some ranges to split UK, Irish & Channel Islands grid refs (and do follow stages in loop for different projections)
   # If doing multiple projections will need to setup output variable before hand!
@@ -41,10 +41,10 @@ function(latitude, longitude, out_projection = "OSGB", return_type = "both"){
   helm_tran = helmert_trans(x =org_cart$x, y = org_cart$y, z = org_cart$z, trans = paste("WGS84to", out_projection, sep=""))
   
   # Convert to UK lat lon
-  out_latlon = Cartesian_LatLong(helm_tran$x, helm_tran$y, helm_tran$z, out_projection)
+  out_latlon = Cartesian_LatLong(helm_tran$x, helm_tran$y, helm_tran$z, out_projection, datum_vars)
   
   # Convert to UK easting and northing
-  out_en = LatLongtoOSGrids(out_latlon$LATITUDE, out_latlon$LONGITUDE, out_projection)
+  out_en = LatLongtoOSGrids(out_latlon$LATITUDE, out_latlon$LONGITUDE, out_projection, datum_vars)
   
   # Convert to UK gridref
   out_gr = gr_num2let(out_en$EASTING, out_en$NORTHING, OSgrid = out_projection)

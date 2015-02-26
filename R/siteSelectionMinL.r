@@ -23,7 +23,7 @@ siteSelectionMinL <- function(taxa, site, time_period, minL){
   if(!is.numeric(minL)) stop('minL must be numeric')
   
   # Create dataframe
-  Data <- data.frame(taxa, site, time_period)
+  Data <- unique(data.frame(taxa, site, time_period))
     
   # Using plyr to create list lengths
   dfLL <- ddply(Data, .(site, time_period), nrow)

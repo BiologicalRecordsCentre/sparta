@@ -48,19 +48,19 @@ function(gridref, precision = NULL, projection = 'OSGB', centre = TRUE){
   org_en = gr_let2num(gridref[i_comp], centre = centre)
   
   # Determine lat lon (original projection)
-  out_latlon[i_comp,] = OSGridstoLatLong(org_en$EASTING, org_en$NORTHING, projection[i_comp])
+  out_latlon[i_comp,] = OSGridstoLatLong(org_en$EASTING, org_en$NORTHING, projection[i_comp], datum_vars)
   
   # Determine indices of gridrefs that are not UTM30 (which will need transformed)
   i_trans = which(!projection %in% c("UTM30","WGS84") & complete.cases(cbind(gridref, precision, projection)))
   
   # Determine Cartesian (Original projection)
-  org_cart = LatLong_Cartesian(out_latlon$LATITUDE[i_trans], out_latlon$LONGITUDE[i_trans], projection[i_trans])
+  org_cart = LatLong_Cartesian(out_latlon$LATITUDE[i_trans], out_latlon$LONGITUDE[i_trans], projection[i_trans], datum_vars)
   
   # Apply Helmert transformation to convert orginal projections to WGS84 (Cartesian in WGS84)
   helm_tran = helmert_trans(x =org_cart$x, y = org_cart$y, z = org_cart$z, trans = paste(projection[i_trans],"toWGS84", sep=""))
   
   # Convert Cartesian coordinates to Latitude/Longitude (Lat Lon in WGS84)
-  out_latlon[i_trans,] = Cartesian_LatLong(helm_tran$x, helm_tran$y, helm_tran$z, "UTM30")
+  out_latlon[i_trans,] = Cartesian_LatLong(helm_tran$x, helm_tran$y, helm_tran$z, "UTM30", datum_vars)
   
   # Return output
   return(out_latlon)

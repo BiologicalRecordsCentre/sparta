@@ -54,6 +54,7 @@
 #' @param end_col The name of the end date column in \code{Data}. See \code{start_col}.
 #' @param print_progress Logical, if \code{TRUE} progress is printed to console when
 #'        running models. Default is \code{TRUE}   
+#' @param family The type of model to be use. Can be \code{"Binomial"} or \code{"Bernoulli"}
 #' @return A dataframe of results are returned to R. Each row gives the results for a
 #'         single species, with the species name given in the first column. The columns
 #'         \code{year} and \code{intercept} give the estimates of these coefficients.
@@ -112,7 +113,8 @@ WSS <-
            sp_col = NA,
            start_col = NA,
            end_col = NA,
-           print_progress = TRUE){
+           print_progress = TRUE,
+           family = "Binomial"){
     
     # Clear warnings
     assign("last.warning", NULL, envir = baseenv())
@@ -151,6 +153,7 @@ WSS <-
       }
     }
     if(!is.data.frame(Data)&length(Data)>1){warning('Data cannot have length > 1');warn=TRUE}
+    if(family != 'Bernoulli' & family != 'Binomial'){warning('Family must be Binomial or Bernoulli');warn=TRUE}
     if(warn) stop("Oops, you need to address these warnings")
     
     # Ensure packages are installed
@@ -330,7 +333,8 @@ WSS <-
       Mod_out<-t(as.data.frame(WSS_func(MMdata=species_space_time,
                                         od=od,
                                         V=verbose,
-                                        pvis = prop_vis_used)
+                                        pvis = prop_vis_used,
+                                        family = family)
                                ,stringsAsFactors = FALSE)) # run the model
       row.names(Mod_out)<-ii
       Mod_out<-as.data.frame(Mod_out)

@@ -3,9 +3,10 @@
 #' This function uses the method outlined in Roy et al (2012) and Isaac et al (2014) for selecting
 #' well-sampled sites from a dataset using list length and number of years as selection criteria.
 #' 
-#' @param taxa A character vector of taxon names
-#' @param site A character vector of site names
-#' @param time_period Anumeric vector of user defined time periods, or a date vector
+#' @param taxa A character vector of taxon names, as long as the number of observations.
+#' @param site A character vector of site names, as long as the number of observations.
+#' @param time_period A numeric vector of user defined time periods, or a date vector,
+#' as long as the number of observations. 
 #' @param minL numeric, The minimum number of taxa recorded at a site at a given time period 
 #' (list-length) for the visit to be considered well sampled.
 #' @param minTP numeric, The minimum number of time periods, or if time_period is a date the minimum

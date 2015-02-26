@@ -1,7 +1,5 @@
 context("Test siteSelection, siteSelectionMinL and siteSelectionMinTP")
 
-library(sparta)
-
 # Create data
 n <- 150 #size of dataset
 nyr <- 20 # number of years in data
@@ -24,7 +22,7 @@ site <- sample(c('one', 'two', 'three'), size = n, TRUE)
 time_period <- sample(rDates, size = n, TRUE)
 
 # combine this to a dataframe
-df <- data.frame(taxa, site, time_period) 
+df <- unique(data.frame(taxa, site, time_period) )
 
 ######################
 test_that("Test errors and warnings - siteSelectionMinL", {
@@ -71,6 +69,21 @@ test_that("Sub-selection works - siteSelectionMinTP", {
 ###############
 test_that("Test errors and warnings - siteSelection", {
   
+  expect_error(dfSEL  <- siteSelection(c('a', df$taxa, 'z'),
+                                       c(NA, df$site, 'one'),
+                                       c(df$time_period[1], df$time_period, df$time_period[1]),
+                                       minL = 4, minTP = 3),
+               'site must not contain NAs')
+  expect_error(dfSEL  <- siteSelection(c('a', df$taxa, NA),
+                                       c('one', df$site, 'one'),
+                                       c(df$time_period[1], df$time_period, df$time_period[1]),
+                                       minL = 4, minTP = 3),
+               'taxa must not contain NAs')
+  expect_error(dfSEL  <- siteSelection(c('a', df$taxa, 'a'),
+                                       c('one', df$site, 'one'),
+                                       c(NA, df$time_period, df$time_period[1]),
+                                       minL = 4, minTP = 3),
+               'time_period must not contain NAs')
   expect_error(dfSEL  <- siteSelection('tom', df$site, df$time_period, minL = 4, minTP = 3),
                'The following arguements are not of equal length')
   expect_error(dfSEL  <- siteSelection(df$taxa, df$site, df$time_period, minL = 'four', minTP = 3),

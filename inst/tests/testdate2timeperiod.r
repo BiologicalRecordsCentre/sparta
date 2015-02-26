@@ -1,7 +1,5 @@
 context("Test date2timeperiod")
 
-library(sparta)
-
 # Load example dataset
 data(ex_dat)
 startDate = ex_dat$TO_STARTDATE
