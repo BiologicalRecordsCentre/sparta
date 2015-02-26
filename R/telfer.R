@@ -53,6 +53,7 @@ telfer <- function(taxa, site, time_period, minSite = 5, useIterations = TRUE, i
     
     colnames(basic_temp)[2] <- paste('Telfer_', TPs[1], '_', TPs[2], sep = '')
     
+  
     #Add in NAs
     basic_temp <- merge(basic_temp, data.frame(taxa = sort(unique(taxa))), all = TRUE)
         
