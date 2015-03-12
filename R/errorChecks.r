@@ -1,3 +1,5 @@
+#' @import dplyr
+
 errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate = NULL,
                         endDate = NULL, time_periodsDF = NULL, dist = NULL, sim = NULL,
                         dist_sub = NULL, sim_sub = NULL, minSite = NULL, useIterations = NULL,
@@ -27,7 +29,7 @@ errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate 
     
     df <- data.frame(taxa, site, time_period)
     NR1 <- nrow(df)
-    NR2 <- nrow(unique(df))
+    NR2 <- nrow(distinct(df))
     
     if(NR1 != NR2) warning(paste(NR1 - NR2, 'out of', NR1, 'observations will be removed as duplicates'))
     

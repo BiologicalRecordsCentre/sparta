@@ -14,6 +14,7 @@
 #' of sites that satify the selection criteria
 #' @export
 #' @import plyr 
+#' @import dplyr
 #' @references needed
 
 siteSelectionMinTP <- function(taxa, site, time_period, minTP){
@@ -33,7 +34,7 @@ siteSelectionMinTP <- function(taxa, site, time_period, minTP){
   }
   
   # Create a data.frame from the vectors
-  Data <- unique(data.frame(taxa, site, time_period))
+  Data <- distinct(data.frame(taxa, site, time_period))
   if(!is.null(year)) Data$year <- year
     
   # Get a list of sites with visits in >=minTP time_periods

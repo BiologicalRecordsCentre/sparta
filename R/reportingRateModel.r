@@ -78,6 +78,7 @@
 #' @export
 #' @import reshape2
 #' @import plyr
+#' @import dplyr
 #' @references Roy, H.E., Adriaens, T., Isaac, N.J.B. et al. (2012) Invasive alien predator
 #'             causes rapid declines of native European ladybirds. Diversity & Distributions,
 #'             18, 717-725.
@@ -92,7 +93,7 @@ reportingRateModel <- function(taxa, site, time_period, list_length = FALSE, sit
               family = family)
   
   # Create dataframe from vectors
-  taxa_data <- unique(data.frame(taxa, site, time_period))
+  taxa_data <- distinct(data.frame(taxa, site, time_period))
   
   # Reshape the data so that it is suitable for model
   space_time <- dcast(taxa_data, time_period + site ~ ., value.var='taxa', fun = function(x) length(unique(x)))

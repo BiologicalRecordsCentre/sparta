@@ -13,7 +13,8 @@
 #' \code{visits} gives the total number of visits in the dataset (unique combinations of \code{site}
 #'  and \code{time_period}), \code{success} gives the number of visits that satify the selection criteria
 #' @export
-#' @import plyr 
+#' @import plyr
+#' @import dplyr
 #' @references needed
 
 siteSelectionMinL <- function(taxa, site, time_period, minL){
@@ -23,7 +24,7 @@ siteSelectionMinL <- function(taxa, site, time_period, minL){
   if(!is.numeric(minL)) stop('minL must be numeric')
   
   # Create dataframe
-  Data <- unique(data.frame(taxa, site, time_period))
+  Data <- distinct(data.frame(taxa, site, time_period))
     
   # Using plyr to create list lengths
   dfLL <- ddply(Data, .(site, time_period), nrow)

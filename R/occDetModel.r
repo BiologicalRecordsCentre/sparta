@@ -63,6 +63,7 @@
 #' @export
 #' @import reshape2
 #' @import R2jags
+#' @import dplyr
 #' @references Roy, H.E., Adriaens, T., Isaac, N.J.B. et al. (2012) Invasive alien predator
 #'             causes rapid declines of native European ladybirds. Diversity & Distributions,
 #'             18, 717-725.
@@ -78,12 +79,14 @@ occDetModel <- function(taxa, site, time_period, print_progress = FALSE,
               n_iterations = n_iterations, burnin = burnin,
               thinning = thinning, n_chains = n_chains)
   
-  # Do we have JAGS installed?
-  JAGS_test <- Sys.which(names = 'jags-terminal.exe')
-  if(JAGS_test[[1]] == '') stop('R cannot find jags-terminal.exe, check that you have installed JAGS')
+  # Do we have JAGS installed - this works only on windows
+  if(.Platform$OS.type == "windows"){
+    JAGS_test <- Sys.which(names = 'jags-terminal.exe')
+    if(JAGS_test[[1]] == '') stop('R cannot find jags-terminal.exe, check that you have installed JAGS')
+  }
   
   # Create dataframe from vectors
-  taxa_data <- unique(data.frame(taxa, site, time_period))
+  taxa_data <- distinct(data.frame(taxa, site, time_period))
   
   # time_period could be a numeric or a date. If it is a date extract the year
   if('POSIXct' %in% class(time_period) | 'Date' %in% class(time_period)){
