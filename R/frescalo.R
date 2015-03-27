@@ -139,7 +139,7 @@
 #' @keywords trends, frescalo
 #' @references Hill, Mark. Local frequency as a key to interpreting species occurrence data when
 #' recording effort is not known. 2011. \emph{Methods in Ecology and Evolution}, 3 (1), 195-205.
-#' @import lme4 reshape2 sp RODBC
+#' @import lme4 reshape2 sp RODBC gdata dplyr
 #' @examples
 #' \dontrun{
 #' # Load the library
@@ -407,7 +407,7 @@ frescalo <-
         
     # retain only the columns we need (site, concept, timeperiod)
     # at the same time keep only unique rows
-    taxa_data<-na.omit(unique(taxa_data[c('site','CONCEPT','yearnew')]))
+    taxa_data<-na.omit(distinct(taxa_data[c('site','CONCEPT','yearnew')]))
     
     # Setup output
     datecode <- format(Sys.Date(),'%y%m%d')
