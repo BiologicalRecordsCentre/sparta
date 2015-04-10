@@ -61,9 +61,7 @@
 #'                        output_dir = "W:/PYWELL_SHARED/Pywell Projects/BRC/Tom August/R Packages/Trend analyses/occ_test_out")
 #' }
 #' @export
-#' @import reshape2
 #' @import R2jags
-#' @import dplyr
 #' @references Roy, H.E., Adriaens, T., Isaac, N.J.B. et al. (2012) Invasive alien predator
 #'             causes rapid declines of native European ladybirds. Diversity & Distributions,
 #'             18, 717-725.
@@ -85,30 +83,8 @@ occDetModel <- function(taxa, site, time_period, print_progress = FALSE,
     if(JAGS_test[[1]] == '') stop('R cannot find jags-terminal.exe, check that you have installed JAGS')
   }
   
-  # Create dataframe from vectors
-  taxa_data <- distinct(data.frame(taxa, site, time_period))
-  
-  # time_period could be a numeric or a date. If it is a date extract the year
-  if('POSIXct' %in% class(time_period) | 'Date' %in% class(time_period)){
-    taxa_data$year <- as.numeric(format(taxa_data$time_period,'%Y')) # take year from date year 
-  } else{
-    stop('non-dates not yet supported for time_period')
-  }
-  
-  # add list length column
-  taxa_data$visit <- paste(taxa_data$site, taxa_data$time_period, sep="") # create a factor which combines date and site
-  visit_Ls <- as.data.frame(table(taxa_data$visit))
-  names(visit_Ls) <- c("visit", "L")
-  taxa_data <- merge(taxa_data, visit_Ls)
-  
-  # create species_visit dataframe/matrix
-  temp <- taxa_data[,c('taxa','visit')]
-  names(temp)[1] <- "species_name"
-  temp$pres <- TRUE # add TRUE column which will populate the spp with visit matrix/dataframe
-  spp_vis <- dcast(temp, formula = visit ~ species_name, value.var = "pres", fill = FALSE) # This is the dataframe that contains a row per visit and a column for each species present or not.  USed to create the focal column in the next step
-  
-  # create "simdata" which is the main file sent to bugs (1 row per visist) - this will have "focal" added to it within the species loop
-  occDetdata <- unique(taxa_data[,c("visit", "site", "L", "year")])
+  # reformat the data into visits
+  visitData <- formatOccData(taxa = taxa, site = site, time_period = time_period)
   
   ### loop through the species list running the Bayesian occupancy model function ###
   filepaths <- list()
@@ -116,8 +92,8 @@ occDetModel <- function(taxa, site, time_period, print_progress = FALSE,
     cat('\n###\nModeling', taxa_name, '-', grep(taxa_name, species_list),
         'of', length(species_list), 'taxa\n' )
     filepaths[taxa_name] <- occDetFunc(taxa_name = taxa_name,
-                                       occDetdata = occDetdata,
-                                       spp_vis = spp_vis,
+                                       occDetdata = visitData$occDetdata,
+                                       spp_vis = visitData$spp_vis,
                                        n_iterations = n_iterations,
                                        burnin = burnin,
                                        thinning = thinning,
