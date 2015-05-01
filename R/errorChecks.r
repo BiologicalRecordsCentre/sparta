@@ -1,4 +1,4 @@
-#' @import dplyr
+#' @importFrom dplyr distinct
 
 errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate = NULL,
                         endDate = NULL, time_periodsDF = NULL, dist = NULL, sim = NULL,
@@ -6,7 +6,7 @@ errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate 
                         iterations = NULL, overdispersion = NULL, verbose = NULL,
                         list_length = NULL, site_effect = NULL, family = NULL,
                         n_iterations = NULL, burnin = NULL, thinning = NULL,
-                        n_chains = NULL){
+                        n_chains = NULL, seed = NULL){
   
   # Create a list of all non-null arguements that should be of equal length
   valid_argumentsTEMP <- list(taxa=taxa,
@@ -193,6 +193,12 @@ errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate 
     if(!is.numeric(burnin)) stop('burnin should be numeric')
     if(!is.numeric(thinning)) stop('thinning should be numeric')
     if(!is.numeric(n_chains)) stop('n_chains should be numeric')
+    
+  }
+  
+  if(!is.null(seed)){
+    
+    if(!is.numeric(seed)) stop('seed muct be numeric')
     
   }
 }

@@ -3,8 +3,7 @@
 #' This function can be used to plot gis data that has been loaded from shape files
 #' using the \code{readShapePoly()} function contained in the 'maptools' R package.
 #'
-#' @param gis_data GIS object, or list of objects, to be plotted. Alternativly the name
-#'        of the country (or list of names) to be plotted. Defaults to a world map
+#' @param gis_data GIS object, or list of objects, to be plotted.
 #' @param main Text variable controlling the main title placed on the plot - value
 #'        needs to be a text string (default == '', title is blank)
 #' @param xlab Text variable controlling the label for the x-axis - value needs
@@ -72,71 +71,10 @@
 #' @param additions Logical variable determining whether plot is to be created from scratch
 #'        or whether components (i.e. axes, gridlines, outline) are to be added to an existing
 #'        plot (default = \code{FALSE})
-#' @param additions Logical variable determining whether country polygons (if more than one
-#'        is selected) should be dissolved. If they are the boundaries between them are not
-#'        shown. Default is \code{FALSE}.
+#' @param return.dimen logical, if \code{TRUE} the plot dimensions are returned
 #' @return A data.frame giving the dimensions of the plot area.
 #' @keywords GIS, mapping, shapefile
-#' @examples
-#' \dontrun{
-#' # load example shapefile that was created using readShapePoly() from library 'maptools'
-#' data(world)
-#' 
-#' # Example 1
-#' # plot with defaults, main plot title set to 'World Map', grid line intervals at units of 10
-#' plot_GIS(world, main = "World Map", grid.div = 10)   
-#' 
-#' # Example 2
-#' # define a region to plot using xlim and ylim, colour plot background, and fill landmass
-#' plot_GIS(world, main = "World Map", grid.div = 10, xlim = c(-10,20), ylim = c(30,60),
-#'          fill.col = "lightgreen", bg.col = "lightblue")
-#' 
-#' # Example 3
-#' # plot with finer scale, black, grid lines, and labelled axes
-#' plot_GIS(world, main = "World Map", grid.div = 5, grid.col = 'black', xlab = 'Longitude',
-#'          ylab = 'Latitude', xlim = c(-10,20), ylim = c(30,60), fill.col = "lightgreen",
-#'          bg.col = "lightblue")
-#' 
-#' # Example 4
-#' # plot Africa without gridlines, axes labels or margins
-#' plot_GIS(world, xlab="", ylab="", show.axis = FALSE, show.grid = FALSE, fill.col = "lightgreen",
-#' no.margin = TRUE, xlim = c(-20,55), ylim = c(-40,40))
-#' 
-#' # Example 5
-#' # Plot UK with fill colour and background colour but no grid, then add points and labels
-#' # highlighting the locations of the capital cities
-#' plot_GIS(world, main="UK Capital Cities", ylim = c(48, 60), xlim = c(-10,3), show.grid = FALSE,fill.col = "lightgreen", bg.col = "lightblue")
-#' city.x = c(0.1062, -3.2200, -3.1771, -6.2661, -5.9167)
-#' city.y = c(51.5171, 55.9500, 51.4780, 53.3428, 54.6000)
-#' points(city.x,city.y,pch=16, col="red")    
-#' text(city.x[1:2], city.y[1:2], labels = c("London", "Edinburgh"), col="black", pos=1)
-#' text(city.x[3], city.y[3], labels = "Cardiff", col="black", pos=3)
-#' text(city.x[4:5], city.y[4:5], labels = c("Dublin", "Belfast"), col="black", pos=2)
-#' 
-#' # Example 6
-#' # This plot highlights that when round.grid=TRUE the real xlim and ylim for the plot are determined
-#' # by taking user specified values and rounding to the nearest grid division allowing given
-#' # coordinates to be plotted 
-#' plot_GIS(world, main = "This is Sparta!", xlim=c(15,25), ylim = c(33,43), grid.div = 10,
-#' fill.col = "lightgreen", bg.col = "lightblue", round.grid=TRUE)
-#' rect(15,33,25,43, border ="red", lty=2)
-#' points(x = 22.4303, y = 37.0765, col="red", pch=16, cex = 1.7)
-#' text(x = 22.4303, y = 37.0765, labels = "Sparta", pos = 2, cex = 1.5)
-#' 
-#' # Example 7
-#' # Plot the distribution records of Falco subbuteo in the Netherlands using data extracted from the 
-#' # Global Biodiversity Information Facility (GBIF).
-#' # i) Install and load the rgbif and ropensci packages from github
-#' install_github('rgbif', 'ropensci') 
-#' library(rgbif)
-#'
-#' # ii) Extract Falco subbuteo records from GBIF (use ?occurrencelist for further details)
-#' spp<-occurrencelist(scientificname="Falco subbuteo", coordinatestatus = TRUE, originisocountrycode="NL", maxresults=100)
-#' 
-#' # iii) Plot the distribution of F. subbuteo onto a map of the Netherlands
-#' plot_GIS("Netherlands", round.grid=TRUE,xlab="Long",ylab="Lat",main="Falco subbuteo",grid.div=0.5)
-#' points(spp$decimalLongitude,spp$decimalLatitude,pch=16,col="blue4",cex=0.8)
-#' }
+
 
 plot_GIS <-
 function(
@@ -164,41 +102,9 @@ function(
 	blank.plot = FALSE,
 	plot.shape = TRUE,
 	additions = FALSE,
-	return.dimen = TRUE,
-  dissolve=FALSE
-){
-  
-  required.packages <- c('maptools')
-  new.packages <- required.packages[!(required.packages %in% installed.packages()[,"Package"])]
-  if(length(new.packages)){
-    install.packages(new.packages,dependencies=TRUE)
-  }   
-  
-  if(class(gis_data)=='character'){
-    if(!exists('world')) data(world)
-    missing<-gis_data[!tolower(gis_data) %in% tolower(world$name)]
-    if(length(missing)!=0) stop(paste(missing,'not found in world map'))
-    if(length(gis_data!=1) & dissolve==TRUE){
-      library(maptools)
-      polygons<-world[tolower(world$name) %in% tolower(gis_data),] 
-      gis_data<-unionSpatialPolygons(polygons,rep(1, length(polygons)))
-    } else {
-      gis_data<-world[tolower(world$name) %in% tolower(gis_data),]                                                            
-    }                                                  
-  } else if(is.null(gis_data)){
-    if(!exists('world')) data(world)
-    gis_data<-world
-    if (dissolve==TRUE){
-      library(maptools)
-      gis_data<-unionSpatialPolygons(gis_data,rep(1, length(gis_data)))
-    }
-  } else {
-    if (dissolve==TRUE){
-    library(maptools)
-    gis_data<-unionSpatialPolygons(gis_data,rep(1, length(gis_data)))
-    }
-  }
-  
+	return.dimen = TRUE
+  ){
+    
   # Determine dimesions of plot
     if(is.null(xlim)){
       if(is.list(gis_data)){

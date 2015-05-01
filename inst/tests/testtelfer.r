@@ -57,7 +57,7 @@ test_that("Test errors and warnings", {
   expect_error(temp <- telfer(taxa = df$taxa, site = df$site, time_period = df$time_period, minSite = TRUE),
                'minSite must be numeric or interger')
   expect_warning(temp <- telfer(taxa, site, time_period),
-                 '260 out of 1000 observations have been removed as duplicates')
+                 '260 out of 1000 observations will be removed as duplicates')
   
 })
 test_that("The function works", {

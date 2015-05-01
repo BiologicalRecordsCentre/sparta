@@ -1,11 +1,6 @@
 percentageChange <-
-  function(intercept=NULL, Ymin=NULL, Ymax=NULL, slope=NULL, NYears=10, option='arithmetic', probability = TRUE){
+  function(intercept, Ymin, Ymax, slope, NYears = 10, option = 'arithmetic', probability = TRUE){
     
-    if(is.null(intercept)) stop('No intercept value given')
-    if(is.null(slope)) stop('No slope value given')
-    if(is.null(Ymin)) stop('No Ymin value given')
-    if(is.null(Ymax)) stop('No Ymax value given')    
-   
     if(NA %in% c(intercept, Ymin, Ymax, slope)){
       
       change <- NA

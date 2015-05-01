@@ -1,4 +1,4 @@
-#' @import reshape2
+#' @importFrom reshape2 dcast
 
 RR_model_func <- function(taxa_data, species_name, space_time,
                           overdispersion = FALSE, verbose = FALSE,

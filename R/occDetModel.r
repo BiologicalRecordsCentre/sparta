@@ -6,18 +6,24 @@
 #' @param site A character vector of site names, as long as the number of observations.
 #' @param time_period A numeric vector of user defined time periods, or a date vector,
 #'        as long as the number of observations.
-#' @param species_list A list of taxa names for which models should be run. This is
-#'        optional and by default models will be run for all taxa 
-#' @param output_dir The output directory were the output for each taxa will be saved
+#' @param species_list A character vector of taxa names for which models should be run. This is
+#'        optional and by default models will be run for all taxa
+#' @param write_results logical, should results be saved to \code{output_dir}. This is
+#'        recommended since these models can take a long time to run. If \code{TRUE} (default)
+#'        the results from each species will be saved as an .rdata file once the species
+#'        has run. This prevents loss of data should anything go wrong.
+#' @param output_dir character, the output directory were the output for each taxa will be saved
 #'        as .rdata files. This will defualt to the working directory
-#' @param nyr The minimum number of years on which a site must have records for it
+#' @param nyr numeric, the minimum number of years on which a site must have records for it
 #'        to be included in the models
-#' @param n_iterations An MCMC parameter - The number of interations
-#' @param burnin An MCMC parameter - The length of the burn in
-#' @param thinning An MCMC parameter - The thinning factor
-#' @param n_chains An MCMC parameter - The number of chains to be run
-#' @param model.file optionally a user defined BUGS model coded as a function (see ?jags,
+#' @param n_iterations numeric, An MCMC parameter - The number of interations
+#' @param burnin numeric, An MCMC parameter - The length of the burn in
+#' @param thinning numeric, An MCMC parameter - The thinning factor
+#' @param n_chains numeric, an MCMC parameter - The number of chains to be run
+#' @param model.file optionally a user defined BUGS model coded as a function (see \code{?jags},
 #'        including the example there, for how this is done)
+#' @param seed numeric, uses \code{set.seed} to set the randon number seed. Setting
+#'        this number ensures repeatabl analyses
 #' 
 #' @return A list of filepaths, one for each species run, giving the location of the
 #'         output saved as a .rdata file, containing an object called 'out'
@@ -57,8 +63,7 @@
 #'                        species_list = c('a','m','g'),
 #'                        n_iterations = 1000,
 #'                        burnin = 10,
-#'                        thinning = 2,
-#'                        output_dir = "W:/PYWELL_SHARED/Pywell Projects/BRC/Tom August/R Packages/Trend analyses/occ_test_out")
+#'                        thinning = 2)
 #' }
 #' @export
 #' @import R2jags
@@ -66,16 +71,17 @@
 #'             causes rapid declines of native European ladybirds. Diversity & Distributions,
 #'             18, 717-725.
 
-occDetModel <- function(taxa, site, time_period, print_progress = FALSE,
-                        species_list = unique(taxa), output_dir = getwd(),
-                        nyr = 3, n_iterations = 5000, burnin = 1500,
-                        thinning = 3, n_chains = 3, model.file = occDetBUGScode){
+occDetModel <- function(taxa, site, time_period,
+                        species_list = unique(taxa), write_results = TRUE,
+                        output_dir = getwd(), nyr = 3, n_iterations = 5000,
+                        burnin = 1500, thinning = 3, n_chains = 3, 
+                        model.file = occDetBUGScode, seed = NULL){
  
   # Do error checks
   # ADD IN BUGS PARAMETERS
   errorChecks(taxa = taxa, site = site, time_period = time_period,
               n_iterations = n_iterations, burnin = burnin,
-              thinning = thinning, n_chains = n_chains)
+              thinning = thinning, n_chains = n_chains, seed = seed)
   
   # Do we have JAGS installed - this works only on windows
   if(.Platform$OS.type == "windows"){
@@ -87,22 +93,24 @@ occDetModel <- function(taxa, site, time_period, print_progress = FALSE,
   visitData <- formatOccData(taxa = taxa, site = site, time_period = time_period)
   
   ### loop through the species list running the Bayesian occupancy model function ###
-  filepaths <- list()
+  output <- list()
   for (taxa_name in species_list){
     cat('\n###\nModeling', taxa_name, '-', grep(taxa_name, species_list),
         'of', length(species_list), 'taxa\n' )
-    filepaths[taxa_name] <- occDetFunc(taxa_name = taxa_name,
-                                       occDetdata = visitData$occDetdata,
-                                       spp_vis = visitData$spp_vis,
-                                       n_iterations = n_iterations,
-                                       burnin = burnin,
-                                       thinning = thinning,
-                                       n_chains = n_chains,
-                                       output_dir = output_dir,
-                                       nyr = nyr)
+    output[[taxa_name]] <- occDetFunc(taxa_name = taxa_name,
+                                    occDetdata = visitData$occDetdata,
+                                    spp_vis = visitData$spp_vis,
+                                    n_iterations = n_iterations,
+                                    burnin = burnin,
+                                    thinning = thinning,
+                                    n_chains = n_chains,
+                                    write_results = write_results,
+                                    output_dir = output_dir,
+                                    nyr = nyr,
+                                    seed = seed)
   }
   
-  return(filepaths)
+  return(output)
   
 }
   

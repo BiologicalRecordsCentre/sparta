@@ -26,7 +26,8 @@
 #' @keywords trends, frescalo, weights
 #' @references Hill, Mark. Local frequency as a key to interpreting species occurrence data when
 #' recording effort is not known. 2011. \emph{Methods in Ecology and Evolution}, 3 (1), 195-205.
-#' @import sp reshape2
+#' @import sp
+#' @importFrom reshape2 melt
 #' @export
 #' @examples
 #' \dontrun{

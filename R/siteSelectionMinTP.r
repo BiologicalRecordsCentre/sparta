@@ -13,8 +13,7 @@
 #' \code{sites} gives the total number of sites in the dataset, and \code{sucess} gives the number
 #' of sites that satify the selection criteria
 #' @export
-#' @import plyr 
-#' @import dplyr
+#' @importFrom dplyr distinct
 #' @references needed
 
 siteSelectionMinTP <- function(taxa, site, time_period, minTP){
@@ -22,9 +21,6 @@ siteSelectionMinTP <- function(taxa, site, time_period, minTP){
   # Error checks
   errorChecks(taxa, site, time_period)
   if(!is.numeric(minTP)) stop('minTP must be numeric')
-  
-  # Load library
-  library(plyr)
   
   # If tp is a date get the year out
   # This will be used in TP selection step

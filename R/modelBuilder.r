@@ -1,5 +1,6 @@
 #' @import lme4
-#' @import reshape2
+#' @importFrom reshape2 dcast
+#' @importFrom reshape2 acast
 
 modelBuilder <- function(taxa_data, species_name, space_time,
                          list_length = FALSE, site_effect = FALSE,

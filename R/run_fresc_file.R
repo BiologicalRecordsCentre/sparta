@@ -215,7 +215,8 @@ function(
 					
 		# Extract species names from BRC if not given
 			if(is.null(spp_names_file)){
-				spp_names = get_spp_names(channel,unique(freq$Species), output_list = TRUE)
+				#spp_names = get_spp_names(channel,unique(freq$Species), output_list = TRUE)
+        stop('spp_names_file cannot be NULL')
 			} else {
 				spp_names = read.table(spp_names_file, sep=",", header=TRUE, stringsAsFactors = FALSE)
 			}

@@ -5,7 +5,7 @@
 #' 
 #' @param startDate A vector of dates indicating the start date of a record
 #' @param endDate A vector of dates indicating the end date of a record
-#' @param time_period A data.frame with two columns, the first column gives the start year of each
+#' @param time_periods A data.frame with two columns, the first column gives the start year of each
 #' time period and the second column gives the end year. These year ranges are inclusive.
 #' @return A vector, the same length as startDate and endDate giving the time period of each pair
 #' of dates. Time period 1 is the time period with the earliest start year, 2 with the second

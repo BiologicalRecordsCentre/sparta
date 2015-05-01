@@ -139,7 +139,10 @@
 #' @keywords trends, frescalo
 #' @references Hill, Mark. Local frequency as a key to interpreting species occurrence data when
 #' recording effort is not known. 2011. \emph{Methods in Ecology and Evolution}, 3 (1), 195-205.
-#' @import lme4 reshape2 sp RODBC gdata dplyr
+#' @import lme4
+#' @importFrom dplyr distinct
+#' @importFrom reshape2 dcast
+#' @import sp 
 #' @examples
 #' \dontrun{
 #' # Load the library

@@ -1,5 +1,5 @@
-#' @import dplyr
-#' @import reshape2
+#' @importFrom dplyr distinct
+#' @importFrom reshape2 dcast
 
 formatOccData <- function(taxa, site, time_period){
 

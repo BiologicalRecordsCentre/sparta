@@ -76,9 +76,9 @@
 #' 
 #' }
 #' @export
-#' @import reshape2
-#' @import plyr
-#' @import dplyr
+#' @importFrom reshape2 dcast
+#' @importFrom plyr rbind.fill
+#' @importFrom dplyr distinct
 #' @references Roy, H.E., Adriaens, T., Isaac, N.J.B. et al. (2012) Invasive alien predator
 #'             causes rapid declines of native European ladybirds. Diversity & Distributions,
 #'             18, 717-725.

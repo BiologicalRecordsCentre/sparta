@@ -13,8 +13,9 @@
 #' \code{visits} gives the total number of visits in the dataset (unique combinations of \code{site}
 #'  and \code{time_period}), \code{success} gives the number of visits that satify the selection criteria
 #' @export
-#' @import plyr
-#' @import dplyr
+#' @importFrom plyr ddply
+#' @importFrom plyr .
+#' @importFrom dplyr distinct
 #' @references needed
 
 siteSelectionMinL <- function(taxa, site, time_period, minL){

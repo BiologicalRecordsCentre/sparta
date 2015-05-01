@@ -7,8 +7,6 @@
 #' @param taxa A character vector of taxon names
 #' @param site A character vector of site names
 #' @param time_period A numeric vector of user defined time periods, or a date vector
-#' @param minL numeric, The minimum number of taxa recorded at a site at a given time period 
-#' (list-length) for the visit to be considered well sampled.
 #' @param minSite The minimum number of sites occupied in the first time period in
 #'        order for a trend to be calculated for a taxon.
 #' @param useIterations A logical variable indicating whether iterations should be used.
@@ -18,7 +16,7 @@
 #'        the number of iterations to be used. In Telfer et al 2002 the number of iterations
 #'        used were 7 and 8 for the two datasets for which it was applied. The defualt here
 #'        is 10.
-#' @import reshape2
+#' @importFrom reshape2 dcast
 #' @examples
 #' 
 #' # Create fake data

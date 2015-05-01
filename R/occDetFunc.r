@@ -1,7 +1,12 @@
+#' @importFrom reshape2 acast
+
 occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 3,
-                        burnin = 1500, thinning = 3, n_chains = 3, output_dir = getwd(),
-                        model.file = occDetBUGScode) {
+                        burnin = 1500, thinning = 3, n_chains = 3, write_results = TRUE,
+                        output_dir = getwd(), model.file = occDetBUGScode, seed = NULL) {
   
+  # Set seed for repeatability
+  if(!is.null(seed)) set.seed(seed)
+    
   # Add the focal column (was the species recorded on the visit?). Use the spp_vis dataframe to extract this info
   occDetdata <- merge(occDetdata, spp_vis[,c("visit", taxa_name)])
   names(occDetdata)[names(occDetdata) == taxa_name] <- "focal"
@@ -56,8 +61,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   # set the initial values... 
   init.vals <- replicate(n_chains, initiate(z = zst, i = init, nyear = nyear),
                          simplify = F)
-
-  error_status <- try(
+  error_status <- try(    
     out <- jags(bugs_data, init.vals, parameters, model.file = model.file,
                 n.chains = n_chains, n.iter = n_iterations, n.thin = thinning,
                 n.burnin = burnin, DIC = TRUE)
@@ -73,7 +77,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     out$SPP_NAME <- taxa_name
     out$min_year <- min_year
     out$max_year <- max_year
-    save(out, file = file.path(output_dir, paste(taxa_name, ".rdata", sep = "")))  
-    return(file.path(output_dir, paste(taxa_name, ".rdata", sep = "")))
+    if(write_results) save(out, file = file.path(output_dir, paste(taxa_name, ".rdata", sep = "")))  
+    return(out)
   }  	
 }

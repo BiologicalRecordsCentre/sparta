@@ -91,7 +91,7 @@ test_that("Test formulaBuilder", {
 test_that("Check outputs are in the correct form", {
   
   expect_warning(RR_out <- reportingRateModel(df$taxa, df$site, df$time_period),
-                 "343 out of 3001 observations have been removed as duplicates")
+                 "343 out of 3001 observations will be removed as duplicates")
   atts <- attributes(RR_out)  
   expect_equal(atts$intercept_year, 2014)
   expect_equal(atts$min_year, -814)
