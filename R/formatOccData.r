@@ -1,3 +1,4 @@
+#' @export
 #' @importFrom dplyr distinct
 #' @importFrom reshape2 dcast
 
