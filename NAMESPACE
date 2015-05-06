@@ -3,6 +3,8 @@
 export(WSS)
 export(createWeights)
 export(date2timeperiod)
+export(formatOccData)
+export(occDetFunc)
 export(occDetModel)
 export(recsOverTime)
 export(reportingRateModel)
