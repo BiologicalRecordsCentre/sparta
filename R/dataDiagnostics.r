@@ -9,8 +9,9 @@
 #' @param site A character vector of site names, as long as the number of observations.
 #' @param time_period A numeric vector of user defined time periods, or a date vector,
 #'        as long as the number of observations.
-#' @param silent Logical, if \code{TRUE} plots will not be rendered and model results
-#'        will not be printed to the console
+#' @param plot Logical, if \code{TRUE} plots and model results will be printed to
+#'        the console
+#' @param progress_bar If \code{TRUE} a progress bar is printed to console
 #' 
 #' @return A list of filepaths, one for each species run, giving the location of the
 #'         output saved as a .rdata file, containing an object called 'out'
@@ -47,21 +48,22 @@
 #' 
 #' dataDiagnostics(taxa, site, time_period)
 #' }
+#' @export
 #' @importFrom dplyr distinct
 #' @importFrom reshape2 dcast
 
 ## Change in List-length over time ##
-dataDiagnostics <- function(taxa, site, time_period, silent = FALSE){
+dataDiagnostics <- function(taxa, site, time_period, plot = TRUE, progress_bar = TRUE){
   
-  if(!silent) cat('Calculating diagnostics\n')
-  if(!silent) pb <- txtProgressBar(min = 0, max = 10, style = 3)
+  if(progress_bar) cat('Calculating diagnostics\n')
+  if(progress_bar) pb <- txtProgressBar(min = 0, max = 10, style = 3)
   
   # Do error checks
   errorChecks(taxa = taxa, site = site, time_period = time_period)
   
   # Create dataframe from vectors
   taxa_data <- distinct(data.frame(taxa, site, time_period))
-  if(!silent) setTxtProgressBar(pb, 2)
+  if(progress_bar) setTxtProgressBar(pb, 2)
   
   # Create records over time plot
   head(taxa_data)
@@ -71,20 +73,20 @@ dataDiagnostics <- function(taxa, site, time_period, silent = FALSE){
   } else {
     recOverTime <- time_period
   }
-  if(!silent) setTxtProgressBar(pb, 3)
+  if(progress_bar) setTxtProgressBar(pb, 3)
   
   # Model the trend in records over time
   bars <- table(recOverTime, dnn = 'RecordsPerYear')
   mData <- data.frame(time_period = as.numeric(names(bars)), count = as.numeric(bars))
   modelRecs <- glm(count ~ time_period, data = mData)
   modelRecsSummary <- summary(modelRecs)  
-  if(!silent) setTxtProgressBar(pb, 5)
+  if(progress_bar) setTxtProgressBar(pb, 5)
   
   # Reshape the data
   space_time <- dcast(taxa_data, time_period + site ~ ., value.var='taxa',
                       fun = function(x) length(unique(x)))
   names(space_time)[ncol(space_time)] <- 'listLength'  
-  if(!silent) setTxtProgressBar(pb, 8)
+  if(progress_bar) setTxtProgressBar(pb, 8)
   
   
   # If time_period is a date then we want to convert it to a year for plotting
@@ -94,15 +96,15 @@ dataDiagnostics <- function(taxa, site, time_period, silent = FALSE){
     
   }
   
-  if(!silent) setTxtProgressBar(pb, 9)
+  if(progress_bar) setTxtProgressBar(pb, 9)
   
   # Model the trend in list length
   modelList <- glm(listLength ~ time_period, family = 'poisson', data = space_time)
   modelListSummary <- summary(modelList)  
-  if(!silent) setTxtProgressBar(pb, 10)
-  if(!silent) cat('\n\n')
+  if(progress_bar) setTxtProgressBar(pb, 10)
+  if(progress_bar) cat('\n\n')
   
-  if(!silent){
+  if(plot){
     # Setup plot space
     par(mfrow = c(2,1))
     par(mar = c(0.1, 4.1, 4.1, 2.1))
