@@ -20,7 +20,6 @@
 #' \dontrun{
 #' 
 #' ### Diagnostics functions ###
-#' rm(list = ls())
 #' # Create data
 #' n <- 2000 #size of dataset
 #' nyr <- 20 # number of years in data
@@ -45,8 +44,10 @@
 #' } else {
 #'   time_period <- sample(1:nSamples, size = n, TRUE)
 #' }
-#' 
+#' # Using a date
 #' dataDiagnostics(taxa, site, time_period)
+#' # Using a numeric
+#' dataDiagnostics(taxa, site, as.numeric(format(time_period, '%Y')))
 #' }
 #' @export
 #' @importFrom dplyr distinct
@@ -120,7 +121,9 @@ dataDiagnostics <- function(taxa, site, time_period, plot = TRUE, progress_bar =
     boxplot(listLength ~ time_period,
             data = space_time,
             xlab = 'Time Period',
-            ylab = 'List Length', frame.plot=FALSE, ylim = c(0, max(space_time$listLength)))
+            ylab = 'List Length',
+            frame.plot=FALSE,
+            ylim = c(min(space_time$listLength), max(space_time$listLength)))
     
     # Print the result to console
     cat(ifelse(modelRecsSummary$coefficients[2,4] < 0.05,
