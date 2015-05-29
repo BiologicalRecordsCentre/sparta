@@ -143,6 +143,7 @@
 #' @importFrom dplyr distinct
 #' @importFrom reshape2 dcast
 #' @import sp 
+#' @export
 #' @examples
 #' \dontrun{
 #' # Load the library
