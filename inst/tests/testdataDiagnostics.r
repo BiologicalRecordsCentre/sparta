@@ -27,9 +27,10 @@ df <- data.frame(taxa, site, time_period)
 test_that("Test dataDiagnostics", {
   
  results <- dataDiagnostics(taxa = df$taxa,
+                            progress_bar = FALSE,
                             site = df$site,
                             time_period = df$time_period,
-                            silent = TRUE)
+                            plot = FALSE)
  
  recperyear <- structure(c(778L, 752L, 963L, 301L, 448L, 1086L, 593L, 912L, 
              607L, 290L, 705L, 772L, 751L, 921L, 720L, 902L, 755L, 847L, 1196L, 
@@ -37,12 +38,14 @@ test_that("Test dataDiagnostics", {
                                                                               "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", 
                                                                               "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026", 
                                                                               "2027", "2028", "2029")), .Names = "RecordsPerYear"), class = "table")
- visittop50 <- structure(list(time_period = c(2010, 2010, 2010, 2010, 2010, 
-                                2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 
-                                2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 
-                                2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 
-                                2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 
-                                2010), site = structure(c(2L, 3L, 4L, 5L, 7L, 8L, 9L, 10L, 11L, 
+ visittop50 <- structure(list(time_period = structure(c(14657, 14657, 14657, 
+                                                         14657, 14657, 14657, 14657, 14657, 14657, 14657, 14657, 14657, 
+                                                         14657, 14657, 14657, 14657, 14657, 14657, 14657, 14657, 14657, 
+                                                         14657, 14657, 14657, 14657, 14657, 14657, 14657, 14657, 14657, 
+                                                         14657, 14657, 14657, 14657, 14657, 14657, 14657, 14657, 14657, 
+                                                         14657, 14657, 14657, 14657, 14657, 14657, 14713, 14713, 14713, 
+                                                         14713, 14713), class = "Date"),
+                              site = structure(c(2L, 3L, 4L, 5L, 7L, 8L, 9L, 10L, 11L, 
                                                           12L, 13L, 15L, 16L, 17L, 18L, 19L, 20L, 21L, 22L, 23L, 24L, 25L, 
                                                           26L, 27L, 28L, 29L, 30L, 31L, 32L, 33L, 34L, 36L, 37L, 38L, 39L, 
                                                           40L, 41L, 42L, 43L, 44L, 45L, 46L, 48L, 49L, 50L, 1L, 2L, 3L, 
@@ -60,8 +63,8 @@ test_that("Test dataDiagnostics", {
 
  coefModRecs <- structure(c(-21036.3052631559, 10.7879699248111), .Names = c("(Intercept)", 
                                                               "time_period"))
- coefModVis <- structure(c(6.01300831038488, -0.00243121537279749), .Names = c("(Intercept)", 
-                                                                 "time_period"))
+ coefModVis <- structure(c(1.22559804480835, -6.7141614071053e-06), .Names = c("(Intercept)", 
+                                                                               "time_period"))
  
      
  expect_equal(recperyear, results$RecordsPerYear)

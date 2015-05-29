@@ -4,7 +4,7 @@
 \alias{dataDiagnostics}
 \title{Data Diagnostics}
 \usage{
-dataDiagnostics(taxa, site, time_period, silent = FALSE)
+dataDiagnostics(taxa, site, time_period, plot = TRUE, progress_bar = TRUE)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}
@@ -14,8 +14,10 @@ dataDiagnostics(taxa, site, time_period, silent = FALSE)
 \item{time_period}{A numeric vector of user defined time periods, or a date vector,
 as long as the number of observations.}
 
-\item{silent}{Logical, if \code{TRUE} plots will not be rendered and model results
-       will not be printed to the console}
+\item{plot}{Logical, if \code{TRUE} plots and model results will be printed to
+the console}
+
+\item{progress_bar}{If \code{TRUE} a progress bar is printed to console}
 }
 \value{
 A list of filepaths, one for each species run, giving the location of the
@@ -31,7 +33,6 @@ if there is a significant trend.
 \dontrun{
 
 ### Diagnostics functions ###
-rm(list = ls())
 # Create data
 n <- 2000 #size of dataset
 nyr <- 20 # number of years in data
@@ -56,8 +57,10 @@ if(useDates){
 } else {
   time_period <- sample(1:nSamples, size = n, TRUE)
 }
-
+# Using a date
 dataDiagnostics(taxa, site, time_period)
+# Using a numeric
+dataDiagnostics(taxa, site, as.numeric(format(time_period, '\%Y')))
 }
 }
 

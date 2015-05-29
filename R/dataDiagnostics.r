@@ -66,9 +66,6 @@ dataDiagnostics <- function(taxa, site, time_period, plot = TRUE, progress_bar =
   taxa_data <- distinct(data.frame(taxa, site, time_period))
   if(progress_bar) setTxtProgressBar(pb, 2)
   
-  # Create records over time plot
-  head(taxa_data)
-  
   if('POSIXct' %in% class(time_period) | 'Date' %in% class(time_period)){
     recOverTime <- as.numeric(format(time_period,'%Y'))
   } else {
@@ -87,16 +84,6 @@ dataDiagnostics <- function(taxa, site, time_period, plot = TRUE, progress_bar =
   space_time <- dcast(taxa_data, time_period + site ~ ., value.var='taxa',
                       fun = function(x) length(unique(x)))
   names(space_time)[ncol(space_time)] <- 'listLength'  
-  if(progress_bar) setTxtProgressBar(pb, 8)
-  
-  
-  # If time_period is a date then we want to convert it to a year for plotting
-  if('POSIXct' %in% class(time_period) | 'Date' %in% class(time_period)){
-    
-    space_time$time_period <- as.numeric(format(space_time$time_period,'%Y')) # take year from date year
-    
-  }
-  
   if(progress_bar) setTxtProgressBar(pb, 9)
   
   # Model the trend in list length
@@ -118,14 +105,25 @@ dataDiagnostics <- function(taxa, site, time_period, plot = TRUE, progress_bar =
     # Plot the change in list length over time
     par(mar = c(5.1, 4.1, 0.1, 2.1))
   
-    boxplot(listLength ~ time_period,
-            data = space_time,
-            xlab = 'Time Period',
-            ylab = 'List Length',
-            frame.plot=FALSE,
-            ylim = c(min(space_time$listLength), max(space_time$listLength)))
+    if('POSIXct' %in% class(time_period) | 'Date' %in% class(time_period)){
+      boxplot(listLength ~ as.numeric(format(space_time$time_period,'%Y')),
+              data = space_time,
+              xlab = 'Time Period',
+              ylab = 'List Length',
+              frame.plot=FALSE,
+              ylim = c(min(space_time$listLength), max(space_time$listLength)))
+      } else {
+        boxplot(listLength ~ space_time$time_period,
+                data = space_time,
+                xlab = 'Time Period',
+                ylab = 'List Length',
+                frame.plot=FALSE,
+                ylim = c(min(space_time$listLength), max(space_time$listLength))) 
+      }
+
     
     # Print the result to console
+    cat('## Linear model outputs ##\n\n')
     cat(ifelse(modelRecsSummary$coefficients[2,4] < 0.05,
                'There is a significant change in the number of records over time:\n\n',
                'There is no detectable change in the number of records over time:\n\n'))

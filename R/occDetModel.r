@@ -42,8 +42,8 @@
 #' nSites <- 50 # set number of sites
 #' 
 #' # Create somes dates
-#' first <- as.Date(strptime("2010/01/01", "%Y/%m/%d")) 
-#' last <- as.Date(strptime(paste(2010+(nyr-1),"/12/31", sep=''), "%Y/%m/%d")) 
+#' first <- as.Date(strptime("1980/01/01", "%Y/%m/%d")) 
+#' last <- as.Date(strptime(paste(1980+(nyr-1),"/12/31", sep=''), "%Y/%m/%d")) 
 #' dt <- last-first 
 #' rDates <- first + (runif(nSamples)*dt)
 #' 
@@ -61,6 +61,7 @@
 #'                        site = site,
 #'                        time_period = time_period,
 #'                        species_list = c('a','m','g'),
+#'                        write_results = FALSE,
 #'                        n_iterations = 1000,
 #'                        burnin = 10,
 #'                        thinning = 2)
@@ -77,12 +78,8 @@ occDetModel <- function(taxa, site, time_period,
                         burnin = 1500, thinning = 3, n_chains = 3, 
                         model.file = occDetBUGScode, seed = NULL){
  
-  # Do error checks
-  # ADD IN BUGS PARAMETERS
-  errorChecks(taxa = taxa, site = site, time_period = time_period,
-              n_iterations = n_iterations, burnin = burnin,
-              thinning = thinning, n_chains = n_chains, seed = seed)
-  
+  # Error checking done in lower functions
+    
   # Do we have JAGS installed - this works only on windows
   if(.Platform$OS.type == "windows"){
     JAGS_test <- Sys.which(names = 'jags-terminal.exe')

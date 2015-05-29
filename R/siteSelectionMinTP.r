@@ -21,16 +21,18 @@ siteSelectionMinTP <- function(taxa, site, time_period, minTP){
   # Error checks
   errorChecks(taxa, site, time_period)
   if(!is.numeric(minTP)) stop('minTP must be numeric')
-  
+
+  # Create a data.frame from the vectors
+  Data <- distinct(data.frame(taxa, site, time_period))
+
   # If tp is a date get the year out
   # This will be used in TP selection step
   year <- NULL
+  
   if(any(class(time_period) %in% c("Date", "POSIXct", "POSIXt"))){
-    year <- as.numeric(format(time_period, '%Y'))  
+    year <- as.numeric(format(Data$time_period, '%Y'))  
   }
   
-  # Create a data.frame from the vectors
-  Data <- distinct(data.frame(taxa, site, time_period))
   if(!is.null(year)) Data$year <- year
     
   # Get a list of sites with visits in >=minTP time_periods

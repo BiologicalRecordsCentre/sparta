@@ -1,7 +1,7 @@
 #' @importFrom dplyr distinct
 
 errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate = NULL,
-                        endDate = NULL, time_periodsDF = NULL, dist = NULL, sim = NULL,
+                        endDate = NULL, Date = NULL, time_periodsDF = NULL, dist = NULL, sim = NULL,
                         dist_sub = NULL, sim_sub = NULL, minSite = NULL, useIterations = NULL,
                         iterations = NULL, overdispersion = NULL, verbose = NULL,
                         list_length = NULL, site_effect = NULL, family = NULL,
@@ -60,6 +60,15 @@ errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate 
     }
     # Make sure there are no NAs
     if(!all(!is.na(startDate))) stop('startDate must not contain NAs')
+  }
+  
+  ### Checks for Date ###
+  if(!is.null(Date)){
+    if(!'POSIXct' %in% class(Date) & !'Date' %in% class(Date) & !'data.frame' %in% class(Date)){
+      stop(paste('Date must be a data.frame or date vector'))
+    }
+    # Make sure there are no NAs
+    if(!all(!is.na(Date))) stop('Date must not contain NAs')
   }
   
   ### Checks for endDate ###
@@ -200,5 +209,5 @@ errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate 
     
     if(!is.numeric(seed)) stop('seed muct be numeric')
     
-  }
+  }  
 }

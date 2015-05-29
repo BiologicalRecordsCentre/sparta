@@ -1,3 +1,69 @@
+#' Occupancy detection Function
+#' 
+#' Run occupancy detection models using the output from \code{formatOccData}
+#' 
+#' @param taxa_name A character giving the name of the species to be modelled.
+#' @param occDetdata The 2nd element of the object returned by formatOccData.
+#' @param spp_vis The 1st element of the object returned by formatOccData.
+#' @param n_iterations numeric, An MCMC parameter - The number of interations
+#' @param nyr numeric, the minimum number of years on which a site must have records for it
+#'        to be included in the models
+#' @param burnin numeric, An MCMC parameter - The length of the burn in
+#' @param thinning numeric, An MCMC parameter - The thinning factor
+#' @param n_chains numeric, an MCMC parameter - The number of chains to be run
+#' @param write_results logical, should results be saved to \code{output_dir}. This is
+#'        recommended since these models can take a long time to run. If \code{TRUE} (default)
+#'        the results from each species will be saved as an .rdata file once the species
+#'        has run. This prevents loss of data should anything go wrong.
+#' @param output_dir character, the output directory were the output for each taxa will be saved
+#'        as .rdata files. This will defualt to the working directory
+#' @param model.file optionally a user defined BUGS model coded as a function (see \code{?jags},
+#'        including the example there, for how this is done)
+#' @param seed numeric, uses \code{set.seed} to set the randon number seed. Setting
+#'        this number ensures repeatabl analyses
+#' 
+#' @return A list of filepaths, one for each species run, giving the location of the
+#'         output saved as a .rdata file, containing an object called 'out'
+#'          
+#' @keywords trends, species, distribution, occupancy, bayesian, modeling
+#' @references Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
+#'             Statistics for citizen science: extracting signals of change from noisy ecological data.
+#'             Methods in Ecology and Evolution, 5 (10), 1052-1060.
+#' @examples
+#' \dontrun{
+#' 
+#' # Create data
+#' n <- 15000 #size of dataset
+#' nyr <- 20 # number of years in data
+#' nSamples <- 100 # set number of dates
+#' nSites <- 50 # set number of sites
+#' 
+#' # Create somes dates
+#' first <- as.Date(strptime("2010/01/01", "%Y/%m/%d")) 
+#' last <- as.Date(strptime(paste(2010+(nyr-1),"/12/31", sep=''), "%Y/%m/%d")) 
+#' dt <- last-first 
+#' rDates <- first + (runif(nSamples)*dt)
+#' 
+#' # taxa are set as random letters
+#' taxa <- sample(letters, size = n, TRUE)
+#' 
+#' # three sites are visited randomly
+#' site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
+#' 
+#' # the date of visit is selected at random from those created earlier
+#' time_period <- sample(rDates, size = n, TRUE)
+#'
+#' # Format the data
+#' visitData <- formatOccData(taxa = taxa, site = site, time_period = time_period)
+#'
+#' # run the model with these data for one species (very small number of iterations)
+#' results <- occDetFunc(taxa_name = taxa[1],
+#'                       n_iterations = 50,
+#'                       burnin = 15, 
+#'                       occDetdata = visitData$occDetdata,
+#'                       spp_vis = visitData$spp_vis,
+#'                       write_results = FALSE)
+#' }
 #' @export
 #' @importFrom reshape2 acast
 
@@ -5,8 +71,20 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                         burnin = 1500, thinning = 3, n_chains = 3, write_results = TRUE,
                         output_dir = getwd(), model.file = occDetBUGScode, seed = NULL) {
   
+  errorChecks(n_iterations = n_iterations, burnin = burnin,
+              thinning = thinning, n_chains = n_chains, seed = seed)
+  
+  # Do we have JAGS installed - this works only on windows
+  if(.Platform$OS.type == "windows"){
+    JAGS_test <- Sys.which(names = 'jags-terminal.exe')
+    if(JAGS_test[[1]] == '') stop('R cannot find jags-terminal.exe, check that you have installed JAGS')
+  }
+  
   # Set seed for repeatability
   if(!is.null(seed)) set.seed(seed)
+  
+  # Check the taxa_name is one of my species
+  if(!taxa_name %in% colnames(spp_vis)) stop('taxa_name is not the name of a taxa in spp_vis')
     
   # Add the focal column (was the species recorded on the visit?). Use the spp_vis dataframe to extract this info
   occDetdata <- merge(occDetdata, spp_vis[,c("visit", taxa_name)])
@@ -71,13 +149,13 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   dir.create(path = output_dir, showWarnings = FALSE) # create the top results folder
   
   if (class(error_status) == "try-error" ){
-    write.table(taxa_name, file = file.path(output_dir,"failed_spp.txt"),
-                append = TRUE, row.names = FALSE, col.names = FALSE)
+    warning('JAGS returned an error when modelling', taxa_name, 'error:', error_status[1])
     return(NULL)
   } else {
     out$SPP_NAME <- taxa_name
     out$min_year <- min_year
     out$max_year <- max_year
+    class(out) <- 'occDet'
     if(write_results) save(out, file = file.path(output_dir, paste(taxa_name, ".rdata", sep = "")))  
     return(out)
   }  	

@@ -62,8 +62,8 @@ nSamples <- 100 # set number of dates
 nSites <- 50 # set number of sites
 
 # Create somes dates
-first <- as.Date(strptime("2010/01/01", "\%Y/\%m/\%d"))
-last <- as.Date(strptime(paste(2010+(nyr-1),"/12/31", sep=''), "\%Y/\%m/\%d"))
+first <- as.Date(strptime("1980/01/01", "\%Y/\%m/\%d"))
+last <- as.Date(strptime(paste(1980+(nyr-1),"/12/31", sep=''), "\%Y/\%m/\%d"))
 dt <- last-first
 rDates <- first + (runif(nSamples)*dt)
 
@@ -81,6 +81,7 @@ results <- occDetModel(taxa = taxa,
                        site = site,
                        time_period = time_period,
                        species_list = c('a','m','g'),
+                       write_results = FALSE,
                        n_iterations = 1000,
                        burnin = 10,
                        thinning = 2)
