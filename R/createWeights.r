@@ -5,12 +5,12 @@
 #' takes a table of geographical distances between sites and a table of numeric data
 #' from which to calculate similarity (for example, landcover or abiotic data)
 #'
-#' @param dist a dataframe giving the distance between sites in a long format with three
+#' @param distances a dataframe giving the distance between sites in a long format with three
 #'        columns. The first column give the ID of the first site, the second column gives
 #'        the ID of the second site and the third column gives the distance between them.
 #'        The table should include reciprocal data i.e. both rows 'A, B, 10' and 'B, A, 10'
 #'        should exist. 
-#' @param sim a dataframe of numeric attributes of each site. The first column must contain
+#' @param attributes a dataframe of numeric attributes of each site. The first column must contain
 #'        the site IDs and all other columns are used to calculate the similarity between
 #'        sites using dist() and method 'euclidean'.
 #' @param dist_sub the number of neighbours to include after ranking by distance. In Hill
@@ -38,85 +38,89 @@
 #' data(dist)
 #'
 #' # Create the weights file
-#' weights <- createWeights(dist=dist,
-#'                           sim=sim,
+#' weights <- createWeights(distances=dist,
+#'                           attributes=sim,
 #'                           dist_sub=20,
 #'                           sim_sub=10)
 #' }
  
-createWeights<-function(dist,
-                        sim,
+createWeights<-function(distances,
+                        attributes,
                         dist_sub=200,
                         sim_sub=100,
                         normalise=FALSE){
   
   # Error checks
-  errorChecks(dist = dist, sim = sim, dist_sub = dist_sub, sim_sub = sim_sub)
+  errorChecks(dist = distances, sim = attributes, dist_sub = dist_sub, sim_sub = sim_sub)
 
   # Ensure site names are characters not factors
-  dist[,1] <- as.character(dist[,1])
-  dist[,2] <- as.character(dist[,2])
-  sim[,1] <- as.character(sim[,1])
+  distances[,1] <- as.character(distances[,1])
+  distances[,2] <- as.character(distances[,2])
+  attributes[,1] <- as.character(attributes[,1])
   
+  # rename the columns
+  colnames(distances) <- c('site1', 'site2' ,'distance')
+    
   # Check that sites are in both drop those that are not - give a warning
-  unique_dist_sites <- unique(c(dist[,1], dist[,2]))
-  unique_sim_sites <- unique(sim[,1])
+  unique_dist_sites <- unique(c(distances[,1], distances[,2]))
+  unique_sim_sites <- unique(attributes[,1])
   distmiss <- unique_dist_sites[!unique_dist_sites %in% unique_sim_sites]
   simmiss <- unique_sim_sites[!unique_sim_sites %in% unique_dist_sites]
   missing <- unique(c(distmiss,simmiss))
   
   if(length(missing) > 0){
-    warning(paste("The following sites were in only one of 'sim' and 'dist' and so have been excluded from the weights file:",toString(missing)))
-    dist <- dist[!dist[,1] %in% missing,]
-    dist <- dist[!dist[,2] %in% missing,]
-    sim <- sim[!sim[,1] %in% missing,]
+    warning(paste("The following sites were in only one of 'attributes' and 'distances' and so have been excluded from the weights file:",toString(missing)))
+    distances <- distances[!distances[,1] %in% missing,]
+    distances <- distances[!distances[,2] %in% missing,]
+    attributes <- attributes[!attributes[,1] %in% missing,]
   }
   
   #normalise if required
   if(normalise){
-    for(i in 2:length(colnames(sim))){
-      mx <- max(sim[,i])
-      sim[,i] <- sim[,i] / mx
+    for(i in 2:length(colnames(attributes))){
+      mx <- max(attributes[,i])
+      attributes[,i] <- attributes[,i] / mx
     }
   }
   
   #convert attribute table into a long distance table
   cat('Creating similarity distance table...')
-  row.names(sim) <- sim[,1]
-  sim_distance <- dist(sim[,2:length(names(sim))], diag = TRUE, upper = TRUE) 
+  row.names(attributes) <- attributes[,1]
+  sim_distance <- dist(attributes[,2:length(names(attributes))], diag = TRUE, upper = TRUE) 
   sim_distance <- melt(as.matrix(sim_distance))
   sim_distance$value <- (sim_distance$value/max(sim_distance$value))
   sim_distance[,1] <- as.character(sim_distance[,1])
   sim_distance[,2] <- as.character(sim_distance[,2])
+  colnames(sim_distance) <- c('site1', 'site2', 'similarity')
   cat('Complete\n')
   
   # Set up progress tracking
-  if(length(unique(dist[,1]) >=10)){
+  if(length(unique(distances[,1]) >=10)){
     breaks_length <- 11
   } else {
-    breaks_length <- length(unique(dist[,1]))
+    breaks_length <- length(unique(distances[,1]))
   }
-  breaks <- round(seq(0,length(unique(dist[,1])), length.out = breaks_length))[-1]
-  breakpoints <- unique(dist[,1])[breaks]
+  breaks <- round(seq(0,length(unique(distances[,1])), length.out = breaks_length))[-1]
+  breakpoints <- unique(distances[,1])[breaks]
   progressDF <- data.frame(progress = paste(seq(from = 10, to = 100, length.out = length(breakpoints))), ID = breakpoints)
   cat('Creating weights file...\n0%\n')
   
   # Taking each cell in turn calculate the weights
-  weights_list <- lapply(unique(dist[,1]), function(i){
+  weights_list <- lapply(unique(distances[,1]), function(i){
     
     # select for target cell
-    sim_foc <- subset(sim_distance, sim_distance[,1] == i)
-    dist_foc <- subset(dist, dist[,1] == i)
+    sim_foc <- subset(sim_distance, subset = sim_distance$site1 == i)
+    dist_foc <- subset(distances, subset = distances$site1 == i)
     
     # For this focal cell rank all others by distance
-    dist_foc$rankdist <- rank(dist_foc[,3], ties.method = "first")
+    dist_foc$rankdist <- rank(dist_foc$distance, ties.method = "first")
     
     # Take the top 'dist_sub' closest (dist_sub defaults to 200)
     dist_foc <- subset(dist_foc, rankdist <= dist_sub)
     
     # Of these take the 'sim_sub' top by similarity distance (sim_sub defaults to 100)
-    ranks <- merge(x = dist_foc, y = sim_foc, by = c("Var1", "Var2"), all.x = TRUE, all.y = FALSE)
-    ranks$rankflor <- rank(ranks$value.y, ties.method = "first")
+    ranks <- merge(x = dist_foc, y = sim_foc, by = c('site1', 'site2'), all.x = TRUE, all.y = FALSE)
+    ranks$rankflor <- rank(ranks$similarity, ties.method = "first")
     ranks <- subset(ranks, rankflor <= sim_sub)
     
     # Calculate similarity by distance and flora
@@ -132,9 +136,9 @@ createWeights<-function(dist,
     }
     
     # Merge back with all data
-    return(data.frame(target=ranks$Var1,
-                      neighbour=ranks$Var2,
-                      weight=round(ranks$weight,4)))
+    return(data.frame(target = ranks$site1,
+                      neighbour = ranks$site2,
+                      weight = round(ranks$weight, 4)))
     
     })
 

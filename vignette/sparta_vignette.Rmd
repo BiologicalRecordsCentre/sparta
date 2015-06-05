@@ -1,0 +1,551 @@
+---
+output: pdf_document
+---
+<!--
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{sparta vignette}
+-->
+
+sparta - Species Presence/Absence R Trends Analyses
+======
+
+## Introduction
+
+Sparta provides a range of tools for analysing trends in species occurrence data. These data have three components, what where and when. This package is based on the work presented in [Isaac et al (2014)](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract)
+
+Installing the package is easy and can be done from CRAN. Alternatively the development version can be installed from GitHub.
+
+NOTE: JAGS must be installed before the R package installation will work. JAGS can be found here - http://sourceforge.net/projects/mcmc-jags/files/JAGS/
+
+```{r, eval=FALSE}
+# Install the package from CRAN
+# THIS WILL WORK ONLY AFTER THE PACKAGE IS PUBLISHED
+install.packages('sparta')
+
+# Or install the development version from GitHub
+library(devtools)
+install_github('biologicalrecordscentre/sparta')
+```
+
+```{r, }
+# Once installed, load the package
+library(sparta)
+```
+
+The functions in sparta cover a range of tasks. Primarily they are focused on analysing trends in species occurrence data while accounting for biases (see Isaac et al, 2014). In this vignette we step through these functions and others so that you can understand how the package works. If you have any questions you can find the package maintainers email address using `maintainer('sparta')`, and if you have issues or bugs you can [report them here](https://github.com/biologicalrecordscentre/sparta/issues)
+
+
+## Create some example data
+
+To show you how the functions work first we need some data, here we create a data set that is hopefully similar in format to your own data.
+
+```{r, }
+# Create data
+n <- 15000 # size of dataset
+nyr <- 20 # number of years in data
+nSamples <- 100 # set number of dates
+nSites <- 50 # set number of sites
+set.seed(125) # set a random seed
+
+# Create somes dates
+first <- as.Date(strptime("1980/01/01", "%Y/%m/%d")) 
+last <- as.Date(strptime(paste(1980+(nyr-1),"/12/31", sep=''), "%Y/%m/%d")) 
+dt <- last-first 
+rDates <- first + (runif(nSamples)*dt)
+
+# taxa are set as random letters
+taxa <- sample(letters, size = n, TRUE)
+
+# sites are visited randomly
+site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
+
+# the date of visit is selected at random from those created earlier
+time_period <- sample(rDates, size = n, TRUE)
+
+myData <- data.frame(taxa, site, time_period)
+
+head(myData)
+```
+
+In general this is the format of data you will need for all of the function in sparta. The taxa and site columns should be characters and the time_period column should ideally be a date but can in some cases be a numeric.
+
+## Assessing the quality of data
+
+It can be useful to have a look at your data before you do any analyses. For example it is important to understand the biases in your data. The function `dataDiagnostics` is designed to help with this.
+
+```{r,}
+# Run some data diagnostics on our data
+results <- dataDiagnostics(taxa = myData$taxa,
+                           site = myData$site,
+                           time_period = myData$time_period,
+                           progress_bar = FALSE)
+```
+
+The plot produced shows the number of records for each year in the top plot and the average list length in a box plot at the bottom. List length is the number of taxa observed on a visit to a site, where a visit is taken to be a unique combination of site and time_period. It is important to know if you have trends in either of these over time. To help in this regard this function also fits linear models to both these graphs and the results have been returned to the console. Unsurprisingly, since this is a random dataset, we have no trend in either the number of records or list length over time. This fucntion also works if we have a numeric for time period such as the year
+
+```{r,}
+# Run some data diagnostics on our data
+results <- dataDiagnostics(taxa = myData$taxa,
+                           site = myData$site,
+                           time_period = as.numeric(format(myData$time_period, '%Y')),
+                           progress_bar = FALSE)
+```
+
+If we want to view these results in more detail we can interrogate the object `results`
+
+```{r,}
+# See what is in results..
+names(results)
+
+# Let's have a look at the details
+head(results$RecordsPerYear)
+head(results$VisitListLength)
+summary(results$modelRecs)
+summary(results$modelList)
+```
+
+
+## Telfer
+
+Telfer's change index is designed to assess the relative change in range size of species between two time periods ([Telfer et al, 2002](http://www.sciencedirect.com/science/article/pii/S0006320702000502#)). This function can take multiple time periods and will complete all pairwise comparisons.
+
+Our data is not quite in the correct format for Telfer since it is used for comparing two time periods but our `time_period` column is a date. We can fix this by using the `date2timeperiod` function.
+
+```{r,}
+## Create a new column for the time period
+# First define my time periods
+time_periods <- data.frame(start=c(1980,1985,1990,1995),end=c(1984,1989,1994,1999))
+
+time_periods
+
+# Now use these to assign my dates to time periods
+myData$tp <- date2timeperiod(myData$time_period, time_periods)
+
+head(myData)
+```
+
+As you can see our new column indicates which time period each date falls into with 1 being the earliest time period, 2 being the second and so on. This function will also work if instead of a single date for each record you have a date range
+
+```{r,}
+## Create a dataset where we have date ranges
+Date_range <- data.frame(startdate = myData$time_period,
+                         enddate = (myData$time_period + 300))
+
+head(Date_range)
+
+# Now assign my date ranges to time periods
+Date_range$time_period <- date2timeperiod(Date_range, time_periods)
+
+head(Date_range)
+```
+
+As you can see in this example when a date range spans the boundaries of your time periods (as in the first row) NA is returned.
+
+Now we have our data in the right format we can use the `telfer` function to analyse the data. Telfer is used for comparing two time periods and if you have more than this the `telfer` function will all pair-wise comparisons
+
+```{r,}
+# Here is our data
+head(myData)
+
+telfer_results <- telfer(taxa = myData$taxa,
+                         site = myData$site,
+                         time_period = myData$tp,
+                         minSite = 2)
+```
+
+We get a warning message indicating that a large number of rows are being removed as duplicates. This occurs since we are now aggregating records into time periods and therefore creating a large number of duplicates.
+
+The results give is the change index for each species (rows) in each of the pairwise comparisons of time periods (columns).
+
+```{r,}
+head(telfer_results)
+```
+
+## Reporting Rate Models
+
+The Reporting rate models in sparta are modular giving the user a number of options for their analyses.
+
+First there are functions that allow the user to subset data according to certain rules
+
+### Data selection
+
+The fist function allows you to subset your data by list length. This works out, for each combination of time_period and taxa (a visit), the number of species observed (list length). Any records that to not come from a list that meets your list length criteria are then dropped. 
+
+```{r,}
+# Select only records which occur on lists of length 5 or more
+myDataL <- siteSelectionMinL(taxa = myData$taxa,
+                              site = myData$site,
+                              time_period = myData$time_period,
+                              minL = 5) 
+
+head(myDataL)
+
+# We now have a much smaller dataset after subsetting
+nrow(myData)
+nrow(myDataL)
+```
+
+We are also able to subset by the number of times a site is sampled. The function `siteSelectionMinTP` does this. When time_period is a date, as in this case, minTP is minimum number of years a site must be sampled in for it be included in the subset.
+
+```{r,}
+# Select only data from sites sampled in at least 3 years
+myDataTP <- siteSelectionMinTP(taxa = myData$taxa,
+                               site = myData$site,
+                               time_period = myData$time_period,
+                               minTP = 5) 
+
+head(myDataTP)
+
+# Here we have only lost a small number rows, this is because
+# all sites have had 20 visits. Those rows that have been removed
+# are duplicates
+nrow(myData)
+nrow(myDataTP)
+```
+
+Following the method in Roy et al (2012) we can combine these two functions to subset both by the length of lists and by the number of years that sites are sampled. This has been wrapped up in to the function `siteSelection` which takes all the arguments of the previous two functions plus the argument `LFirst` which indicates whether the data should be subset by list length first (`TRUE`) or second (`FALSE`). 
+
+```{r,}
+# Subset our data as above but in one go
+myDataSubset  <- siteSelection(taxa = myData$taxa,
+                               site = myData$site,
+                               time_period = myData$time_period,
+                               minL = 5,
+                               minTP = 5,
+                               LFirst = TRUE)
+
+head(myDataSubset)
+nrow(myDataSubset)
+```
+
+### Running Reporting Rate Models
+
+Once you have subset your data using the above functions (or perhaps not at all) the reporting rate models can be applied using the function `reportingtRateModel`. This function offers flexibility in the model you wish to fit, allowing the user to specify whether list length and site should be used as covariates, whether over-dispersion should be used, and whether the family should be binomial or Bernoulli.
+
+```{r,}
+# Run the reporting rate model
+RR_out <- reportingRateModel(taxa = myData$taxa,
+                             site = myData$site,
+                             time_period = myData$time_period,
+                             list_length = TRUE,
+                             site_effect = TRUE,
+                             overdispersion = FALSE,
+                             family = 'Bernoulli',
+                             print_progress = TRUE)
+
+# Let's have a look at the data that is returned
+str(RR_out)
+
+# We could plot these to see the species trends
+with(RR_out[1:10,],
+     # Plot graph
+     {plot(x = 1:10, y = year.estimate,
+           ylim = range(c(year.estimate - year.stderror,
+                          year.estimate + year.stderror)),
+           ylab = 'Year effect (+/- Std Dev)',
+           xlab = 'Species',
+           xaxt="n")
+     # Add x-axis with species names
+     axis(1, at=1:10, labels = species_name[1:10])
+     # Add the error bars
+     arrows(1:10, year.estimate - year.stderror,
+            1:10, year.estimate + year.stderror,
+            length=0.05, angle=90, code=3)}
+     )
+```
+
+The returned object is a data frame with one row per species. Each column gives information on an element of the model output including covariate estimates, standard errors and p-values. This object also has some attributes giving the year that was chosen as the intercept, the number of visits in the dataset and the model formula used. 
+
+Using these functions it is possible to recreate the 'Well-sampled sites' method that is presented in Roy et al (2012). This is made available in the function `WSS` which is a simple wrapper around `siteSelection` and `reportingratemodel`.
+
+```{r,}
+# Run our data through the well-sampled sites function
+WSS_out <- WSS(taxa = myData$taxa,
+               site = myData$site,
+               time_period = myData$time_period,
+               minL = 5,
+               minTP = 5,
+               print_progress = FALSE)
+
+# The data is returned in the same format as from reportingRateModel
+str(WSS_out)
+
+# We can plot these and see that we get different results to our
+# previous analysis since this time the method includes subsetting
+with(WSS_out[1:10,],
+     # Plot graph
+     {plot(x = 1:10, y = year.estimate,
+           ylim = range(c(year.estimate - year.stderror,
+                          year.estimate + year.stderror)),
+           ylab = 'Year effect (+/- Std Dev)',
+           xlab = 'Species',
+           xaxt="n")
+     # Add x-axis with species names
+     axis(1, at=1:10, labels = species_name[1:10])
+     # Add the error bars
+     arrows(1:10, year.estimate - year.stderror,
+            1:10, year.estimate + year.stderror,
+            length=0.05, angle=90, code=3)}
+     )
+```
+
+### Occupancy models
+
+Occupancy models were found by Isaac et al (2014) to be one of the better tools for analysing species occurrence data typical of citizen science projects. This model models the occupancy process separately from the detection process, but we will not go in to the details of the model here since there is a growing literature about occupancy models, how and when they should be used. Here we focus on how the occupancy model discussed in Isaac et al 2014 is implemented in `sparta`.
+
+This function works in a very similar fashion to that of the previous functions we have discussed. The data it takes is 'What, where, when' as in other functions, however here we have the option to specify which species we wish to model. This feature has been added as occupancy models are computationally intensive. The parameters of the function allow you control over the number of iterations, burnin, thinning, the number of chains, the seed and for advanced users there is also the possibility to pass in your own BUGS script.
+
+```{r,}
+# Here is our data
+str(myData)
+
+# Run an occupancy model for three species
+# Here we use very small number of iterations 
+# to avoid a long run time
+system.time({
+occ_out <- occDetModel(taxa = myData$taxa,
+                       site = myData$site,
+                       time_period = myData$time_period,
+                       species_list = c('a','b','c','d'),
+                       write_results = FALSE,
+                       n_iterations = 50,
+                       burnin = 15,
+                       n_chains = 3,
+                       thinning = 3,
+                       seed = 123)
+})
+
+# This took about 13 seconds
+# Lets look at the results
+## The object returned is a list with one element for each species
+names(occ_out)
+
+# Each of these is an object of class 'occDet'
+class(occ_out$a)
+
+# Inside these elements is the information of interest
+names(occ_out$a)
+
+# Of particular interest to many users will be the summary
+# data in the BUGSoutput
+head(occ_out$a$BUGSoutput$summary)
+
+# We have included a plotting feature for objects of class
+# occDet which provides a useful visualisation of the trend
+# in occupancy over time
+plot(occ_out$a)
+```
+
+He we have run a small example but in reality these models are usually run for many thousands of iterations, making the analysis of more than a handful of species impractical. For those with access to the necessary facilities it is possible to parallelise across species. To do this we use a pair of functions that are used internally by `occDetModel`. These are `formatOccData` which is used to format our occurrence data into the format needed by JAGS, and `occDetFunc`, the function which undertakes the modelling.
+
+```{r,}
+# First format our data
+formattedOccData <- formatOccData(taxa = myData$taxa,
+                                  site = myData$site,
+                                  time_period = myData$time_period)
+# This is a list of two elements
+names(formattedOccData)
+```
+
+`formatOccData` returns a list of length 2; the first element 'spp_vis' is a data.frame with visit (unique combination of site and time period) in the first column and taxa for all the following columns. Values in taxa columns are either TRUE or FALSE depending on whether they were observed on that visit.
+
+```{r,}
+# Lets have a look at spp_vis
+head(formattedOccData$spp_vis[,1:5])
+```
+
+The second element ('occDetData') is a data frame giving the site, list length (the number of species observed on a visit) and year for each visit.
+
+```{r,}
+# Lets have a look at occDetData
+head(formattedOccData$occDetdata)
+```
+
+With our data in the correct format this can now go into the modelling function
+
+
+```{r,}
+# Use the occupancy modelling function to parrellise the process
+# Here we are going to use the package snowfall
+library(snowfall)
+
+# I have 4 cpus on my PC so I set cpus to 4
+# when I initialise the cluster
+sfInit(parallel = TRUE, cpus=4 )
+
+# Export my data to the cluster
+sfExport('formattedOccData')
+
+# I create a function that takes a species name and runs my model
+myfunction <- function(taxa_name){
+  
+  library(sparta)
+  
+  occ_out <- occDetFunc(taxa_name = taxa_name,
+                        n_iterations = 50,
+                        burnin = 15, 
+                        occDetdata = formattedOccData$occDetdata,
+                        spp_vis = formattedOccData$spp_vis,
+                        write_results = FALSE,
+                        seed = 123)  
+} 
+
+# I then run this in parallel
+system.time({
+para_out <- sfClusterApplyLB(c('a','b','c','d'), myfunction)
+names(para_out) <- c('a','b','c','d')
+})
+
+# This takes about half the time of the 
+# serial version we ran earlier, and the resulting object 
+# is the same (since we set the random seed to be the same
+# in each)
+head(para_out$a$BUGSoutput$summary)
+plot(para_out$a)
+```
+
+This same approach can be used on cluster computers, which can have hundreds of processors, to dramatically reduce run times.
+
+## Frescalo
+
+The frescalo method is outlined in [Hill (2012)](http://onlinelibrary.wiley.com/doi/10.1111/j.2041-210X.2011.00146.x/suppinfo) and is a means to account for both spatial and temporal bias. This method was shown by [Isaac et al (2014)](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract) to be a good method for data that is aggregated into time periods such as when comparing atlases. The frescalo method is run using a .exe, you will need to download this first (https://github.com/BiologicalRecordsCentre/frescalo) and make a note of the directory you place it in, we will need that in a moment.
+
+Again we will assume that your data is in a 'what, where, when' format similar to that we used in the previous method:
+
+```{r,}
+head(myData)
+```
+
+Frescalos requirements in terms of data structure and types is a little different to that we have seen in other functions. Firstly the entire dataframe is passed in as an argument called `Data`, and the column names of your various elements (taxa, site, etc) are given as other arguments. Secondly frescalo require that the 'when' component is either a column of year or two columns, one of 'start date' and one of 'end date'. Our data as presented above does not fit into this format so first we must reformat it. In our situation the simplest thing to do is to add a column giving the year. Since frescalo aggregates across time periods (often decades or greater) this loss of temporal resolution is not an issue.
+
+```{r,}
+# Add a year column
+myData$year <- as.numeric(format(myData$time_period, '%Y'))
+head(myData)
+```
+
+Now we have our data in the correct format for frescalo there is one other major component we need, a weights file. You can find out more about the weights file and what it is used for in the original paper [(Hill, 2012)](http://onlinelibrary.wiley.com/doi/10.1111/j.2041-210X.2011.00146.x/suppinfo). In short this file outlines the similarity between sites in your dataset. This information is used to weight the analysis of each site accordingly. If you are undertaking this analysis in the UK at 10km square resolution there are some built in weights files you can use. Some of these weights files use the UK landcover map instead of floristic similarity (as used in [Hill (2012)](http://onlinelibrary.wiley.com/doi/10.1111/j.2041-210X.2011.00146.x/suppinfo)). You can find out more about these in the frescalo help file.
+
+For the sake of demonstration let us assume that you do not have a weights file for your analysis, or that you want to create your own. To create a weights file you need two things, a measure of physical distance between your sites and a measure of similarity. In the original paper this similarity measure was floristic similarity, but it could also be habitat similarity or whatever is relevant for the taxa you are studying.
+
+```{r,}
+# I'm going to create some made up data
+mySites <- unique(myData$site)
+
+# Build a table of distances
+myDistances <- merge(mySites, mySites) 
+# add random distances
+myDistances$dist <- runif(n = nrow(myDistances), min = 10, max = 10000) 
+# to be realistic the distance from a site to itself should be 0
+myDistances$dist[myDistances$x == myDistances$y] <- 0
+head(myDistances)
+
+# Build a table of attributes
+# This can be done in numerous ways, here is one example
+# Lets say I have habitat data for all my sites
+myHabitatData <- data.frame(site = mySites,
+                            grassland = runif(length(mySites), 0, 1),
+                            woodland = runif(length(mySites), 0, 1),
+                            heathland = runif(length(mySites), 0, 1),
+                            urban = runif(length(mySites), 0, 1),
+                            freshwater = runif(length(mySites), 0, 1))
+
+# This pretend data is supposed to be proportional cover so lets 
+# make sure each row sums to 1
+multiples <- apply(myHabitatData[,2:6], 1, sum)
+
+for(i in 1:length(mySites)){
+  
+  myHabitatData[i,2:6] <- myHabitatData[i,2:6]/multiples[i]
+  
+}
+
+# Here is our pretend habitat data, and the rows sum to 1
+head(myHabitatData)
+
+# With our distance and habitat tables in hand we can
+# use the createWeights function to build our weights file
+# I have changed the defualts of dist_sub and sim_sub since
+# we have a very small example dataset of only 50 sites
+myWeights <- createWeights(distances = myDistances,
+                           attributes = myHabitatData,
+                           dist_sub = 20,
+                           sim_sub = 10)
+
+head(myWeights)
+```
+
+
+The `createWeights` function follows the procedure outlined in [Hill (2012)](http://onlinelibrary.wiley.com/doi/10.1111/j.2041-210X.2011.00146.x/suppinfo) for creating weights and more information can be found in the help file of the function. With our data and weights file we are now ready to proceed with frescalo. As with other functions frescalo can take a range of additional arguments which you can see by entering `?frescalo` at the console, here we will do a minimal example.
+
+```{r,}
+# First we need to enter the location where we placed the .exe
+# In my case I saved it to my documents folder
+myFrescaloPath <- 'C:/Users/tomaug/Documents/Frescalo_3a_windows.exe'
+
+# I then want to set up the time periods I want to analyse
+# Here I say I want to compare 1980-89 to 1990-99
+myTimePeriods <- data.frame(start=c(1980,1990),end=c(1989,1999))
+head(myTimePeriods)
+
+# I also need to specify where I want my results to be saved
+# I'm going to save it in a folder in my working directory
+myFolder <- '~/myFolder'
+
+# Simple run of frescalo
+frescalo_results <- frescalo(Data = myData, 
+                             frespath = myFrescaloPath,
+                             time_periods = myTimePeriods,
+                             site_col = 'site',
+                             sp_col = 'taxa',
+                             year = 'year',
+                             Fres_weights = myWeights,
+                             sinkdir = myFolder)
+```
+
+
+We get a warning from this analysis that our value of phi is too low. In this case this is because our simulated data suggests every species is found on every site in our time periods. This is a little unreaslistic but should you get a similar warning with your data you might want to consult [Hill (2012)](http://onlinelibrary.wiley.com/doi/10.1111/j.2041-210X.2011.00146.x/suppinfo) and change your input value of phi. 
+
+The object that is returned (`frescalo_results` in my case) is an object of class `frescalo`. this means there are a couple of special methds we can use with it.
+
+```{r,}
+# Using 'summary' give a quick overview of our data
+# This can be useful to double check that your data was read in correctly
+summary(frescalo_results)
+
+# Using 'print' we get a preview of the results
+print(frescalo_results)
+
+
+# There is a lot of information here and you can read more about
+# what these data mean by looking at the frescalo help file
+# The files detailed in paths are also in the object returned
+frescalo_results$paths
+names(frescalo_results)
+
+# However we additionally get some model results in our returned object
+# under '$lm_stats'
+```
+
+The results from frescalo may seem complex at first and I suggest reading the Value section of the frescalo help file for details. In brief: `frescalo_results$paths` lists the file paths of the raw data files for `$log`, `$stat`, `$freq` and `$trend`, in that order. `frescalo_results$trend` is a data.frame providing the list of time factors for each species-timeperiod. `frescalo_results$stat` is a data.frame giving details about sites such as estimated species richness. `frescalo_results$freq` is a data.frame of the species frequencies, that is the probabilities that a species was present at a certain location. `frescalo_results$log`, a simple report of the console output from the .exe. `frescalo_results$lm_stats` is a dataframe giving the results of a linear regression of Tfactors for each species when more than two time periods are used, if only 2 time periods are used (as in our example) the linear modeling section of this data.frame is filled with NAs and a z-test is performed instead (results are given in the last columns).
+
+```{r,}
+# Lets look at some results fo the first three species
+frescalo_results$lm_stats[1:3, c('NAME','Z_VAL','SIG_95')]
+
+# None of these have a significant change using a z-test
+# Lets look at the raw data
+frescalo_results$trend[frescalo_results$trend$Species %in% c('a', 'b', 'c'),
+                       c('Species', 'Time', 'TFactor', 'StDev')]
+
+# We can see from these results that the big standard deviations on 
+# the tfactor values means there is no real difference between the 
+# two time periods
+```
+
+
+## References
+
+1. [Hill, M.O. (2012) Local frequency as a key to interpreting species occurrence data when recording effort is not known. Methods Ecol. Evol. 3, 195–205](http://onlinelibrary.wiley.com/doi/10.1111/j.2041-210X.2011.00146.x/suppinfo) 
+2. [Isaac, N.J.B. et al. (2014) Statistics for citizen science: extracting signals of change from noisy ecological data. Methods Ecol. Evol. 5, 1052–1060](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract)
+3. [Telfer, M.G. et al. (2002) A general method for measuring relative change in range size from biological atlas data. Biol. Conserv. 107, 99–109](http://www.sciencedirect.com/science/article/pii/S0006320702000502#)

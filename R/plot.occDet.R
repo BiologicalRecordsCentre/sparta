@@ -1,6 +1,6 @@
 #' @import ggplot2
 #' @method plot occDet
-#' @S3method plot occDet
+#' @export
 
 plot.occDet <- function(x, y = NULL, ...){
     

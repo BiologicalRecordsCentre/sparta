@@ -4,16 +4,17 @@
 \alias{createWeights}
 \title{Create frescalo weights file}
 \usage{
-createWeights(dist, sim, dist_sub = 200, sim_sub = 100, normalise = FALSE)
+createWeights(distances, attributes, dist_sub = 200, sim_sub = 100,
+  normalise = FALSE)
 }
 \arguments{
-\item{dist}{a dataframe giving the distance between sites in a long format with three
+\item{distances}{a dataframe giving the distance between sites in a long format with three
 columns. The first column give the ID of the first site, the second column gives
 the ID of the second site and the third column gives the distance between them.
 The table should include reciprocal data i.e. both rows 'A, B, 10' and 'B, A, 10'
 should exist.}
 
-\item{sim}{a dataframe of numeric attributes of each site. The first column must contain
+\item{attributes}{a dataframe of numeric attributes of each site. The first column must contain
 the site IDs and all other columns are used to calculate the similarity between
 sites using dist() and method 'euclidean'.}
 
@@ -47,8 +48,8 @@ data(sim)
 data(dist)
 
 # Create the weights file
-weights <- createWeights(dist=dist,
-                          sim=sim,
+weights <- createWeights(distances=dist,
+                          attributes=sim,
                           dist_sub=20,
                           sim_sub=10)
 }

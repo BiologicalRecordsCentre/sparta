@@ -4,37 +4,44 @@
 \alias{frescalo}
 \title{Frescalo trend analysis}
 \usage{
-frescalo(Data = NULL, species_to_include = NULL, ignore.ireland = F,
-  ignore.channelislands = F, sinkdir = NULL, time_periods = NULL,
-  plot_fres = FALSE, Fres_weights = "LCGB", non_benchmark_sp = NULL,
-  fres_site_filter = NULL, phi = NULL, alpha = NULL,
-  trend_option = "arithmetic", NYears = 10, year_col = NA,
-  site_col = NA, sp_col = NA, start_col = NA, end_col = NA)
+frescalo(Data, frespath, time_periods, site_col, sp_col, year_col = NULL,
+  start_col = NULL, end_col = NULL, species_to_include = NULL,
+  sinkdir = NULL, plot_fres = FALSE, Fres_weights = "LCGB",
+  non_benchmark_sp = NULL, fres_site_filter = NULL, phi = 0.74,
+  alpha = 0.27, trend_option = "arithmetic", NYears = 10,
+  ignore.ireland = F, ignore.channelislands = F)
 }
 \arguments{
-\item{Data}{A dataframe object or string giving the file path to the
-location of data (either .rdata or .csv). This should consist of rows of
+\item{Data}{A dataframe object. This should consist of rows of
 observations and columns indicating the species and location as well as
 either the year of the observation or columns specifying the start and end
-dates of the observation. If \code{NULL} (default) the user is prompted to select
-a .csv or .rdata file. If using a dataframe it is important that date columns are in
-a date format. If using a .csv dates are assumed to be in the format dd/mm/yyyy.}
+dates of the observation. It is important that date columns are in
+a date format.}
+
+\item{frespath}{the path to the frescalo .exe file. This can be downloaded from
+http://www.brc.ac.uk/biblio/frescalo-computer-program-analyse-your-biological-records.
+It is currently only available for Windows. The directory where the .exe
+is saved should be writeable.}
+
+\item{time_periods}{A dataframe object with two columns. The first column contains the
+start year of each time period and the second column contains the end year of
+each time period. Time periods should not overlap.}
+
+\item{site_col}{The name of the site column in \code{Data}}
+
+\item{sp_col}{The name of the species column in \code{Data}}
+
+\item{year_col}{The name of the year column in \code{Data}}
+
+\item{start_col}{The name of the start date column in \code{Data}}
+
+\item{end_col}{The name of the end date column in \code{Data}}
 
 \item{species_to_include}{Optionally a character vector listing the names of species to be used.
 Species not in your list are ignored. This is useful if you are only interested in a
 subset of species.}
 
-\item{ignore.ireland}{Logical, if \code{TRUE} Irish hectads are removed. Default
-is \code{FALSE}}
-
-\item{ignore.channelislands}{Logical, if \code{TRUE} channel island hectads are
-removed. Default is \code{FALSE}}
-
 \item{sinkdir}{String giving the output directory for results}
-
-\item{time_periods}{A dataframe object with two columns. The first column contains the
-start year of each time period and the second column contains the end year of
-each time period. Time periods should not overlap.}
 
 \item{plot_fres}{Logical, if \code{TRUE} maps are produced by Frescalo. Default is
 \code{FALSE}. CURRENTLY ONLY WORKS FOR UK GRID-REFERENCE DATA}
@@ -46,13 +53,12 @@ file based on vascular plant data for the UK
 given as a data.frame. This must have three columns: target cell, neighbour cell,
 weight. Default is 'LCGB'}
 
-\item{non_benchmark_sp}{a character vector or data.frame with one column, giving the
-names of species not to be used as benchmarks in Frescalo. Default is
-\code{NULL} and all species are used. See Hill, 2011 for reasons why some
-species may not be suitable benchmarks.}
+\item{non_benchmark_sp}{a character vector, giving the names of species not to be
+used as benchmarks in Frescalo. Default is \code{NULL} and all species are used.
+See Hill, 2011 for reasons why some species may not be suitable benchmarks.}
 
-\item{fres_site_filter}{Optionally a character vector or data.frame with one column, giving
-the names of sites to be used for in the trend analysis. Sites not include in this
+\item{fres_site_filter}{Optionally a character vector giving
+the names of sites to be used in the trend analysis. Sites not include in this
 list are not used for estimating TFactors. Default is \code{NULL} and all sites are
 used.}
 
@@ -73,15 +79,11 @@ every 10 years as this work on a compound rate.}
 \item{NYears}{The number of years over which you want the percentage change to be calculated (i.e.
 10 gives a decadal change). Default = 10}
 
-\item{year_col}{The name of the year column in \code{Data}}
+\item{ignore.ireland}{Logical, if \code{TRUE} Irish hectads are removed. Default
+is \code{FALSE}}
 
-\item{site_col}{The name of the site column in \code{Data}}
-
-\item{sp_col}{The name of the species column in \code{Data}}
-
-\item{start_col}{The name of the start date column in \code{Data}}
-
-\item{end_col}{The name of the end date column in \code{Data}}
+\item{ignore.channelislands}{Logical, if \code{TRUE} channel island hectads are
+removed. Default is \code{FALSE}}
 }
 \value{
 Results are saved to file and most are returned in a list to R.

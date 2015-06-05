@@ -6,7 +6,10 @@ errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate 
                         iterations = NULL, overdispersion = NULL, verbose = NULL,
                         list_length = NULL, site_effect = NULL, family = NULL,
                         n_iterations = NULL, burnin = NULL, thinning = NULL,
-                        n_chains = NULL, seed = NULL){
+                        n_chains = NULL, seed = NULL, year_col = NULL, site_col = NULL,
+                        sp_col = NULL, start_col = NULL, end_col = NULL, phi = NULL,
+                        alpha = NULL, non_benchmark_sp = NULL, fres_site_filter = NULL,
+                        time_periods = NULL, frespath = NULL){
   
   # Create a list of all non-null arguements that should be of equal length
   valid_argumentsTEMP <- list(taxa=taxa,
@@ -210,4 +213,51 @@ errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate 
     if(!is.numeric(seed)) stop('seed muct be numeric')
     
   }  
+  
+  ## Checks for frescalo
+  if(!is.null(year_col)){
+    if(is.na(year_col)){
+      if(!is.null(start_col) & !is.null(end_col)){
+        if(is.na(start_col)|is.na(end_col)){
+          stop('year_col or start_col and end_col must be given')
+        } else {  
+          if(!is.na(start_col)|!is.na(end_col)){
+            stop('year_col cannot be used at the same time as start_col and end_col')
+          }
+        }
+      }
+    }
+  }
+  
+  if(!is.null(phi)){
+    if(phi>0.95|phi<0.5){
+      stop("phi is outside permitted range of 0.50 to 0.95")
+    } 
+  }
+  
+  if(!is.null(alpha)){
+    if(alpha>0.5|alpha<0.08){
+      stop("alpha is outside permitted range of 0.08 to 0.50")
+    } 
+  }
+  
+  if(!is.null(non_benchmark_sp)){    
+    if(any(!is.vector(non_benchmark_sp), !is.character(non_benchmark_sp))){
+        stop('non_benchmark_sp must be a character vector')
+    }
+  }
+  
+  if(!is.null(fres_site_filter)){
+    if(any(!is.vector(fres_site_filter), !is.character(fres_site_filter))){
+      stop('fres_site_filter must be a character vector')
+    }  
+  }
+  
+  if(!is.null(time_periods)){
+    if(!is.data.frame(time_periods)) stop('time_periods should be a data.frame. e.g. "data.frame(start=c(1980,1990),end=c(1989,1999))"')
+  }
+  
+  if(!is.null(frespath)){
+    if(!file.exists(frespath)) paste(frespath, 'does not exist')
+  }
 }

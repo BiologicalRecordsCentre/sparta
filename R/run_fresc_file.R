@@ -1,6 +1,5 @@
 run_fresc_file <-
 function(
-	channel=NULL, 
 	fres_data,
 	output_dir,
 	frescalo_path,
@@ -213,25 +212,18 @@ function(
 		# Print progress to screen
 			cat("\nREAD FRESCALO OUTPUT\n",rep("*",20),"\n\n", sep="")
 					
-		# Extract species names from BRC if not given
-			if(is.null(spp_names_file)){
-				#spp_names = get_spp_names(channel,unique(freq$Species), output_list = TRUE)
-        stop('spp_names_file cannot be NULL')
-			} else {
-				spp_names = read.table(spp_names_file, sep=",", header=TRUE, stringsAsFactors = FALSE)
-			}
+		# Extract species names
+			spp_names = read.table(spp_names_file, sep=",", header=TRUE, stringsAsFactors = FALSE)
+			
 		# Make standard Frescalo plots	
 			# Print progress to screen
 				cat("\nPLOT MAPS AND CALCULATE RESULTS\n",rep("*",20),"\n\n", sep="")
 			# Do plots
 			lm_stats<-all_oneplots(stat = stats, trend = trend, freq = freq, spp_names = spp_names, onefile_name = "Standard Frescalo Plots", dir_path = fres_sub_dir["RESULTS"], plot = Plot)
 	}	else {
-  	  # Extract species names from BRC if not given
-  	  if(is.null(spp_names_file)){
-  	    spp_names = get_spp_names(channel,unique(freq$Species), output_list = TRUE)
-  	  } else {
-  	    spp_names = read.table(spp_names_file, sep=",", header=TRUE, stringsAsFactors = FALSE)
-  	  }
+  	  # Extract species names
+  	  spp_names = read.table(spp_names_file, sep=",", header=TRUE, stringsAsFactors = FALSE)
+  	  
       #Run tfactor stats without plotting
 	    lm_stats<-all_oneplots(stat = stats, trend = trend, freq = freq, spp_names = spp_names, dir_path = fres_sub_dir["RESULTS"], plot = Plot)
   }
@@ -245,18 +237,17 @@ function(
   # format files for returning
     if(!exists('spp_names')) spp_names = read.table(spp_names_file, sep=",", header=TRUE, stringsAsFactors = FALSE)
     
-    trend<-as.data.frame(trend)
-		names(trend)<-gsub('_','',names(trend))
+    trend <- as.data.frame(trend)
+		names(trend) <- gsub('_', '', names(trend))
 		for(i in unique(trend$Species)){
 		  trend$Species[trend$Species==i]<-spp_names$NAME[spp_names$SPECIES==i]
 		}
-		
-		
-    stats<-as.data.frame(stats)
-    
-    freq<-as.data.frame(freq)
-		names(freq)<-gsub('_','',names(freq))
-		for(i in unique(freq$Species)){
+				
+    stats <- as.data.frame(stats)
+    freq <- as.data.frame(freq)
+		names(freq) <- gsub('_', '', names(freq))
+
+  for(i in unique(freq$Species)){
 		  freq$Species[freq$Species==i]<-spp_names$NAME[spp_names$SPECIES==i]
 		}
     
@@ -274,5 +265,6 @@ function(
 		rm(list=unwanted[unwanted %in% ls(pos = ".GlobalEnv")],pos = ".GlobalEnv")
     		
   # Return output
+    class(frescalo) <- 'frescalo'
     return(frescalo)
 }

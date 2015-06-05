@@ -1,6 +1,8 @@
 context("Test createWeights")
 
 #small dataset
+library(sp)
+library(reshape2)
 set.seed(seed = 128)
 n <- 10 #number of sites
 sites <- paste('A',1:n, sep='')
