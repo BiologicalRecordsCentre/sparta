@@ -20,7 +20,7 @@ temp <- capture.output(weights <- createWeights(dist, sim, dist_sub = 5, sim_sub
 test_that("Test errors and warnings", {
   
   expect_warning(createWeights(dist, sim[1:5,], dist_sub = 5, sim_sub = 3),
-                 "The following sites were in only one of 'sim' and 'dist' and so have been excluded from the weights file")
+                 "The following sites were in only one of 'attributes' and 'distances' and so have been excluded from the weights file")
   expect_error(createWeights(head(dist, -1), sim, dist_sub = 5, sim_sub = 3),
                'dist table does not include all possible combinations of sites')  
   expect_error(createWeights(dist, sim, dist_sub = 5, sim_sub = 5),

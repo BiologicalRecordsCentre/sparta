@@ -33,7 +33,7 @@ allsites <- sort(unique(site))
 weights <- merge(allsites, allsites)
 weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 
-frespath <- "W:/PYWELL_SHARED/Pywell Projects/BRC/Tom August/R Packages/Trend analyses/exec/Frescalo_3a.exe"
+frespath <- "W:/PYWELL_SHARED/Pywell Projects/BRC/Tom August/R Packages/Trend analyses/frescalo_exes/Frescalo_3a_windows.exe"
 
 test_that("Runs without error", {
   #cat('Testing exectutable functionality\n')
