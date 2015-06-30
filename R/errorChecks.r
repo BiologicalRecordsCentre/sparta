@@ -9,7 +9,7 @@ errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate 
                         n_chains = NULL, seed = NULL, year_col = NULL, site_col = NULL,
                         sp_col = NULL, start_col = NULL, end_col = NULL, phi = NULL,
                         alpha = NULL, non_benchmark_sp = NULL, fres_site_filter = NULL,
-                        time_periods = NULL, frespath = NULL){
+                        time_periods = NULL, frespath = NULL, species_to_include = NULL){
   
   # Create a list of all non-null arguements that should be of equal length
   valid_argumentsTEMP <- list(taxa=taxa,
@@ -188,10 +188,23 @@ errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate 
     
     if(!is.null(list_length)){
       
-      ### FINISH THIS ###
       if(list_length & family == 'Binomial'){
         warning('When list_length is TRUE family will default to Bernoulli')
       }      
+    }
+  }
+  
+  ### checks for species_to_include ###
+  
+  if(!is.null(species_to_include)){
+    
+    missing_species <- species_to_include[!species_to_include %in% unique(taxa)]
+    
+    if(length(missing_species) > 0){
+      
+      warning('The following species in species_to_include are not in your data: ',
+           paste(missing_species, collapse = ', '))
+      
     }
   }
   

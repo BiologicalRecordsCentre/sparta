@@ -1,7 +1,7 @@
 Package: sparta
 Type: Package
 Title: Trend analysis for unstructured data
-Version: 0.1.27
+Version: 0.1.28
 Date: 2015-06-05
 Author: Tom August <tomaug@ceh.ac.uk>
 Maintainer: Tom August <tomaug@ceh.ac.uk>
@@ -11,5 +11,5 @@ Description: This package includes methods used to analyse trends in unstructure
 License: MIT + file LICENSE
 Depends: R (>= 3.1.0), lme4 (>= 1.0)
 Imports: plyr, dplyr (>= 0.4.1), sp, reshape2, Matrix, ggplot2
-Suggests: testthat (>= 0.8.0), roxygen2, knitr, R2jags
+Suggests: testthat (>= 0.8.0), roxygen2, knitr, R2jags, gdata
 LazyData: TRUE

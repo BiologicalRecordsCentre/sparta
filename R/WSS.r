@@ -11,10 +11,14 @@
 #'        (list-length) for the visit to be considered well sampled.
 #' @param minTP numeric, The minimum number of time periods, or if time_period is a date the minimum
 #'        number of years, a site must be sampled in for it be be considered well sampled.
+#' @param species_to_include A character vector giving the name of species to model. By default
+#'        all species will be modelled
 #' @param overdispersion This option allows modelling overdispersion (\code{TRUE}) in models.
 #'        Default is \code{FALSE}.
+#' @param family The type of model to be use. Can be \code{"Binomial"} or \code{"Bernoulli"}.
 #' @param verbose This option, if \code{TRUE}, sets models to verbose, allowing the 
 #'        interations of each model to be viewed.
+#'        
 #' @param print_progress Logical, if \code{TRUE} progress is printed to console when
 #'        running models. Default is \code{TRUE}  
 #'        
@@ -80,7 +84,10 @@
 #' attributes(results)
 #' }
 
-WSS <- function(taxa, site, time_period, minL = 2, minTP = 3, overdispersion = FALSE, verbose = FALSE, print_progress = FALSE){
+WSS <- function(taxa, site, time_period, minL = 2, minTP = 3,
+                species_to_include = unique(taxa),
+                overdispersion = FALSE, family = 'Binomial',
+                verbose = FALSE, print_progress = FALSE){
   
   selected_data  <- siteSelection(taxa,
                           site,
@@ -96,7 +103,9 @@ WSS <- function(taxa, site, time_period, minL = 2, minTP = 3, overdispersion = F
                                    site_effect = TRUE,
                                    verbose = verbose,
                                    print_progress = print_progress,
-                                   overdispersion = overdispersion)  
+                                   overdispersion = overdispersion,
+                                   family = family,
+                                   species_to_include = species_to_include)  
   
   attr(WSS_result, 'minL') <- minL
   attr(WSS_result, 'minTP') <- minTP

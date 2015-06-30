@@ -5,8 +5,9 @@
 \title{Run Reporting Rate Models}
 \usage{
 reportingRateModel(taxa, site, time_period, list_length = FALSE,
-  site_effect = FALSE, overdispersion = FALSE, verbose = FALSE,
-  family = "Binomial", print_progress = FALSE)
+  site_effect = FALSE, species_to_include = unique(taxa),
+  overdispersion = FALSE, verbose = FALSE, family = "Binomial",
+  print_progress = FALSE)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}
@@ -23,6 +24,9 @@ a binomial model rather that as a bernoulli model.}
 \item{site_effect}{Logical, if \code{TRUE} then site is added to the models as a random
 effect.}
 
+\item{species_to_include}{A character vector giving the name of species to model. By default
+all species will be modelled}
+
 \item{overdispersion}{This option allows modelling overdispersion (\code{TRUE}) in models.
 Default is \code{FALSE}.}
 
@@ -30,7 +34,7 @@ Default is \code{FALSE}.}
 interations of each model to be viewed.}
 
 \item{family}{The type of model to be use. Can be \code{"Binomial"} or \code{"Bernoulli"}.
-Note the if list_length is used family defaults to Bernoulli.}
+Note the if list_length is \code{TRUE} family defaults to Bernoulli.}
 
 \item{print_progress}{Logical, if \code{TRUE} progress is printed to console when
        running models. Default is \code{TRUE}}
@@ -42,7 +46,8 @@ A dataframe of results are returned to R. Each row gives the results for a
         sufix (after the ".") gives the parameter of that covariate.
         \code{number_observations} gives the number of visits where the species of interest
         was observed. If any of the models encountered an error this will be given in the
-        column \code{error_message}.\cr
+        column \code{error_message}. If model do encounter errors the the values for most
+        columns will be \code{NA}\cr
 
         The data.frame has a number of attributes:
         \itemize{

@@ -4,8 +4,9 @@
 \alias{WSS}
 \title{Well sampled sites model}
 \usage{
-WSS(taxa, site, time_period, minL = 2, minTP = 3, overdispersion = FALSE,
-  verbose = FALSE, print_progress = FALSE)
+WSS(taxa, site, time_period, minL = 2, minTP = 3,
+  species_to_include = unique(taxa), overdispersion = FALSE,
+  family = "Binomial", verbose = FALSE, print_progress = FALSE)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}
@@ -21,11 +22,16 @@ as long as the number of observations.}
 \item{minTP}{numeric, The minimum number of time periods, or if time_period is a date the minimum
 number of years, a site must be sampled in for it be be considered well sampled.}
 
+\item{species_to_include}{A character vector giving the name of species to model. By default
+all species will be modelled}
+
 \item{overdispersion}{This option allows modelling overdispersion (\code{TRUE}) in models.
 Default is \code{FALSE}.}
 
+\item{family}{The type of model to be use. Can be \code{"Binomial"} or \code{"Bernoulli"}.}
+
 \item{verbose}{This option, if \code{TRUE}, sets models to verbose, allowing the
-interations of each model to be viewed.}
+       interations of each model to be viewed.}
 
 \item{print_progress}{Logical, if \code{TRUE} progress is printed to console when
        running models. Default is \code{TRUE}}

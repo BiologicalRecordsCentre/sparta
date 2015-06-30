@@ -61,7 +61,11 @@ test_that("Test errors and warnings", {
                                               df$time_period,
                                               site_effect = 1),
                  "site_effect must be logical")
-
+  expect_warning(RR_out <- reportingRateModel(df$taxa,
+                                            df$site,
+                                            df$time_period,
+                                            species_to_include = c('tom','a','b','c')),
+               "The following species in species_to_include are not in your data: tom")
 })
 
 test_that("Test formulaBuilder", {
@@ -90,7 +94,7 @@ test_that("Test formulaBuilder", {
 
 test_that("Check outputs are in the correct form", {
   
-  expect_warning(RR_out <- reportingRateModel(df$taxa, df$site, df$time_period),
+  expect_warning(RR_out <- reportingRateModel(df$taxa, df$site, df$time_period, species_to_include = c('a','b','c')),
                  "343 out of 3001 observations will be removed as duplicates")
   atts <- attributes(RR_out)  
   expect_equal(atts$intercept_year, 2014)
@@ -98,8 +102,7 @@ test_that("Check outputs are in the correct form", {
   expect_equal(atts$max_year, 5)
   expect_equal(atts$nVisits, 450)
   expect_equal(atts$model_formula, "cbind(successes, failures) ~ year")
-  
   expect_is(RR_out, "data.frame")
-  expect_equal(nrow(RR_out), length(unique(df$taxa)))  
+  expect_identical(c('a','b','c'), sort(as.character(RR_out$species_name)))
 
 })

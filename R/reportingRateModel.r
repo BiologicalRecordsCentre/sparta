@@ -11,12 +11,14 @@
 #'        a binomial model rather that as a bernoulli model.
 #' @param site_effect Logical, if \code{TRUE} then site is added to the models as a random
 #'        effect.
+#' @param species_to_include A character vector giving the name of species to model. By default
+#'        all species will be modelled
 #' @param overdispersion This option allows modelling overdispersion (\code{TRUE}) in models.
 #'        Default is \code{FALSE}.
 #' @param verbose This option, if \code{TRUE}, sets models to verbose, allowing the 
 #'        interations of each model to be viewed.
 #' @param family The type of model to be use. Can be \code{"Binomial"} or \code{"Bernoulli"}.
-#'        Note the if list_length is used family defaults to Bernoulli.
+#'        Note the if list_length is \code{TRUE} family defaults to Bernoulli.
 #' @param print_progress Logical, if \code{TRUE} progress is printed to console when
 #'        running models. Default is \code{TRUE}   
 #' 
@@ -26,7 +28,8 @@
 #'         sufix (after the ".") gives the parameter of that covariate.
 #'         \code{number_observations} gives the number of visits where the species of interest
 #'         was observed. If any of the models encountered an error this will be given in the
-#'         column \code{error_message}.\cr
+#'         column \code{error_message}. If model do encounter errors the the values for most
+#'         columns will be \code{NA}\cr
 #'         
 #'         The data.frame has a number of attributes:
 #'         \itemize{
@@ -84,13 +87,13 @@
 #'             18, 717-725.
 
 reportingRateModel <- function(taxa, site, time_period, list_length = FALSE, site_effect = FALSE,
-                               overdispersion = FALSE, verbose = FALSE, family = 'Binomial',
-                               print_progress = FALSE){
+                               species_to_include = unique(taxa), overdispersion = FALSE,
+                               verbose = FALSE, family = 'Binomial', print_progress = FALSE) {
   
   # Do error checks
   errorChecks(taxa = taxa, site = site, time_period = time_period, list_length = list_length,
               site_effect = site_effect, overdispersion = overdispersion, verbose = verbose,
-              family = family)
+              family = family, species_to_include = species_to_include)
   
   # Create dataframe from vectors
   taxa_data <- distinct(data.frame(taxa, site, time_period))
@@ -118,27 +121,35 @@ reportingRateModel <- function(taxa, site, time_period, list_length = FALSE, sit
                                   site_effect,
                                   overdispersion)
   
-  counter <- data.frame(species = sort(unique(taxa_data$taxa)),
-                        count = 1:length(sort(unique(taxa_data$taxa))))
+  counter <- data.frame(species = species_to_include,
+                        count = 1:length(species_to_include))
     
   # Run an apply across all species which undertakes the modelling
-  all_coefs <- lapply(sort(unique(taxa_data$taxa)), function(species_name){ # the sort ensures species are done in order
+  all_coefs <- lapply(species_to_include, function(species_name){ # the sort ensures species are done in order
     
     if(print_progress) cat('Modelling', species_name, '- Species', 
                            counter$count[counter$species == species_name],
-                           'of',length(unique(taxa_data$taxa)), '\n')
+                           'of',length(species_to_include), '\n')
     
-    ii_coefs <- RR_model_func(taxa_data,
-                              species_name,
-                              space_time,
-                              overdispersion,
-                              verbose,
-                              site_effect,
-                              list_length,
-                              model_formula,
-                              family)
-  
-    return(as.data.frame(ii_coefs))
+    if(species_name %in% unique(taxa_data$taxa)){
+      
+      ii_coefs <- RR_model_func(taxa_data,
+                                species_name,
+                                space_time,
+                                overdispersion,
+                                verbose,
+                                site_effect,
+                                list_length,
+                                model_formula,
+                                family)
+    
+      return(as.data.frame(ii_coefs))
+      
+    } else {
+      
+      return(NULL)
+      
+    }
     
   })
       
