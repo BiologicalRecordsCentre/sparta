@@ -64,9 +64,8 @@ This function is a wrapper for \code{siteSelection} and \code{reportingRateModel
 allows users the run a well sampled sites analysis as in Roy et al (2012).
 }
 \examples{
-\dontrun{
 # Create data
-n <- 150 #size of dataset
+n <- 1500 #size of dataset
 nyr <- 8 # number of years in data
 nSamples <- 20 # set number of dates
 
@@ -88,17 +87,17 @@ time_period <- sample(rDates, size = n, TRUE)
 # combine this to a dataframe
 df <- data.frame(taxa, site, time_period)
 
-results <- WSS2(df$taxa,
+results <- WSS(df$taxa,
                 df$site,
                 df$time_period,
                 minL = 4,
-                minTP = 3)
+                minTP = 3,
+                species_to_include = c('a', 'b', 'c'))
 
 # Look at the results for the first few species
 head(results)
 # Look at the attributes of the object returned
 attributes(results)
-}
 }
 \references{
 Roy, H.E., Adriaens, T., Isaac, N.J.B. et al. (2012) Invasive alien predator

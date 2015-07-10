@@ -9,7 +9,7 @@ modelBuilder <- function(taxa_data, species_name, space_time,
   
     
   # Get data for just this species as 0 and 1 against visits
-  y <- subset(taxa_data, taxa == species_name)
+  y <- taxa_data[taxa_data$taxa == species_name, ]
   spDat <- merge(x = space_time, y = y, all.x = T, all.y = F)
   spDat$taxa <- as.character(spDat$taxa)
   spDat$taxa[is.na(spDat$taxa)] <- 0
@@ -21,11 +21,14 @@ modelBuilder <- function(taxa_data, species_name, space_time,
 
   if(!list_length){
     # Summarise each site~year as a row
-    MMdata <- dcast(spDat, year + site ~ ., fun = length, value.var = 'listLength') #how many lists for each year?
+    MMdata <- dcast(spDat, year + site ~ ., fun.aggregate = length,
+                    value.var = 'listLength') #how many lists for each year?
     # This has created a number of visits column
     names(MMdata)[ncol(MMdata)] <- 'nVis'  
     # Number of successful visits for our species
-    MMdata$successes <- as.numeric(acast(spDat, year + site ~ ., fun = sum, value.var='taxa'))
+    MMdata$successes <- as.numeric(acast(spDat, year + site ~ .,
+                                         fun.aggregate = sum,
+                                         value.var='taxa'))
     # Number of unsuccessful visits for our species
     MMdata$failures <- with(MMdata, nVis - successes)
     # Add data for overdispersion

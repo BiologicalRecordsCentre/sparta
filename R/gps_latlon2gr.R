@@ -12,17 +12,14 @@
 #'        reference is returned
 #' @return A dataframe of results are returned
 #' @keywords mapping latitude longitude grid-reference
+#' @export
 #' @examples
 #' 
-#' gps_latlon2gr(51.60233,-1.111254)
+#' gps_latlon2gr(51.60233, -1.111254)
 
 gps_latlon2gr <-
 function(latitude, longitude, out_projection = "OSGB", return_type = "both"){
-  
-  #Load data needed
-  data(datum_vars)
-  data(helmert_trans_vars)
-  
+
   # Determine number of coordinates
   n_coords = length(latitude)
   # Check lengths are the same if not stop

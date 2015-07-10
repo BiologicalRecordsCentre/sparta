@@ -99,7 +99,8 @@ reportingRateModel <- function(taxa, site, time_period, list_length = FALSE, sit
   taxa_data <- distinct(data.frame(taxa, site, time_period))
   
   # Reshape the data so that it is suitable for model
-  space_time <- dcast(taxa_data, time_period + site ~ ., value.var='taxa', fun = function(x) length(unique(x)))
+  space_time <- dcast(taxa_data, time_period + site ~ ., value.var='taxa',
+                      fun.aggregate = function(x) length(unique(x)))
   names(space_time)[ncol(space_time)] <- 'listLength'
   
   # time_period could be a numeric or a date. If it is a date extract the year

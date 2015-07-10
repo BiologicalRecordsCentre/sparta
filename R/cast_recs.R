@@ -6,9 +6,11 @@ function(records, resolution='visit'){
   #6 December: minor alterations to make it work with nonfocal species
     
   if(resolution=='visit'){
-    castrecs <- dcast(records, Date + kmsq ~ ., value.var='CONCEPT', fun=LenUniq)
+    castrecs <- dcast(records, Date + kmsq ~ ., value.var='CONCEPT',
+                      fun.aggregate = LenUniq)
   } else if(resolution=='kmyr'){
-    castrecs <- dcast(records, year + kmsq ~ ., value.var='CONCEPT', fun=LenUniq)
+    castrecs <- dcast(records, year + kmsq ~ ., value.var='CONCEPT',
+                      fun.aggregate = LenUniq)
   }
   
   names(castrecs)[ncol(castrecs)] <- 'L'

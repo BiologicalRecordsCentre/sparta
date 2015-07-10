@@ -1,13 +1,15 @@
-plot.frescalo<-function(x){
+#' @import ggplot2
+#' @method plot frescalo
+#' @export
+
+plot.frescalo <- function(x, y = NULL, ...){
   
-  options(device = "windows") #this a is fix for windows for Rstudio's 1 device rule
+  #options(device = "windows") #this a is fix for windows for Rstudio's 1 device rule
   
   if('lm_stats' %in% names(x)) lm_stats<-x$lm_stats
   stats<-x$stat
-  
-  if(!exists('UK')) data(UK)
-    
-  dev.new()
+
+  #dev.new()
   
   # Setup outer margin area
   par(oma = c(1,1,1,1))
@@ -26,7 +28,7 @@ plot.frescalo<-function(x){
   map_data_R(gridrefs = stats$Location, attribute = stats$Spnum_out, breaks = cat_breaks(stats$Spnum_out, n_cat = 10, whole_breaks = TRUE), show.axis = FALSE, show.grid = FALSE, legend_pos = "topleft",leg_cex = 0.7,  sq_border = NA, bg.col = NULL,shape_data = UK, xlab='',ylab='')
   mtext("(b) Rescaled No. Species", adj = 0.05, font = 1, cex = 0.7)
   
-  # Alpha (Derivied Breaks)
+  # Alpha (Derivied Breaks) 
   
   map_data_R(gridrefs = stats$Location, attribute = stats$Alpha, breaks = cat_breaks(stats$Alpha, n_cat = 10, whole_breaks = FALSE, rnd_digits = 2), show.axis = FALSE, show.grid = FALSE, legend_pos = "topleft", leg_cex = 0.7,  sq_border = NA, bg.col = NULL,shape_data = UK, xlab='',ylab='')
   mtext("(c) Alpha (Derived Breaks)", adj = 0.05, font = 1, cex = 0.7)

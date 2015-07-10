@@ -205,8 +205,11 @@ function(
 		invisible(file.copy(from = file.path(exe_dir, c(fres_f_log, fres_f_stat, fres_f_freq, fres_f_trend)), to = file.path(fres_sub_dir["OUTPUT"], c(fres_f_log, fres_f_stat, fres_f_freq, fres_f_trend)), overwrite = TRUE ))
 	
   # Read in output to return
-		capture.output(read_frescalo(stat_path = file.path(fres_sub_dir["OUTPUT"], fres_f_stat), trend_path = file.path(fres_sub_dir["OUTPUT"], fres_f_trend), freq_path = file.path(fres_sub_dir["OUTPUT"], fres_f_freq)),file='NUL')
-        
+		read_in <- read_frescalo(stat_path = file.path(fres_sub_dir["OUTPUT"], fres_f_stat), trend_path = file.path(fres_sub_dir["OUTPUT"], fres_f_trend), freq_path = file.path(fres_sub_dir["OUTPUT"], fres_f_freq))
+    trend <- read_in$trend
+    freq <- read_in$freq
+    stats <- read_in$stats
+    
 	# Run alloneplots to create maps etc
 	if(Plot){
 		# Print progress to screen

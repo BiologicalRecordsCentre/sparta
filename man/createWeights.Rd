@@ -41,17 +41,38 @@ from which to calculate similarity (for example, landcover or abiotic data)
 }
 \examples{
 \dontrun{
-library(sparta)
 
-# Load example distance and similarity data
-data(sim)
-data(dist)
+mySites <- paste('Site_', 1:100, sep = '')
+
+# Build a table of distances
+myDistances <- merge(mySites, mySites)
+
+# add random distances
+myDistances$dist <- runif(n = nrow(myDistances), min = 10, max = 10000)
+
+# to be realistic the distance from a site to itself should be 0
+myDistances$dist[myDistances$x == myDistances$y] <- 0
+
+# Build a table of attributes
+myHabitatData <- data.frame(site = mySites,
+                            grassland = runif(length(mySites), 0, 1),
+                            woodland = runif(length(mySites), 0, 1),
+                            heathland = runif(length(mySites), 0, 1),
+                            urban = runif(length(mySites), 0, 1),
+                            freshwater = runif(length(mySites), 0, 1))
+
+# This pretend data is supposed to be proportional cover so lets
+# make sure each row sums to 1
+multiples <- apply(myHabitatData[,2:6], 1, sum)
+for(i in 1:length(mySites)){
+  myHabitatData[i,2:6] <- myHabitatData[i,2:6]/multiples[i]
+}
 
 # Create the weights file
-weights <- createWeights(distances=dist,
-                          attributes=sim,
-                          dist_sub=20,
-                          sim_sub=10)
+weights <- createWeights(distances = myDistances,
+                          attributes = myHabitatData,
+                          dist_sub = 20,
+                          sim_sub = 10)
 }
 }
 \references{

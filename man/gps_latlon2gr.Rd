@@ -27,7 +27,7 @@ A dataframe of results are returned
 Coverts latitude and longitude to a grid reference and/or easting and northing.
 }
 \examples{
-gps_latlon2gr(51.60233,-1.111254)
+gps_latlon2gr(51.60233, -1.111254)
 }
 \keyword{grid-reference}
 \keyword{latitude}

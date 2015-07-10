@@ -1,10 +1,10 @@
 #' @method summary frescalo
 #' @export
 
-summary.frescalo<-function(x){
+summary.frescalo<-function(object, ...){
   
-  start <- grep('Actual numbers in data',x$log)
-  end <- grep('Filter locations included',x$log)
-  cat(paste(x$log[start:end],'\n'))
+  start <- grep('Actual numbers in data',object$log)
+  end <- grep('Filter locations included',object$log)
+  cat(paste(object$log[start:end],'\n'))
   
 }

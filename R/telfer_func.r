@@ -86,7 +86,7 @@ telfer_func <- function (taxa_data, iterations = 10, useIterations = TRUE, minSi
       inv_sq_V <- 1 / (V_^2)										
       
       # run the new model weighting by the inverse variance identifeid above.
-      error <- try(m4 <- lm(sq_residual_m1 ~ NP_test, weight = inv_sq_V, data = spp_table), silent = TRUE)
+      error <- try(m4 <- lm(sq_residual_m1 ~ NP_test, weights = inv_sq_V, data = spp_table), silent = TRUE)
       if(class(error) == 'try-error') stop('Model failed in iteration, too little data?')
       
       c_ <- coef(m4)[1] # take the intercept of the new model
@@ -102,7 +102,7 @@ telfer_func <- function (taxa_data, iterations = 10, useIterations = TRUE, minSi
     # take the reciprocal of the "settled" variance (Telfer et al 2002)
     spp_table$recip_V <- 1 / V_  										
     # use the reciprocal of the "settled" variance as weight for the final model.
-    m1 <- lm(T2_logit_range ~ T1_logit_range, weight = recip_V, data = spp_table)
+    m1 <- lm(T2_logit_range ~ T1_logit_range, weights = spp_table$recip_V, data = spp_table)
     # take the standardised residuals from the model.
     # For each taxa, the standardised residual from the fitted regression line provides
     # the index of relative change in range size. A taxa with a negative change index has

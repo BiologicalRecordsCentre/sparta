@@ -22,44 +22,36 @@ unpack_fres_weights <- function(Fres_weights, frespath){
     if(Fres_weights=='LCUK'){
       Fres_weights_name<-'UK_LC_Wts.txt'
       if(!file.exists(paste(dirname(frespath),'/UK_LC_Wts.txt',sep=''))){
-        data(UK_LC_Wts)
         write.table(UK_LC_Wts,file=paste(dirname(frespath),'/UK_LC_Wts.txt',sep=''),row.names=FALSE,col.names=FALSE,quote=FALSE) 
         Fres_weights_out <- fixedtoDF(UK_LC_Wts)
       } else {
-        data(UK_LC_Wts)
         Fres_weights_out <- fixedtoDF(UK_LC_Wts)
       }
     }      
     if(Fres_weights=='LCGB'){
       Fres_weights_name<-'GB_LC_Wts.txt'
       if(!file.exists(paste(dirname(frespath),'/GB_LC_Wts.txt',sep=''))){
-        data(GB_LC_Wts)
         write.table(GB_LC_Wts, file = paste(dirname(frespath), '/GB_LC_Wts.txt', sep = ''), row.names=FALSE,col.names=FALSE,quote=FALSE) 
         Fres_weights_out <- fixedtoDF(GB_LC_Wts)
       } else {
-        data(GB_LC_Wts)
         Fres_weights_out <- fixedtoDF(GB_LC_Wts)
       } 
     }
     if(Fres_weights=='LCNI'){
       Fres_weights_name<-'NI_LC_Wts.txt'
       if(!file.exists(paste(dirname(frespath),'/NI_LC_Wts.txt',sep=''))){
-        data(NI_LC_Wts)
         write.table(NI_LC_Wts,file=paste(dirname(frespath),'/NI_LC_Wts.txt',sep=''),row.names=FALSE,col.names=FALSE,quote=FALSE) 
         Fres_weights_out <- fixedtoDF(NI_LC_Wts)
       } else {
-        data(NI_LC_Wts)
         Fres_weights_out <- fixedtoDF(NI_LC_Wts)
       }
     }
     if(Fres_weights == 'VP'){
       Fres_weights_name <- 'Wts.txt' 
       if(!file.exists(paste(dirname(frespath), '/Wts.txt', sep = ''))){
-        data(Wts)
         write.table(Wts, file = paste(dirname(frespath),'/Wts.txt', sep = ''), row.names = FALSE,col.names=FALSE,quote=FALSE)             
         Fres_weights_out <- fixedtoDF(Wts)
       } else {
-        data(Wts)
         Fres_weights_out <- fixedtoDF(Wts)
       }
     }

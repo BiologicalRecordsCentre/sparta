@@ -48,9 +48,8 @@
 #'             18, 717-725.
 #' @export
 #' @examples
-#' \dontrun{
 #' # Create data
-#' n <- 150 #size of dataset
+#' n <- 1500 #size of dataset
 #' nyr <- 8 # number of years in data
 #' nSamples <- 20 # set number of dates
 #' 
@@ -72,17 +71,17 @@
 #' # combine this to a dataframe
 #' df <- data.frame(taxa, site, time_period)
 #' 
-#' results <- WSS2(df$taxa,
+#' results <- WSS(df$taxa,
 #'                 df$site,
 #'                 df$time_period,
 #'                 minL = 4,
-#'                 minTP = 3)
+#'                 minTP = 3,
+#'                 species_to_include = c('a', 'b', 'c'))
 #' 
 #' # Look at the results for the first few species
 #' head(results)
 #' # Look at the attributes of the object returned
 #' attributes(results)
-#' }
 
 WSS <- function(taxa, site, time_period, minL = 2, minTP = 3,
                 species_to_include = unique(taxa),

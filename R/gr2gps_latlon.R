@@ -11,6 +11,7 @@
 #'        else if \code{FALSE} the coordinates for the bottom left corner are given. 
 #' @return A dataframe of results are returned
 #' @keywords mapping latitude longitude grid-reference
+#' @export 
 #' @examples
 #' 
 #' gr2gps_latlon('SU616896')
@@ -18,9 +19,6 @@
 gr2gps_latlon <-
 function(gridref, precision = NULL, projection = 'OSGB', centre = TRUE){
   
-  # NOTE FOR UTM30 gridrefs then no need to use helmert transformation as lat long are already in correct projection
-  data(datum_vars)
-  data(helmert_trans_vars)
   # Setup up variable to hold final output
   out_latlon = data.frame(LATITUDE = rep(NA, length(gridref)), LONGITUDE = rep(NA, length(gridref)))
   

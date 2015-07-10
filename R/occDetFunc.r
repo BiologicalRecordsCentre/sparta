@@ -66,6 +66,7 @@
 #' }
 #' @export
 #' @importFrom reshape2 acast
+#' @importFrom R2jags jags
 
 occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 3,
                         burnin = 1500, thinning = 3, n_chains = 3, write_results = TRUE,

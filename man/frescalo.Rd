@@ -174,19 +174,16 @@ returned object gives a useful summary.
 }
 \examples{
 \dontrun{
-# Load the library
-library(sparta)
-
 # Load data
-data(ex_dat)
+data(unicorns)
 
 # Run frescalo (data is save to the working directory as sinkdir is not given)
-fres_out<-frescalo(Data=ex_dat,
-                   time_periods=data.frame(start=c(1980,1990),end=c(1989,1999)),
-                   site_col='hectad',
-                   sp_col='CONCEPT',
-                   start_col='TO_STARTDATE',
-                   end_col='Date')
+fres_out <- frescalo(Data = unicorns,
+                     time_periods = data.frame(start=c(1980,1990),end=c(1989,1999)),
+                     site_col = 'hectad',
+                     sp_col = 'CONCEPT',
+                     start_col = 'TO_STARTDATE',
+                     end_col = 'Date')
 }
 }
 \references{

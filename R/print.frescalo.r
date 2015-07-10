@@ -1,7 +1,7 @@
 #' @method print frescalo
 #' @export
 
-print.frescalo<-function(x){
+print.frescalo<-function(x, ...){
   
   elements<-names(x)
   if('lm_stats' %in% elements){

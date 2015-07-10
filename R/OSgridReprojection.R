@@ -1,7 +1,6 @@
 OSgridReprojection <-
 function(Easting, Northing, org_grid = "OSNI", out_grid = "OSGB", full_output = FALSE){
-	data(datum_vars)
-  
+
   # Determine length of easting and check same as northing
 		len_east = length(Easting)
 		if(length(Northing) != len_east){

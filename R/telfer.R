@@ -20,12 +20,13 @@
 #' @examples
 #' 
 #' # Create fake data
-#' SS <- 1000 # number of observations
+#' SS <- 5000 # number of observations
 #' taxa <- sample(letters, SS, replace = TRUE)
 #' site <- sample(paste('A', 1:20, sep = ''), SS, replace = TRUE)
 #' time_period <- sample(1:3, SS, replace = TRUE)
 #' 
 #' TelferResult <- telfer(taxa, site, time_period)
+#' head(TelferResult)
 #' 
 #' @export
 #' @references Telfer, M.G., Preston, C.D., & Rothery, P. (2002) A general method for

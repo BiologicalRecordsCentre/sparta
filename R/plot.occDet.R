@@ -19,9 +19,11 @@ plot.occDet <- function(x, y = NULL, ...){
   
   ### plot the yearly predicted proportion of occupied sites ###
   # plot with error bars based on 95CI
-  ggplot(new_data, aes(x = year, y = mean), ...) + 
+  ggplot(new_data, aes_string(x = "year", y = "mean"), ...) + 
     theme_bw() +
-    geom_ribbon(data = new_data, aes(group = 1, ymin=quant_025, ymax=quant_975), alpha = 0.2) +
+    geom_ribbon(data = new_data,
+                aes_string(group = 1, ymin = "quant_025", ymax = "quant_975"),
+                alpha = 0.2) +
     geom_line(size=1, col="red") +
     geom_point(size=2, col="red") +
     theme(legend.position = "none") +

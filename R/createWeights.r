@@ -31,17 +31,40 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' library(sparta)
 #'
-#' # Load example distance and similarity data
-#' data(sim)
-#' data(dist)
+#  # I'm going to create some made up data
+#' mySites <- paste('Site_', 1:100, sep = '')
+#'
+#' # Build a table of distances
+#' myDistances <- merge(mySites, mySites) 
+#' 
+#' # add random distances
+#' myDistances$dist <- runif(n = nrow(myDistances), min = 10, max = 10000) 
+#'
+#' # to be realistic the distance from a site to itself should be 0
+#' myDistances$dist[myDistances$x == myDistances$y] <- 0
+#'
+#' # Build a table of attributes
+#' myHabitatData <- data.frame(site = mySites,
+#'                             grassland = runif(length(mySites), 0, 1),
+#'                             woodland = runif(length(mySites), 0, 1),
+#'                             heathland = runif(length(mySites), 0, 1),
+#'                             urban = runif(length(mySites), 0, 1),
+#'                             freshwater = runif(length(mySites), 0, 1))
+#'
+#' # This pretend data is supposed to be proportional cover so lets 
+#' # make sure each row sums to 1
+#' multiples <- apply(myHabitatData[,2:6], 1, sum)
+# 
+#' for(i in 1:length(mySites)){
+#'   myHabitatData[i,2:6] <- myHabitatData[i,2:6]/multiples[i]
+#' }
 #'
 #' # Create the weights file
-#' weights <- createWeights(distances=dist,
-#'                           attributes=sim,
-#'                           dist_sub=20,
-#'                           sim_sub=10)
+#' weights <- createWeights(distances = myDistances,
+#'                           attributes = myHabitatData,
+#'                           dist_sub = 20,
+#'                           sim_sub = 10)
 #' }
  
 createWeights<-function(distances,
@@ -109,19 +132,19 @@ createWeights<-function(distances,
   weights_list <- lapply(unique(distances[,1]), function(i){
     
     # select for target cell
-    sim_foc <- subset(sim_distance, subset = sim_distance$site1 == i)
-    dist_foc <- subset(distances, subset = distances$site1 == i)
+    sim_foc <- sim_distance[sim_distance$site1 == i, ]
+    dist_foc <- distances[distances$site1 == i, ]
     
     # For this focal cell rank all others by distance
     dist_foc$rankdist <- rank(dist_foc$distance, ties.method = "first")
     
     # Take the top 'dist_sub' closest (dist_sub defaults to 200)
-    dist_foc <- subset(dist_foc, rankdist <= dist_sub)
+    dist_foc <- dist_foc[dist_foc$rankdist <= dist_sub, ]
     
     # Of these take the 'sim_sub' top by similarity distance (sim_sub defaults to 100)
     ranks <- merge(x = dist_foc, y = sim_foc, by = c('site1', 'site2'), all.x = TRUE, all.y = FALSE)
     ranks$rankflor <- rank(ranks$similarity, ties.method = "first")
-    ranks <- subset(ranks, rankflor <= sim_sub)
+    ranks <- ranks[ranks$rankflor <= sim_sub, ]
     
     # Calculate similarity by distance and flora
     ranks$distsim <- (1 - (((ranks$rankdist - 1)^2) / (dist_sub)^2))^4

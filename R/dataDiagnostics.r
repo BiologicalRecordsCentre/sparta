@@ -82,7 +82,7 @@ dataDiagnostics <- function(taxa, site, time_period, plot = TRUE, progress_bar =
   
   # Reshape the data
   space_time <- dcast(taxa_data, time_period + site ~ ., value.var='taxa',
-                      fun = function(x) length(unique(x)))
+                      fun.aggregate = function(x) length(unique(x)))
   names(space_time)[ncol(space_time)] <- 'listLength'  
   if(progress_bar) setTxtProgressBar(pb, 9)
   

@@ -148,19 +148,16 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' # Load the library
-#' library(sparta)
-#' 
 #' # Load data
-#' data(ex_dat)
+#' data(unicorns)
 #'
 #' # Run frescalo (data is save to the working directory as sinkdir is not given)
-#' fres_out<-frescalo(Data=ex_dat,
-#'                    time_periods=data.frame(start=c(1980,1990),end=c(1989,1999)),
-#'                    site_col='hectad',
-#'                    sp_col='CONCEPT',
-#'                    start_col='TO_STARTDATE',
-#'                    end_col='Date')
+#' fres_out <- frescalo(Data = unicorns,
+#'                      time_periods = data.frame(start=c(1980,1990),end=c(1989,1999)),
+#'                      site_col = 'hectad',
+#'                      sp_col = 'CONCEPT',
+#'                      start_col = 'TO_STARTDATE',
+#'                      end_col = 'Date')
 #'}
 
 frescalo <-
@@ -218,16 +215,13 @@ frescalo <-
       sinkdir <- getwd()
     }
     
-    # Load in the map of the UK if we are plotting
-    if(plot_fres) data(UK)
-    
     # Load in the weights file and save it to the exe location    
     unpacked <- unpack_fres_weights(Fres_weights, frespath)
     Fres_weights_name <- unpacked$Fres_weights_name
     
     # check weights file and input data match (in terms of sites)
     weights_data_matchup(weights_sites = unpacked$site_names,
-                         data_sites = unique(Data[,site_col]))
+                         data_sites = unique(Data$site))
           
 
     
