@@ -65,13 +65,6 @@ occDetBUGScode <- function(){
   sumXY <- sum(sumxy[1:nyear])
   regres.psi <- (sumXY - ((sumX*sumY)/nyear))/(sumX2 - ((sumX*sumX)/nyear))
   
-  # calculate mean occupancy across the final 3 years and a second three year block 10 years earlier (e.g. 1998-2000 and 2008-2010)
-  late_sum <- sum(psi.fs[(nyear-2):nyear]) # sum the last three years of occupancy
-  mean_late <- late_sum/3  # take the mean of them
-  
-  early_sum <- sum(psi.fs[(nyear-12):(nyear-10)]) # sum the three early years of occupancy (ten years prior to late period)
-  mean_early <- early_sum/3  # take the mean of them
-  
   # Derived parameters observation model
   for (t in 1:nyear) {          
     pdet.alpha[t] <- exp(alpha.p[t])/(1 + exp(alpha.p[t])) 
