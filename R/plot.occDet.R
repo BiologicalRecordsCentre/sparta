@@ -17,19 +17,24 @@ plot.occDet <- function(x, y = NULL, ...){
   names(new_data) <- gsub("2.5%","quant_025", names(new_data))
   names(new_data) <- gsub("97.5%","quant_975", names(new_data))
   
+  # Add rhat T/F column
+  new_data$rhat_threshold[new_data$Rhat < 1.1] <- 'Good (<1.1)'
+  new_data$rhat_threshold[new_data$Rhat > 1.1] <- 'Bad (>1.1)'
+  
   ### plot the yearly predicted proportion of occupied sites ###
   # plot with error bars based on 95CI
-  ggplot(new_data, aes_string(x = "year", y = "mean"), ...) + 
+  ggplot(new_data, aes_string(x = "year", y = "mean"))+#, ...) + 
     theme_bw() +
     geom_ribbon(data = new_data,
                 aes_string(group = 1, ymin = "quant_025", ymax = "quant_975"),
                 alpha = 0.2) +
-    geom_line(size=1, col="red") +
-    geom_point(size=2, col="red") +
-    theme(legend.position = "none") +
+    geom_line(size = 1, col = "black") +
+    geom_point(size = 2, aes(col = rhat_threshold)) +
+    scale_color_manual(name = 'Rhat', values = c('red','blue')) +
     ylab("Occupancy") +
     xlab("Year") +
     scale_y_continuous(limits = c(0, 1)) +
     ggtitle(x$SPP_NAME) + 
-    theme(plot.title = element_text(lineheight=.8, face="bold"))
+    theme(plot.title = element_text(lineheight = .8, face = "bold"),
+          legend.position = 'bottom')
 }
