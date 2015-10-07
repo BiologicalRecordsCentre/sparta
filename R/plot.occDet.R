@@ -30,7 +30,7 @@ plot.occDet <- function(x, y = NULL, ...){
                 alpha = 0.2) +
     geom_line(size = 1, col = "black") +
     geom_point(size = 2, aes(col = rhat_threshold)) +
-    scale_color_manual(name = 'Rhat', values = c('red','blue')) +
+    scale_color_manual(name = 'Rhat', values = c('Bad (>1.1)' = 'red','Good (<1.1)' = 'blue')) +
     ylab("Occupancy") +
     xlab("Year") +
     scale_y_continuous(limits = c(0, 1)) +
