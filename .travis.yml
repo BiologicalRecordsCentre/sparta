@@ -8,6 +8,9 @@ before_install:
   - curl -OL https://raw.githubusercontent.com/metacran/r-builder/master/pkg-build.sh
   - chmod 755 pkg-build.sh
   - ./pkg-build.sh bootstrap
+  - sudo add-apt-repository ppa:marutter/rrutter -y
+  - sudo apt-get update
+  - sudo apt-get install r-cran-rjags
 
 install:
   - sudo apt-get install -y libv8-dev curl libcurl4-openssl-dev
