@@ -16,7 +16,7 @@ function(stat, trend, freq, spp_names = NULL, onefile = TRUE, onefile_name = NUL
 			miss_names = spp_list[!spp_list %in% spp_names[,1]]
 			# Add miss_names to spp_names
 			if(length(miss_names) > 0){
-				spp_names = rbind(spp_names, data.frame(CONCEPT = miss_names, NAME = paste("Unnamed Species (", miss_names,")", sep=""), stringsAsFactors = FALSE))
+				spp_names = rbind(spp_names, data.frame(SPECIES = miss_names, NAME = paste("Unnamed Species (", miss_names,")", sep=""), stringsAsFactors = FALSE))
 			}
 			# Remove any species from spp_names where not in dataset
 			spp_names = spp_names[spp_names[,1] %in% spp_list,]

@@ -33,7 +33,19 @@ allsites <- sort(unique(site))
 weights <- merge(allsites, allsites)
 weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 
-frespath <- "W:/PYWELL_SHARED/Pywell Projects/BRC/Tom August/R Packages/Trend analyses/frescalo_exes/Frescalo_3a_windows.exe"
+frespath <- file.path(tempdir(), 'fres.exe')
+
+if(.Platform$OS.type == "windows"){
+  download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_windows.exe',
+                destfile = frespath,
+                mode = 'wb', quiet = TRUE)
+} else if(.Platform$OS.type == "unix"){
+  download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_linux.exe',
+                destfile = frespath,
+                mode = 'wb', quiet = TRUE)
+} else{
+  stop(paste('frescalo is not supported on', .Platform$OS.type))
+}
 
 test_that("Runs without error", {
   #cat('Testing exectutable functionality\n')

@@ -51,9 +51,10 @@ telfer <- function(taxa, site, time_period, minSite = 5, useIterations = TRUE, i
     basic_temp <- telfer_func(taxa_data[taxa_data$time_period %in% TPs,], iterations = iterations,
                               useIterations = useIterations, minSite = minSite)[[1]]
     
-    colnames(basic_temp)[2] <- paste('Telfer_', TPs[1], '_', TPs[2], sep = '')
+    colnames(basic_temp)[4] <- paste('Telfer_', TPs[1], '_', TPs[2], sep = '')
+    colnames(basic_temp)[3] <- paste('Nsite_', TPs[2], sep = '')
+    colnames(basic_temp)[2] <- paste('Nsite_', TPs[1], sep = '')
     
-  
     #Add in NAs
     basic_temp <- merge(basic_temp, data.frame(taxa = sort(unique(taxa))), all = TRUE)
         

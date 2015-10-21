@@ -271,6 +271,7 @@ errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate 
   }
   
   if(!is.null(frespath)){
-    if(!file.exists(frespath)) paste(frespath, 'does not exist')
+    if(!grepl('.exe$', tolower(frespath))) stop("filepath is not the path to a '.exe' file") 
+    if(!file.exists(frespath)) stop(paste(frespath, 'does not exist'))
   }
 }

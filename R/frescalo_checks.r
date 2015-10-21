@@ -68,6 +68,8 @@ frescalo_checks <- function(site_col, sp_col, year_col, start_col, end_col,
   # remove irish and/or channel islands data if desired
   if(ignore.ireland) Data <- subset(Data, regexpr('^[A-Z]{2}', Data$site)==1)
   if(ignore.channelislands) Data <- subset(Data, grepl('^[Ww][[:alpha:]]{1}', Data$site)==FALSE)
+  # make sure there are no empty site names
+  if('' %in% unique(Data$site)) stop('Site names cannot be empty (i.e. "")')
   
   # retain only the columns we need (site, concept, timeperiod)
   # at the same time keep only unique rows

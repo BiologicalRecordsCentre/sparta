@@ -50,7 +50,7 @@ telfer_func <- function (taxa_data, iterations = 10, useIterations = TRUE, minSi
   if(!useIterations){
     
     spp_table$change_index <- rstandard(m1)
-    final_output_table <- spp_table[,c(1,9)]
+    final_output_table <- spp_table[,c(1:3,9)]
     return(list(final_output_table, spp_table))
     
   } else if(useIterations){
@@ -109,7 +109,7 @@ telfer_func <- function (taxa_data, iterations = 10, useIterations = TRUE, minSi
     # been recorded in relatively fewer grid cells in the later period, whereas a taxa with
     # a positive change index has been recorded in relatively more.  
     spp_table$change_index <- rstandard(m1)								
-    final_output_table <- spp_table[,c(1,13)]	
+    final_output_table <- spp_table[,c(1:3,13)]	
 
     return(list(final_output_table, spp_table))
     
