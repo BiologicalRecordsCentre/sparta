@@ -6,13 +6,13 @@ sudo: required
 
 before_install:
   - curl -OL https://raw.githubusercontent.com/metacran/r-builder/master/pkg-build.sh
-- chmod 755 pkg-build.sh
-- ./pkg-build.sh bootstrap
+  - chmod 755 pkg-build.sh
+  - ./pkg-build.sh bootstrap
 
 install:
   - sudo apt-get install -y libv8-dev curl libcurl4-openssl-dev
-- ./pkg-build.sh install_deps
-- ./pkg-build.sh install_r covr
+  - ./pkg-build.sh install_deps
+  - ./pkg-build.sh install_r covr
 
 script:
   - travis_wait ./pkg-build.sh run_tests
@@ -21,24 +21,26 @@ after_failure:
   - ./pkg-build.sh dump_logs
 
 after_success:
-  - ./pkg-build.sh run_script -e 'library(covr);codecov()'
+ - ./pkg-build.sh run_script -e 'library(covr);codecov()'
 
 notifications:
   email:
-  recipients:
-  - tomaug@ceh.ac.uk
-on_success: change
-on_failure: change
+    recipients:
+      - tomaug@ceh.ac.uk
+    on_success: change
+    on_failure: change
 
 env:
   matrix:
-  - RVERSION=release
-NOT_CRAN=true
-- RVERSION=release
-NOT_CRAN=false
-R_CHECK_ARGS="--as-cran"
-- RVERSION=devel
-NOT_CRAN=true
-- RVERSION=devel
-NOT_CRAN=false
-R_CHECK_ARGS="--as--cran"
+    - RVERSION=release
+      NOT_CRAN=true
+      R_CHECK_ARGS="--no-manual"
+    - RVERSION=release
+      NOT_CRAN=false
+      R_CHECK_ARGS="--no-manual --as-cran"
+    - RVERSION=devel
+      NOT_CRAN=true
+      R_CHECK_ARGS="--no-manual"
+    - RVERSION=devel
+      NOT_CRAN=false
+      R_CHECK_ARGS="--no-manual --as--cran"
