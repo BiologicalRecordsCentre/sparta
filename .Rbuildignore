@@ -1,0 +1,7 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+.RData
+README.html
+README.md
+pre_vignette
+.travis.yml
