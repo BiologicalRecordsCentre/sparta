@@ -37,11 +37,11 @@ allsites <- sort(unique(site))
 weights <- merge(allsites, allsites)
 weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 
+frespath <- file.path(tempdir(), 'fres.exe')
+
 test_that("Runs without error", {
   
   if (!capabilities('libcurl') | .Platform$OS.type != "windows") skip('skipping as libcurl not supported')
-  
-  frespath <- file.path(tempdir(), 'fres.exe')
   
   if(.Platform$OS.type == "windows"){
     download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_windows.exe',
