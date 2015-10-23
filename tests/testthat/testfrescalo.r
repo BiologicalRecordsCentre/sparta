@@ -1,6 +1,8 @@
 context("Test frescalo")
 
-if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
+### Frescalo testing is currently skipped if not on a ###
+### windows machine, or is libcurl is not supported. I###
+### need to expand testing to linux if possible.      ###
 
 # Create data
 n <- 1500 #size of dataset
@@ -35,24 +37,26 @@ allsites <- sort(unique(site))
 weights <- merge(allsites, allsites)
 weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 
-frespath <- file.path(tempdir(), 'fres.exe')
-
-if(.Platform$OS.type == "windows"){
-  download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_windows.exe',
-                destfile = frespath,
-                method = "libcurl",
-                mode = 'wb', quiet = TRUE)
-} else if(.Platform$OS.type == "unix"){
-  download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_linux.exe',
-                destfile = frespath,
-                method = "libcurl",
-                mode = 'wb', quiet = TRUE)
-} else{
-  stop(paste('frescalo is not supported on', .Platform$OS.type))
-}
-
 test_that("Runs without error", {
-  #cat('Testing exectutable functionality\n')
+  
+  if (!capabilities('libcurl') | .Platform$OS.type != "windows") skip('skipping as libcurl not supported')
+  
+  frespath <- file.path(tempdir(), 'fres.exe')
+  
+  if(.Platform$OS.type == "windows"){
+    download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_windows.exe',
+                  destfile = frespath,
+                  method = "libcurl",
+                  mode = 'wb', quiet = TRUE)
+  } else if(.Platform$OS.type == "unix"){
+    download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_linux.exe',
+                  destfile = frespath,
+                  method = "libcurl",
+                  quiet = TRUE)
+  } else{
+    stop(paste('frescalo is not supported on', .Platform$OS.type))
+  }
+  
   temp <- tempfile(pattern = 'dir')
   dir.create(temp)
   expect_error(frescalo(Data = df1,
@@ -95,7 +99,9 @@ test_that("Runs without error", {
 
 
 test_that("Runs without error", {
-
+  
+  if (!capabilities('libcurl') | .Platform$OS.type != "windows") skip('skipping as libcurl not supported')
+  
   # This first run is done using years
   temp <- tempfile(pattern = 'dir')
   dir.create(temp)
