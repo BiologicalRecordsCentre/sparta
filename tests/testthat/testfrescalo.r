@@ -1,5 +1,7 @@
 context("Test frescalo")
 
+if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
+
 # Create data
 n <- 1500 #size of dataset
 nyr <- 20 # number of years in data
@@ -38,10 +40,12 @@ frespath <- file.path(tempdir(), 'fres.exe')
 if(.Platform$OS.type == "windows"){
   download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_windows.exe',
                 destfile = frespath,
+                method = "libcurl",
                 mode = 'wb', quiet = TRUE)
 } else if(.Platform$OS.type == "unix"){
   download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_linux.exe',
                 destfile = frespath,
+                method = "libcurl",
                 mode = 'wb', quiet = TRUE)
 } else{
   stop(paste('frescalo is not supported on', .Platform$OS.type))
