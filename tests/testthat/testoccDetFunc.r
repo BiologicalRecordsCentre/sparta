@@ -35,6 +35,7 @@ test_that("Test occDetFunc errors", {
                        write_results = FALSE,
                        seed = 111),
               'must not be larger that the number of iteration')
+  
  expect_error(results <- occDetFunc(taxa_name = 'apple',
                                     n_iterations = 50,
                                     burnin = 15, 
@@ -47,9 +48,9 @@ test_that("Test occDetFunc errors", {
 
 test_that("Test occDetFunc", {
   
-  temp <- tempfile(pattern = 'dir')
-  dir.create(temp)
-  sink(file.path(temp, 'null'))
+  sink(file=ifelse(Sys.info()["sysname"] == "Windows",
+                   "NUL",
+                   "/dev/null"))
   results <- occDetFunc(taxa_name = 'a',
                         n_iterations = 50,
                         burnin = 15, 
@@ -58,18 +59,11 @@ test_that("Test occDetFunc", {
                         write_results = FALSE,
                         seed = 111)
   sink()
-  unlink(temp, recursive = TRUE)
-  
-  testComp <- structure(c(0.941666666666667, 0.857777777777778, 0.903333333333333, 
-                          0.75, 0.51, 0.986111111111111, 0.925555555555556, 0.871111111111111, 
-                          0.965, 0.796111111111111, 0.985555555555556, 0.963888888888889, 
-                          0.790555555555556, 0.975, 0.689444444444444, 0.969444444444444, 
-                          0.904444444444444, 0.680555555555556, 0.752222222222222, 0.713888888888889
-                          )
-                        , .Dim = 20L)
-  
-  expect_equal(results[['BUGSoutput']][['mean']][['psi.fs']], testComp)
+
   expect_identical(results$SPP_NAME, 'a')
   expect_identical(results$n.iter, 50)
+  expect_identical(names(results),
+                   c("model", "BUGSoutput", "parameters.to.save", "model.file", 
+                     "n.iter", "DIC", "SPP_NAME", "min_year", "max_year"))
   
 })
