@@ -1,4 +1,4 @@
-![Zoon banner](https://github.com/zoonproject/blog/blob/master/zoon_top.png)
+![Sparta banner](https://raw.githubusercontent.com/AugustT/sparta/master/logo.png)
 
 
 [![Build Status](https://travis-ci.org/BiologicalRecordsCentre/sparta.svg)](https://travis-ci.org/BiologicalRecordsCentre/sparta)
