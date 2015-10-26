@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/BiologicalRecordsCentre/sparta.svg)](https://travis-ci.org/BiologicalRecordsCentre/sparta)
+[![codecov.io](https://codecov.io/github/BiologicalRecordsCentre/sparta/coverage.svg?branch=master)](https://codecov.io/github/BiologicalRecordsCentre/sparta?branch=master)
+
 # sparta
 ========
 
