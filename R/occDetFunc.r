@@ -2,6 +2,10 @@
 #' 
 #' Run occupancy detection models using the output from \code{formatOccData}
 #' 
+#' This function requires both the R package R2jags and the program JAGS.
+#' These are not installed by default when sparta is loaded and so should be
+#' installed by the user. More details can be found in teh vignette.
+#' 
 #' @param taxa_name A character giving the name of the species to be modelled.
 #' @param occDetdata The 2nd element of the object returned by formatOccData.
 #' @param spp_vis The 1st element of the object returned by formatOccData.
@@ -66,11 +70,15 @@
 #' }
 #' @export
 #' @importFrom reshape2 acast
-#' @importFrom R2jags jags
 
 occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 3,
                         burnin = 1500, thinning = 3, n_chains = 3, write_results = TRUE,
                         output_dir = getwd(), model.file = occDetBUGScode, seed = NULL) {
+  
+  J_success <- requireNamespace("R2jags", quietly = TRUE)
+  
+  # test is R2jags installed if not error
+  if(!J_success) stop('Please install the R2jags R package. This also requires you to in stall JAGS from http://sourceforge.net/projects/mcmc-jags/files/JAGS/')
   
   errorChecks(n_iterations = n_iterations, burnin = burnin,
               thinning = thinning, n_chains = n_chains, seed = seed)
@@ -142,9 +150,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   init.vals <- replicate(n_chains, initiate(z = zst, i = init, nyear = nyear),
                          simplify = F)
   error_status <- try(    
-    out <- jags(bugs_data, init.vals, parameters, model.file = model.file,
-                n.chains = n_chains, n.iter = n_iterations, n.thin = thinning,
-                n.burnin = burnin, DIC = TRUE)
+    out <- R2jags::jags(bugs_data, init.vals, parameters, model.file = model.file,
+                        n.chains = n_chains, n.iter = n_iterations, n.thin = thinning,
+                        n.burnin = burnin, DIC = TRUE)
   )
   
   dir.create(path = output_dir, showWarnings = FALSE) # create the top results folder

@@ -2,6 +2,10 @@
 #' 
 #' Run occupancy detection models as described in Isaac et al, 2014 
 #' 
+#' This function requires both the R package R2jags and the program JAGS.
+#' These are not installed by default when sparta is loaded and so should be
+#' installed by the user. More details can be found in teh vignette.
+#' 
 #' @param taxa A character vector of taxon names, as long as the number of observations.
 #' @param site A character vector of site names, as long as the number of observations.
 #' @param time_period A numeric vector of user defined time periods, or a date vector,
@@ -82,7 +86,7 @@ occDetModel <- function(taxa, site, time_period,
   # Do we have JAGS installed - this works only on windows
   if(.Platform$OS.type == "windows"){
     JAGS_test <- Sys.which(names = 'jags-terminal.exe')
-    if(JAGS_test[[1]] == '') stop('R cannot find jags-terminal.exe, check that you have installed JAGS')
+    if(JAGS_test[[1]] == '') stop('R cannot find jags-terminal.exe, check that you have installed and loaded r-package R2jags and you have JAGS installed')
   }
   
   # reformat the data into visits
