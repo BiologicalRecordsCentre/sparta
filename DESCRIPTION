@@ -3,14 +3,28 @@ Type: Package
 Title: Trend Analysis for Unstructured Data
 Version: 0.1.30
 Date: 2015-06-05
-Author: Tom August <tomaug@ceh.ac.uk>, Gary Powney, Colin Harrower, Mark Hill, Nick Isaac
+Author: Tom August <tomaug@ceh.ac.uk>, Gary Powney, Colin Harrower, Mark Hill,
+    Nick Isaac
 Maintainer: Tom August <tomaug@ceh.ac.uk>
 Description: Methods used to analyse trends in unstructured
-             occurrence datasets such as those collected by volunteer recording
-             schemes.
+    occurrence datasets such as those collected by volunteer recording
+    schemes.
 License: MIT + file LICENSE
-Depends: R (>= 3.1.0), lme4 (>= 1.0)
-Imports: plyr, dplyr (>= 0.4.1), sp, reshape2, ggplot2, R2jags, gdata
-Suggests: testthat (>= 0.8.0), roxygen2, knitr
+Depends:
+    R (>= 3.1.0),
+    lme4 (>= 1.0)
+Imports:
+    plyr,
+    dplyr (>= 0.4.1),
+    sp,
+    reshape2,
+    ggplot2,
+    gdata
+Suggests:
+    testthat (>= 0.8.0),
+    R2jags,
+    roxygen2,
+    knitr
 VignetteBuilder: knitr
 LazyData: TRUE
+RoxygenNote: 5.0.0

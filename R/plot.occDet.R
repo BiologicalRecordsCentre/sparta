@@ -29,7 +29,7 @@ plot.occDet <- function(x, y = NULL, ...){
                 aes_string(group = 1, ymin = "quant_025", ymax = "quant_975"),
                 alpha = 0.2) +
     geom_line(size = 1, col = "black") +
-    geom_point(size = 2, aes(col = rhat_threshold)) +
+    geom_point(size = 4, aes(col = rhat_threshold)) +
     scale_color_manual(name = 'Rhat', values = c('Bad (>1.1)' = 'red','Good (<1.1)' = 'blue')) +
     ylab("Occupancy") +
     xlab("Year") +

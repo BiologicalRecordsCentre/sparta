@@ -31,6 +31,6 @@ If you have difficulties installing sparta using this method try updating your v
 ### Vignette/Tutorial
 ----------------
 
-We have written a vignette to support the package which can view [here](https://github.com/BiologicalRecordsCentre/sparta/blob/master/vignette/sparta_vignette.pdf)
+We have written a vignette to support the package which can view [here](https://github.com/BiologicalRecordsCentre/sparta/raw/master/vignettes/sparta_vignette.pdf)
 
 *PLEASE NOTE THAT SINCE THIS PACKAGE IS IN DEVELOPMENT THE STRUCTURE AND FUNCTIONALITY OF THE PACKAGE ARE LIKELY TO CHANGE OVER TIME. WE WILL TRY TO KEEP THIS FRONT PAGE AND TUTORIALS UP TO DATE SO THAT IT WORKS WITH THE CURRENT MASTER VERSION ON GITHUB*
