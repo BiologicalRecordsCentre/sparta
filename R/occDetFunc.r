@@ -115,8 +115,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   if(length(unique(occDetdata$year)) != nyear) stop('It looks like you have years with no data. This will crash BUGS')
   
   parameters <- c("fit", "fit.new", "psi.fs", "regres.psi","regres.pdet", "sigma2",
-                  "sd.lp", "mu.lp", "tau.lp", "pdet.alpha", "mean_late",
-                  "mean_early", "LL.p")
+                  "sd.lp", "mu.lp", "tau.lp", "pdet.alpha", "LL.p")
   
   yps <- rowSums(acast(occDetdata, site ~ year, length, value.var = 'L') > 0)
   sites_to_include <- names(yps[yps >= nyr])
