@@ -13,7 +13,7 @@ r_packages:
 
 ## After success update the code coverage
 after_success:
- - Rscript 'library(covr);codecov()'
+ - Rscript -e 'library(covr);codecov()'
  
 ## Email notification if the package pass status changes
 notifications:
