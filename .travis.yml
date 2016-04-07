@@ -5,14 +5,11 @@ sudo: required
 # Add rjags needed for running occupancy models
 apt_packages:
  - r-cran-rjags
-
-install:
-  - sudo apt-get install -y libv8-dev curl libcurl4-openssl-dev
-  - ./pkg-build.sh install_deps
-  - ./pkg-build.sh install_r covr
+ - libv8-dev
 
 r_packages:
   - rjags
+  - covr
 
 ## After success update the code coverage
 after_success:
