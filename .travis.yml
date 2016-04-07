@@ -23,6 +23,9 @@ notifications:
     on_success: change
     on_failure: change
 
+# Warnings dont fail build
+warnings_are_errors: false
+
 ## Set up the matrix of different runs
 env:
   matrix:
