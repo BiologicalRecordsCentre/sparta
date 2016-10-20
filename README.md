@@ -21,7 +21,7 @@ To **install** the development version of sparta, it's easiest to use the `devto
     # session before installing to avoid problems
     
     library(devtools)
-    install_github("sparta", username = 'BiologicalRecordsCentre')
+    install_github("BiologicalRecordsCentre/sparta")
     
     library(sparta)
 
