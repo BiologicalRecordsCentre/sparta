@@ -24,8 +24,8 @@ To **install** the development version of sparta, it's easiest to use the `devto
     
     # Some users have reported issues with devtools not correctly installing
     # dependencies. Run the following lines to avoid these issues
-    list.of.packages <- c("minqa", "lme4", "gtools", "gtables", "scales",
-                          "assertthat", "magrittr", "tibble", "stringrp")
+    list.of.packages <- c("minqa", "lme4", "gtools", "gtable", "scales",
+                          "assertthat", "magrittr", "tibble", "stringr")
     new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
     if(length(new.packages)) install.packages(new.packages)
     
