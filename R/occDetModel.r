@@ -24,11 +24,39 @@
 #' @param burnin numeric, An MCMC parameter - The length of the burn in
 #' @param thinning numeric, An MCMC parameter - The thinning factor
 #' @param n_chains numeric, an MCMC parameter - The number of chains to be run
-#' @param model.file optionally a user defined BUGS model coded as a function (see \code{?jags},
+#' @param model.function optionally a user defined BUGS model coded as a function (see \code{?jags},
 #'        including the example there, for how this is done)
+#' @param modeltype A character string or vector that specifies the model to use. See details. If
+#' used then model.function is ignored.
 #' @param seed numeric, uses \code{set.seed} to set the randon number seed. Setting
 #'        this number ensures repeatabl analyses
+#' @param additional.parameters A character vector of additional parameters to monitor
+#' @param additional.BUGS.elements A named list giving additioanl bugs elements passed 
+#' to \code{R2jags::jags} 'data' argument
+#' @param additional.init.values A named list giving user specified initial values to 
+#' be added to the defaults.
 #' 
+#' @details \code{modeltype} is used to choose the model as well as the initial values, and
+#' the parameter to monitor. At present this can take the following values.
+#' \itemize{
+#'  \item{\code{halfcauchy}}{Stuff}
+#'  \item{\code{inversegamma}}{Stuff}
+#'  \item{\code{intercept}}{Stuff}
+#'  \item{\code{centering}}{Stuff}
+#'  \item{\code{indran}}{Stuff}
+#'  \item{\code{ranwalk}}{Stuff}
+#'  \item{\code{indran_halfcauchy}}{Stuff}
+#'  \item{\code{indran_inversegamma}}{Stuff}
+#'  \item{\code{indran_intercept}}{Stuff}
+#'  \item{\code{indran_centering}}{Stuff}
+#'  \item{\code{ranwalk_halfcauchy}}{Stuff}
+#'  \item{\code{ranwalk_inversegamma}}{Stuff}
+#'  \item{\code{ranwalk_intercept}}{Stuff}
+#'  \item{\code{ranwalk_centering}}{Stuff}
+#'  \item{\code{indran_true}}{edited to make it a "true" random effect - possibly}
+#'  \item{\code{ranwalk_edit}}{attempted to fix first year always 0.5 issue.}
+#' }
+#'  
 #' @return A list of filepaths, one for each species run, giving the location of the
 #'         output saved as a .rdata file, containing an object called 'out'
 #'          
@@ -40,6 +68,7 @@
 #' \dontrun{
 #' 
 #' # Create data
+#' set.seed(125)
 #' n <- 15000 #size of dataset
 #' nyr <- 20 # number of years in data
 #' nSamples <- 100 # set number of dates
@@ -61,14 +90,27 @@
 #' time_period <- sample(rDates, size = n, TRUE)
 #'
 #' # run the model with these data for one species
+#' # using defaults
 #' results <- occDetModel(taxa = taxa,
 #'                        site = site,
 #'                        time_period = time_period,
-#'                        species_list = c('a','m','g'),
+#'                        species_list = 'a',
 #'                        write_results = FALSE,
 #'                        n_iterations = 1000,
 #'                        burnin = 10,
 #'                        thinning = 2)
+#'                        
+#' # run with a different model type
+#' results <- occDetModel(taxa = taxa,
+#'                        site = site,
+#'                        time_period = time_period,
+#'                        species_list = 'a',
+#'                        write_results = FALSE,
+#'                        n_iterations = 1000,
+#'                        burnin = 10,
+#'                        thinning = 2,
+#'                        seed = 125, 
+#'                        modeltype = c("indran", "intercept"))
 #' }
 #' @export
 #' @references Roy, H.E., Adriaens, T., Isaac, N.J.B. et al. (2012) Invasive alien predator
@@ -79,7 +121,10 @@ occDetModel <- function(taxa, site, time_period,
                         species_list = unique(taxa), write_results = TRUE,
                         output_dir = getwd(), nyr = 3, n_iterations = 5000,
                         burnin = 1500, thinning = 3, n_chains = 3, 
-                        model.file = occDetBUGScode, seed = NULL){
+                        modeltype = 'sparta', model.function = NULL,
+                        seed = NULL, additional.parameters = NULL,
+                        additional.BUGS.elements = NULL,
+                        additional.init.values = NULL){
  
   # Error checking done in lower functions
     
@@ -89,8 +134,13 @@ occDetModel <- function(taxa, site, time_period,
     if(JAGS_test[[1]] == '') stop('R cannot find jags-terminal.exe, check that you have installed and loaded r-package R2jags and you have JAGS installed')
   }
   
+  includeJDay <- ifelse('jul_date' %in% tolower(modeltype), TRUE, FALSE)
+  
   # reformat the data into visits
-  visitData <- formatOccData(taxa = taxa, site = site, time_period = time_period)
+  visitData <- formatOccData(taxa = taxa,
+                             site = site,
+                             time_period = time_period,
+                             includeJDay = includeJDay)
   
   ### loop through the species list running the Bayesian occupancy model function ###
   output <- list()
@@ -98,16 +148,21 @@ occDetModel <- function(taxa, site, time_period,
     cat('\n###\nModeling', taxa_name, '-', grep(taxa_name, species_list),
         'of', length(species_list), 'taxa\n' )
     output[[taxa_name]] <- occDetFunc(taxa_name = taxa_name,
-                                    occDetdata = visitData$occDetdata,
-                                    spp_vis = visitData$spp_vis,
-                                    n_iterations = n_iterations,
-                                    burnin = burnin,
-                                    thinning = thinning,
-                                    n_chains = n_chains,
-                                    write_results = write_results,
-                                    output_dir = output_dir,
-                                    nyr = nyr,
-                                    seed = seed)
+                                      occDetdata = visitData$occDetdata,
+                                      spp_vis = visitData$spp_vis,
+                                      n_iterations = n_iterations,
+                                      burnin = burnin,
+                                      thinning = thinning,
+                                      n_chains = n_chains,
+                                      write_results = write_results,
+                                      output_dir = output_dir,
+                                      nyr = nyr,
+                                      modeltype = modeltype,
+                                      model.function = model.function,
+                                      seed = seed,
+                                      additional.parameters = additional.parameters,
+                                      additional.BUGS.elements = additional.BUGS.elements,
+                                      additional.init.values = additional.init.values)
   }
   
   return(output)

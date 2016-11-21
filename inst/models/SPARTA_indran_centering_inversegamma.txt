@@ -1,0 +1,62 @@
+# JAGS code for SPARTA model plus independent random effect prior
+# on the state model year effect + centering + inversegamma hyperpriors
+
+# State model
+for (i in 1:nsite){ 
+  for (t in 1:nyear){   
+    z[i,t] ~ dbern(muZ[i,t]) 
+    logit(muZ[i,t])<- a[t] + eta[i] 
+  }}   
+
+# State model priors
+eta.psi0 <- log(psi0/(1-psi0))
+psi0 ~ dbeta(psi0.a, psi0.b)
+for(t in 1:nyear){
+a[t] ~ dnorm(eta.psi0, tau.a)
+}
+
+tau.a ~ dgamma(0.001, 0.001)
+sd.a <- pow(tau.a, -0.5)
+
+for (i in 1:nsite) {
+  eta[i] ~ dnorm(0, tau2)       
+} 
+
+tau2 ~ dgamma(0.001, 0.001)
+sigma2 <- pow(tau2, -0.5)
+
+
+# Observation model priors
+eta.p0 <- log(p0/(1-p0))
+p0 ~ dbeta(p0.a, p0.b)
+
+for (t in 1:nyear) {
+  alpha.p[t] ~ dnorm(eta.p0, tau.lp)            
+}
+                      
+tau.lp ~ dgamma(0.001, 0.001)
+sigma.lp <- pow(tau.lp, -0.5)   
+
+# Derived parameters
+for (t in 1:nyear) {  
+  psi.fs[t] <- sum(z[1:nsite,t])/nsite
+} 
+
+# Overall trend in occupuancy
+sumY <- sum(psi.fs[1:nyear])
+for (t in 1:nyear) {
+  sumxy[t] <- psi.fs[t]*t
+}
+sumXY <- sum(sumxy[1:nyear])
+regres.psi <- (sumXY - ((sumX*sumY)/nyear))/(sumX2 - ((sumX*sumX)/nyear))
+# Derived parameters observation model
+for (t in 1:nyear) {          
+  pdet.alpha[t] <- exp(alpha.p[t])/(1 + exp(alpha.p[t])) 
+}
+# overall trend in pdet.alpha
+sumYpdet <- sum(pdet.alpha[1:nyear])  
+for (t in 1:nyear) {          
+  sumxypdet[t] <- pdet.alpha[t]*t
+}
+sumXYpdet <- sum(sumxypdet[1:nyear])
+regres.pdet <- (sumXYpdet - ((sumX*sumYpdet)/nyear))/(sumX2 - ((sumX*sumX)/nyear))

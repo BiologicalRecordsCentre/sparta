@@ -7,7 +7,9 @@
 occDetModel(taxa, site, time_period, species_list = unique(taxa),
   write_results = TRUE, output_dir = getwd(), nyr = 3,
   n_iterations = 5000, burnin = 1500, thinning = 3, n_chains = 3,
-  model.file = occDetBUGScode, seed = NULL)
+  modeltype = "sparta", model.function = NULL, seed = NULL,
+  additional.parameters = NULL, additional.BUGS.elements = NULL,
+  additional.init.values = NULL)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}
@@ -39,11 +41,22 @@ to be included in the models}
 
 \item{n_chains}{numeric, an MCMC parameter - The number of chains to be run}
 
-\item{model.file}{optionally a user defined BUGS model coded as a function (see \code{?jags},
+\item{modeltype}{A character string or vector that specifies the model to use. See details. If
+used then model.function is ignored.}
+
+\item{model.function}{optionally a user defined BUGS model coded as a function (see \code{?jags},
 including the example there, for how this is done)}
 
 \item{seed}{numeric, uses \code{set.seed} to set the randon number seed. Setting
 this number ensures repeatabl analyses}
+
+\item{additional.parameters}{A character vector of additional parameters to monitor}
+
+\item{additional.BUGS.elements}{A named list giving additioanl bugs elements passed 
+to \code{R2jags::jags} 'data' argument}
+
+\item{additional.init.values}{A named list giving user specified initial values to 
+be added to the defaults.}
 }
 \value{
 A list of filepaths, one for each species run, giving the location of the
@@ -56,11 +69,33 @@ Run occupancy detection models as described in Isaac et al, 2014
 This function requires both the R package R2jags and the program JAGS.
 These are not installed by default when sparta is loaded and so should be
 installed by the user. More details can be found in teh vignette.
+
+\code{modeltype} is used to choose the model as well as the initial values, and
+the parameter to monitor. At present this can take the following values.
+\itemize{
+ \item{\code{halfcauchy}}{Stuff}
+ \item{\code{inversegamma}}{Stuff}
+ \item{\code{intercept}}{Stuff}
+ \item{\code{centering}}{Stuff}
+ \item{\code{indran}}{Stuff}
+ \item{\code{ranwalk}}{Stuff}
+ \item{\code{indran_halfcauchy}}{Stuff}
+ \item{\code{indran_inversegamma}}{Stuff}
+ \item{\code{indran_intercept}}{Stuff}
+ \item{\code{indran_centering}}{Stuff}
+ \item{\code{ranwalk_halfcauchy}}{Stuff}
+ \item{\code{ranwalk_inversegamma}}{Stuff}
+ \item{\code{ranwalk_intercept}}{Stuff}
+ \item{\code{ranwalk_centering}}{Stuff}
+ \item{\code{indran_true}}{edited to make it a "true" random effect - possibly}
+ \item{\code{ranwalk_edit}}{attempted to fix first year always 0.5 issue.}
+}
 }
 \examples{
 \dontrun{
 
 # Create data
+set.seed(125)
 n <- 15000 #size of dataset
 nyr <- 20 # number of years in data
 nSamples <- 100 # set number of dates
@@ -82,14 +117,27 @@ site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 time_period <- sample(rDates, size = n, TRUE)
 
 # run the model with these data for one species
+# using defaults
 results <- occDetModel(taxa = taxa,
                        site = site,
                        time_period = time_period,
-                       species_list = c('a','m','g'),
+                       species_list = 'a',
                        write_results = FALSE,
                        n_iterations = 1000,
                        burnin = 10,
                        thinning = 2)
+                       
+# run with a different model type
+results <- occDetModel(taxa = taxa,
+                       site = site,
+                       time_period = time_period,
+                       species_list = 'a',
+                       write_results = FALSE,
+                       n_iterations = 1000,
+                       burnin = 10,
+                       thinning = 2,
+                       seed = 125, 
+                       modeltype = c("indran", "intercept"))
 }
 }
 \references{

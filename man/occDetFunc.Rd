@@ -4,9 +4,11 @@
 \alias{occDetFunc}
 \title{Occupancy detection Function}
 \usage{
-occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 3,
+occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 2,
   burnin = 1500, thinning = 3, n_chains = 3, write_results = TRUE,
-  output_dir = getwd(), model.file = occDetBUGScode, seed = NULL)
+  output_dir = getwd(), modeltype = "sparta", seed = NULL,
+  model.function = NULL, additional.parameters = NULL,
+  additional.BUGS.elements = NULL, additional.init.values = NULL)
 }
 \arguments{
 \item{taxa_name}{A character giving the name of the species to be modelled.}
@@ -18,7 +20,7 @@ occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 3,
 \item{n_iterations}{numeric, An MCMC parameter - The number of interations}
 
 \item{nyr}{numeric, the minimum number of years on which a site must have records for it
-to be included in the models}
+to be included in the models. Defaults to 2}
 
 \item{burnin}{numeric, An MCMC parameter - The length of the burn in}
 
@@ -34,11 +36,22 @@ has run. This prevents loss of data should anything go wrong.}
 \item{output_dir}{character, the output directory were the output for each taxa will be saved
 as .rdata files. This will defualt to the working directory}
 
-\item{model.file}{optionally a user defined BUGS model coded as a function (see \code{?jags},
-including the example there, for how this is done)}
+\item{modeltype}{A character string that specifies the model to use. See details. If
+used then model.function is ignored.}
 
 \item{seed}{numeric, uses \code{set.seed} to set the randon number seed. Setting
 this number ensures repeatabl analyses}
+
+\item{model.function}{optionally a user defined BUGS model coded as a function (see \code{?jags},
+including the example there, for how this is done)}
+
+\item{additional.parameters}{A character vector of additional parameters to monitor}
+
+\item{additional.BUGS.elements}{A named list giving additioanl bugs elements passed 
+to \code{R2jags::jags} 'data' argument}
+
+\item{additional.init.values}{A named list giving user specified initial values to 
+be added to teh defaults.}
 }
 \value{
 A list of filepaths, one for each species run, giving the location of the
@@ -51,6 +64,27 @@ Run occupancy detection models using the output from \code{formatOccData}
 This function requires both the R package R2jags and the program JAGS.
 These are not installed by default when sparta is loaded and so should be
 installed by the user. More details can be found in teh vignette.
+
+\code{modeltype} is used to choose the model as well as the initial values, and
+the parameter to monitor. At present this can take the following values.
+\itemize{
+ \item{\code{halfcauchy}}{Stuff}
+ \item{\code{inversegamma}}{Stuff}
+ \item{\code{intercept}}{Stuff}
+ \item{\code{centering}}{Stuff}
+ \item{\code{indran}}{Stuff}
+ \item{\code{ranwalk}}{Stuff}
+ \item{\code{indran_halfcauchy}}{Stuff}
+ \item{\code{indran_inversegamma}}{Stuff}
+ \item{\code{indran_intercept}}{Stuff}
+ \item{\code{indran_centering}}{Stuff}
+ \item{\code{ranwalk_halfcauchy}}{Stuff}
+ \item{\code{ranwalk_inversegamma}}{Stuff}
+ \item{\code{ranwalk_intercept}}{Stuff}
+ \item{\code{ranwalk_centering}}{Stuff}
+ \item{\code{indran_true}}{edited to make it a "true" random effect - possibly}
+ \item{\code{ranwalk_edit}}{attempted to fix first year always 0.5 issue.}
+}
 }
 \examples{
 \dontrun{

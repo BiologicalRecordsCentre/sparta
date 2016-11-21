@@ -97,7 +97,7 @@ test_that("Sub-selection works - siteSelection", {
   
   dfSEL  <- siteSelection(df$taxa, df$site, df$time_period, minL = 4, minTP = 5)
   
-  expect_less_than(nrow(dfSEL), nrow(df))
+  expect_lt(nrow(dfSEL), nrow(df))
   
   temp <- paste(dfSEL$site, dfSEL$time_period)
   

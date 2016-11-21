@@ -1,7 +1,7 @@
 Package: sparta
 Type: Package
 Title: Trend Analysis for Unstructured Data
-Version: 0.1.30
+Version: 0.1.33
 Date: 2015-06-05
 Author: Tom August <tomaug@ceh.ac.uk>, Gary Powney, Colin Harrower, Mark Hill,
     Nick Isaac
@@ -19,10 +19,11 @@ Imports:
     sp,
     reshape2,
     ggplot2,
-    gdata
+    gdata,
+    R2jags,
+    LearnBayes
 Suggests:
     testthat (>= 0.8.0),
-    R2jags,
     roxygen2,
     knitr
 VignetteBuilder: knitr
