@@ -5,15 +5,15 @@
 for (i in 1:nsite){ 
   for (t in 1:nyear){   
     z[i,t] ~ dbern(muZ[i,t]) 
-    logit(muZ[i,t])<- eta.psi0 + aa[t] + eta[i] 
+    logit(muZ[i,t])<- eta.psi0 + a[t] + eta[i] 
   }}   
 
 # State model priors
 eta.psi0 <- log(psi0/(1-psi0))
 psi0 ~ dbeta(psi0.a, psi0.b)
-aa[1] ~ dnorm(0, 0.0001)
+a[1] ~ dnorm(0, 0.0001)
 for(t in 2:nyear){
-  aa[t] ~ dnorm(aa[t-1], tau.a)
+  a[t] ~ dnorm(a[t-1], tau.a)
 }
 tau.a <- 1/(sd.a * sd.a)
 sd.a ~ dunif(0, 5)

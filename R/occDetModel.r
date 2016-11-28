@@ -119,7 +119,7 @@
 
 occDetModel <- function(taxa, site, time_period,
                         species_list = unique(taxa), write_results = TRUE,
-                        output_dir = getwd(), nyr = 3, n_iterations = 5000,
+                        output_dir = getwd(), nyr = 2, n_iterations = 5000,
                         burnin = 1500, thinning = 3, n_chains = 3, 
                         modeltype = 'sparta', model.function = NULL,
                         seed = NULL, additional.parameters = NULL,

@@ -46,9 +46,10 @@ getObsModel <- function(modeltype, verbose){
   }
   
   fullModel <- paste0(paste(addVar, collapse = '\n'),
-                     paste0('for(j in 1:nvisit) {\n',
-                           '  y[j] ~ dbern(Py[j])\n', 
-                           '  Py[j]<- z[Site[j],Year[j]]*p[j]'),
+                     paste0('### Observation Model\n',
+                            'for(j in 1:nvisit) {\n',
+                            '  y[j] ~ dbern(Py[j])\n', 
+                            '  Py[j]<- z[Site[j],Year[j]]*p[j]'),
                      '\n  ', basemodel, '\n',
                      '}')
   

@@ -176,10 +176,15 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                          sumX = sum(unique(year)), sumX2 = sum(unique(year)^2)))
   
   # added extra elements to bugs data if needed
+  occDetData_temp <- merge(occDetdata[i,], site_to_row_lookup)
+
   for(btype in modeltype){
     bugs_data <- getBugsData(bugs_data, modeltype = btype,
-                             occDetData = merge(occDetdata[i,], site_to_row_lookup))
+                             occDetData = occDetData_temp)
   }
+  
+  rm(list = 'occDetData_temp')
+  
   
   # Add additional elements if specified
   if(!is.null(additional.BUGS.elements)){
@@ -190,8 +195,12 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     }
   }
   
-  initiate <- function(z, nyear) {
-    init <- list (z = z, alpha.p = rep(runif(1, -2, 2), nyear))
+  initiate <- function(z, nyear, bugs_data) {
+    init <- list (z = z,
+                  alpha.p = rep(runif(1, -2, 2),
+                                nyear),
+                  a = rep(runif(1, -2, 2), nyear),
+                  eta = rep(runif(1, -2, 2), bugs_data$nsite))
 
     # add extra init values if needed
     for(itype in modeltype){
@@ -210,7 +219,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   }
   
   # set the initial values... 
-  init.vals <- replicate(n_chains, initiate(z = zst, nyear = nyear),
+  init.vals <- replicate(n_chains, initiate(z = zst,
+                                            nyear = nyear,
+                                            bugs_data = bugs_data),
                          simplify = F)
   
   # Select the correct model file

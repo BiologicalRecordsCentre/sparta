@@ -57,7 +57,7 @@ getBugsData <- function(bugs_data, modeltype, verbose = FALSE,
         
         contlistlength = {
           if(verbose) cat('Adding bugs_data elements for Continious List Length\n')
-          logL <- log(occDetdata[i,]$L)
+          logL <- log(occDetData$L)
           dtype2p_min <- -10 
           dtype2p_max <- 10
           bugs_data <- c(bugs_data,

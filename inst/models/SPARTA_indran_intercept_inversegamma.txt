@@ -61,4 +61,3 @@ for (t in 1:nyear) {
 }
 sumXYpdet <- sum(sumxypdet[1:nyear])
 regres.pdet <- (sumXYpdet - ((sumX*sumYpdet)/nyear))/(sumX2 - ((sumX*sumX)/nyear))
-  
