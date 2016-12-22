@@ -23,6 +23,10 @@
 #'        as .rdata files. This will defualt to the working directory
 #' @param modeltype A character string that specifies the model to use. See details. If
 #' used then model.function is ignored.
+#' @param regional_codes A data.frame object detailing which site is associated with which region.
+#' each row desginates a site and each column represents a region. The first column represents the 
+#' site name (as in \code{site}). Subsequent columns are named for each regions with 1 representing
+#' the site is in that region and 0 that it is not. NOTE a site should only be in one region
 #' @param seed numeric, uses \code{set.seed} to set the randon number seed. Setting
 #'        this number ensures repeatabl analyses
 #' @param model.function optionally a user defined BUGS model coded as a function (see \code{?jags},
@@ -31,7 +35,7 @@
 #' @param additional.BUGS.elements A named list giving additioanl bugs elements passed 
 #' to \code{R2jags::jags} 'data' argument
 #' @param additional.init.values A named list giving user specified initial values to 
-#' be added to teh defaults.
+#' be added to the defaults.
 #'
 #' @details \code{modeltype} is used to choose the model as well as the initial values, and
 #' the parameter to monitor. At present this can take the following values.
@@ -104,8 +108,8 @@
 occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 2,
                         burnin = 1500, thinning = 3, n_chains = 3, write_results = TRUE,
                         output_dir = getwd(),  modeltype = 'sparta', seed = NULL,
-                        model.function = NULL, additional.parameters = NULL,
-                        additional.BUGS.elements = NULL,
+                        model.function = NULL, regional_codes = NULL,
+                        additional.parameters = NULL, additional.BUGS.elements = NULL,
                         additional.init.values = NULL){
   
   J_success <- requireNamespace("R2jags", quietly = TRUE)
@@ -134,13 +138,38 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   occDetdata <- merge(occDetdata, spp_vis[,c("visit", taxa_name)])
   names(occDetdata)[names(occDetdata) == taxa_name] <- "focal"
   
+  # If we are using regional codes do some checks
+  if(!is.null(regional_codes)){
+    if(!inherits(regional_codes, 'data.frame')) stop("regional_codes should be a data.frame")
+    # remove locations that are not in the data
+    regional_codes <- regional_codes[as.character(regional_codes[,1]) %in% as.character(occDetdata$site),]
+    if(any(is.na(regional_codes))){
+      warning("NAs are present in regional_codes, these will be replaced with 0's")
+      regional_codes[is.na(regional_codes)] <- 0
+    }
+    site_counts <- table(regional_codes[,1])
+    bad_sites <- names(site_counts[site_counts > 1])
+    if(length(bad_sites) > 0){
+      warning(paste(length(bad_sites), 'site(s) are present in more than one region and will be removed'))
+      regional_codes <- regional_codes[!regional_codes[,1] %in% bad_sites, ]
+    }
+  }
+  
   # Record the max and min year
   min_year <- min(occDetdata$year)
   max_year <- max(occDetdata$year)
   
   # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
   occDetdata$year <- occDetdata$year - min(occDetdata$year) + 1
+  site_match <- data.frame(original_site = occDetdata$site, new_site_name = as.numeric(as.factor(occDetdata$site)))
+  site_match <- unique(site_match)
   occDetdata$site <- as.numeric(as.factor(occDetdata$site))
+  
+  # Convert the regoinal table to these numeric versions of site names
+  if(!is.null(regional_codes)){
+    regional_codes$numeric_site_name <- site_match$new_site_name[match(x = as.character(regional_codes[,1]),
+                                                             table = as.character(site_match$original_site))]
+  }
   
   # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
   zst <- acast(occDetdata, site ~ factor(year), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
@@ -159,8 +188,13 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   }
   
   # only include sites which have more than nyr of records
+  # and are in the regional data if used
   yps <- rowSums(acast(occDetdata, site ~ year, length, value.var = 'L') > 0)
   sites_to_include <- names(yps[yps >= nyr])
+  if(!is.null(regional_codes)){
+    sites_to_include <- sites_to_include[sites_to_include %in% regional_codes$numeric_site_name]
+    regional_codes <- regional_codes[regional_codes$numeric_site_name %in% sites_to_include, ]
+  }
   zst <- zst[row.names(zst) %in% sites_to_include,]
   i <- occDetdata$site %in% sites_to_include
   
@@ -185,7 +219,17 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   rm(list = 'occDetData_temp')
   
-  
+  # Add regional elements to bugs data
+  if(!is.null(regional_codes)){
+    # use site_to_row_lookup to get teh correct site names
+    regional_codes$rownum <- site_to_row_lookup$rownum[match(x = regional_codes$numeric_site_name, 
+                                                             table = site_to_row_lookup$site)]
+    for(region_name in colnames(regional_codes)[2:(ncol(regional_codes)-2)]){
+      bugs_data[paste0('r_', region_name)] <- list(regional_codes[order(regional_codes$rownum), region_name])
+      bugs_data[paste0('nsite_r_', region_name)] <- list(sum(regional_codes[order(regional_codes$rownum), region_name]))
+    }
+  }
+    
   # Add additional elements if specified
   if(!is.null(additional.BUGS.elements)){
     if(!is.list(additional.BUGS.elements)){

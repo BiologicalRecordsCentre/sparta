@@ -28,6 +28,10 @@
 #'        including the example there, for how this is done)
 #' @param modeltype A character string or vector that specifies the model to use. See details. If
 #' used then model.function is ignored.
+#' @param regional_codes A data.frame object detailing which site is associated with which region.
+#' each row desginates a site and each column represents a region. The first column represents the 
+#' site name (as in \code{site}). Subsequent columns are named for each regions with 1 representing
+#' the site is in that region and 0 that it is not. NOTE a site should only be in one region
 #' @param seed numeric, uses \code{set.seed} to set the randon number seed. Setting
 #'        this number ensures repeatabl analyses
 #' @param additional.parameters A character vector of additional parameters to monitor
@@ -121,7 +125,8 @@ occDetModel <- function(taxa, site, time_period,
                         species_list = unique(taxa), write_results = TRUE,
                         output_dir = getwd(), nyr = 2, n_iterations = 5000,
                         burnin = 1500, thinning = 3, n_chains = 3, 
-                        modeltype = 'sparta', model.function = NULL,
+                        modeltype = 'sparta', regional_codes = NULL,
+                        model.function = NULL,
                         seed = NULL, additional.parameters = NULL,
                         additional.BUGS.elements = NULL,
                         additional.init.values = NULL){
@@ -158,6 +163,7 @@ occDetModel <- function(taxa, site, time_period,
                                       output_dir = output_dir,
                                       nyr = nyr,
                                       modeltype = modeltype,
+                                      regional_codes = regional_codes,
                                       model.function = model.function,
                                       seed = seed,
                                       additional.parameters = additional.parameters,
