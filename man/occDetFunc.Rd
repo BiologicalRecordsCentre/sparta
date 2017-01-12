@@ -7,8 +7,9 @@
 occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 2,
   burnin = 1500, thinning = 3, n_chains = 3, write_results = TRUE,
   output_dir = getwd(), modeltype = "sparta", seed = NULL,
-  model.function = NULL, additional.parameters = NULL,
-  additional.BUGS.elements = NULL, additional.init.values = NULL)
+  model.function = NULL, regional_codes = NULL,
+  additional.parameters = NULL, additional.BUGS.elements = NULL,
+  additional.init.values = NULL)
 }
 \arguments{
 \item{taxa_name}{A character giving the name of the species to be modelled.}
@@ -45,13 +46,18 @@ this number ensures repeatabl analyses}
 \item{model.function}{optionally a user defined BUGS model coded as a function (see \code{?jags},
 including the example there, for how this is done)}
 
+\item{regional_codes}{A data.frame object detailing which site is associated with which region.
+each row desginates a site and each column represents a region. The first column represents the 
+site name (as in \code{site}). Subsequent columns are named for each regions with 1 representing
+the site is in that region and 0 that it is not. NOTE a site should only be in one region}
+
 \item{additional.parameters}{A character vector of additional parameters to monitor}
 
 \item{additional.BUGS.elements}{A named list giving additioanl bugs elements passed 
 to \code{R2jags::jags} 'data' argument}
 
 \item{additional.init.values}{A named list giving user specified initial values to 
-be added to teh defaults.}
+be added to the defaults.}
 }
 \value{
 A list of filepaths, one for each species run, giving the location of the

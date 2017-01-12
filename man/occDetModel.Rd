@@ -7,9 +7,9 @@
 occDetModel(taxa, site, time_period, species_list = unique(taxa),
   write_results = TRUE, output_dir = getwd(), nyr = 2,
   n_iterations = 5000, burnin = 1500, thinning = 3, n_chains = 3,
-  modeltype = "sparta", model.function = NULL, seed = NULL,
-  additional.parameters = NULL, additional.BUGS.elements = NULL,
-  additional.init.values = NULL)
+  modeltype = "sparta", regional_codes = NULL, model.function = NULL,
+  seed = NULL, additional.parameters = NULL,
+  additional.BUGS.elements = NULL, additional.init.values = NULL)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}
@@ -43,6 +43,11 @@ to be included in the models}
 
 \item{modeltype}{A character string or vector that specifies the model to use. See details. If
 used then model.function is ignored.}
+
+\item{regional_codes}{A data.frame object detailing which site is associated with which region.
+each row desginates a site and each column represents a region. The first column represents the 
+site name (as in \code{site}). Subsequent columns are named for each regions with 1 representing
+the site is in that region and 0 that it is not. NOTE a site should only be in one region}
 
 \item{model.function}{optionally a user defined BUGS model coded as a function (see \code{?jags},
 including the example there, for how this is done)}

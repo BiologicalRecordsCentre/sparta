@@ -179,7 +179,10 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   if(length(unique(occDetdata$year)) != nyear) stop('It looks like you have years with no data. This will crash BUGS')
   
   # Parameter you wish to monitor, shown in the output
-  parameters <- c("psi.fs", "tau2", "tau.lp", "eta.p0", "alpha.p", "a", "eta.psi0")
+  parameters <- c("psi.fs", "tau2", "tau.lp", "eta.p0", "alpha.p", "a")
+  
+  # If not sparta add monitoring for eta.psi0
+  if(tolower(modeltype) != 'sparta') parameters <- c(parameters, "eta.psi0")
   
   if(!is.null(additional.parameters)) parameters <- c(parameters, additional.parameters)
   
@@ -207,7 +210,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   bugs_data <- with(merge(occDetdata[i,], site_to_row_lookup), # adds rownum to occDetdata (used below)
                     list(y = as.numeric(focal), Year = year, Site = rownum, 
                          nyear = nyear, nsite = nrow(zst), nvisit = nrow(occDetdata[i,]),
-                         sumX = sum(unique(year)), sumX2 = sum(unique(year)^2)))
+                         #sumX = sum(unique(year)), sumX2 = sum(unique(year)^2)
+                         ))
   
   # added extra elements to bugs data if needed
   occDetData_temp <- merge(occDetdata[i,], site_to_row_lookup)
