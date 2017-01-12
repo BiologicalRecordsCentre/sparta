@@ -39,24 +39,3 @@ for (i in 1:nsite){
 for (t in 1:nyear) {  
   psi.fs[t] <- sum(z[1:nsite,t])/nsite
 } 
-
-# Overall trend in occupuancy
-sumY <- sum(psi.fs[1:nyear])
-for (t in 1:nyear) {
-  sumxy[t] <- psi.fs[t]*t
-}
-sumXY <- sum(sumxy[1:nyear])
-regres.psi <- (sumXY - ((sumX*sumY)/nyear))/(sumX2 - ((sumX*sumX)/nyear))
-
-# Derived parameters observation model
-for (t in 1:nyear) {          
-  pdet.alpha[t] <- exp(alpha.p[t])/(1 + exp(alpha.p[t])) 
-}
-
-# overall trend in pdet.alpha
-sumYpdet <- sum(pdet.alpha[1:nyear])  
-for (t in 1:nyear) {          
-  sumxypdet[t] <- pdet.alpha[t]*t
-}
-sumXYpdet <- sum(sumxypdet[1:nyear])
-regres.pdet <- (sumXYpdet - ((sumX*sumYpdet)/nyear))/(sumX2 - ((sumX*sumX)/nyear))
