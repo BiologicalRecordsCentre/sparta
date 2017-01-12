@@ -179,7 +179,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   if(length(unique(occDetdata$year)) != nyear) stop('It looks like you have years with no data. This will crash BUGS')
   
   # Parameter you wish to monitor, shown in the output
-  parameters <- c("psi.fs", "regres.psi","regres.pdet","pdet.alpha", "tau2", "tau.lp")
+  parameters <- c("psi.fs", "tau2", "tau.lp", "eta.p0", "alpha.p", "a", "eta.psi0")
   
   if(!is.null(additional.parameters)) parameters <- c(parameters, additional.parameters)
   
