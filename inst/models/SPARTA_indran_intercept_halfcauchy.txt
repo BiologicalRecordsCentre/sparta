@@ -1,7 +1,6 @@
 # JAGS code for SPARTA model plus independent random effect prior
 # on the state model year effect + intercept
 
-
 # State model
 for (i in 1:nsite){ 
   for (t in 1:nyear){   
@@ -30,10 +29,9 @@ eta.p0 <- log(p0/(1-p0))
 p0 ~ dbeta(p0.a, p0.b)
 
 for (t in 1:nyear) {
-  alpha.p[t] ~ dnorm(mu.lp, tau.lp)            
+  alpha.p[t] ~ dnorm(0, tau.lp)            
 }
 
-mu.lp ~ dnorm(0, 0.01)                         
 tau.lp ~ dt(0, 1, 1)T(0,)   
 
 # Derived parameters

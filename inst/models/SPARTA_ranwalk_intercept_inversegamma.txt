@@ -29,10 +29,9 @@ sigma2 <- pow(tau2, -0.5)
 eta.p0 <- log(p0/(1-p0))
 p0 ~ dbeta(p0.a, p0.b)
 for (t in 1:nyear) {
-  alpha.p[t] ~ dnorm(mu.lp, tau.lp)            
+  alpha.p[t] ~ dnorm(0, tau.lp)            
 }
 
-mu.lp ~ dnorm(0, 0.01)                         
 tau.lp ~ dgamma(0.001, 0.001)
 sigma.lp <- pow(tau.lp, -0.5) 
 

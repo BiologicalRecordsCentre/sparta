@@ -1,6 +1,12 @@
 #######################################
 # SPARTA model from GitHub 26/05/2016 #
-#######################################
+
+# State model
+for (i in 1:nsite){ 
+  for (t in 1:nyear){   
+    z[i,t] ~ dbern(muZ[i,t]) 
+    logit(muZ[i,t])<- a[t] + eta[i] 
+  }}  
 
 # Priors 
 # State model priors
@@ -25,13 +31,6 @@ for (t in 1:nyear) {
 mu.lp ~ dnorm(0, 0.01)                         
 tau.lp <- 1 / (sd.lp * sd.lp)                 
 sd.lp ~ dunif(0, 5)   
-
-# State model
-for (i in 1:nsite){ 
-  for (t in 1:nyear){   
-    z[i,t] ~ dbern(muZ[i,t]) # True occupancy z at site i
-    logit(muZ[i,t])<- a[t] + eta[i] # plus random site effect
-  }}   
 
 # Derived parameters state model
 

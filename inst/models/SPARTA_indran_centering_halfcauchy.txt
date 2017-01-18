@@ -31,7 +31,6 @@ for (t in 1:nyear) {
   alpha.p[t] ~ dnorm(eta.p0, tau.lp)            
 }
 
-                       
 tau.lp ~ dt(0, 1, 1)T(0,)   
 
 # Derived parameters
