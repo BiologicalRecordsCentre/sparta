@@ -8,7 +8,7 @@ getInitValues <- function(init, modeltype, verbose = FALSE){
            if(verbose) cat('Adding init values for intercept\n')
            init$psi0 <- runif(1, 0, 1)
            init$p0 <- runif(1, 0, 0.2)
-           print(init)
+           if(verbose) cat(init)
            return(init)
          },
          
@@ -16,14 +16,14 @@ getInitValues <- function(init, modeltype, verbose = FALSE){
            if(verbose) cat('Adding init values for centering\n')
            init$psi0 <- runif(1, 0, 1)
            init$p0 <- runif(1, 0, 0.2)
-           print(init)
+           if(verbose) cat(init)
            return(init)
          },
          
          contlistlength = {
            if(verbose) cat('Adding init values for Continious List Length\n')
            init$LL.p = runif(1, -2, 2)
-           print(init)
+           if(verbose) cat(init)
            return(init)
          },
          

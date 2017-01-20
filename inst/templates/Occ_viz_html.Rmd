@@ -1,0 +1,132 @@
+---
+title: "Occupancy model summary"
+author: "Produced by: `r Sys.info()['user']`"
+date: "Produced on: `r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+params:
+  dataFile: temp.rdata
+---
+
+This is a visualiation of an occupancy model produced using the r-package `sparta`. For more information of `sparta` visit https://github.com/biologicalrecordscentre/sparta
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = 'center')
+results <- readRDS(params$dataFile)
+require(sparta)
+require(R2jags)
+```
+
+## Table of contents
+
+1. [Basic Information](#Basic_Information)
+2. [Species trend](#Species_trend)
+3. [Traceplots - Annnual occupancy estimates](#Traceplots_Annnual_occupancy_estimates)
+4. [Traceplots - Annnual detectability estimates](#Traceplots_Annnual_detectability_estimates)
+5. [Traceplots - Other parameters](#Traceplots_Other_parameters)
+6. [Rhat values](#Rhat_values)
+
+### Basic Information {#Basic_Information}
+
+```{r basic_information, echo = FALSE}
+cat(paste('Species:', results$SPP_NAME, '\n'))
+cat(paste('Year range:', results$min_year, '-', results$max_year, '\n'))
+cat(paste('Iterations:', results$n.iter, '\n'))
+cat(paste('Chains:', results$BUGSoutput$n.chains, '\n'))
+cat(paste('Burn in:', results$BUGSoutput$n.burnin, '\n'))
+cat(paste('Thinning:', results$BUGSoutput$n.thin, '\n'))
+cat(paste('Number of sites:', results$nsites, '\n'))
+cat(paste('Number of visits:', results$nvisit, '\n'))
+cat(paste('Number of sites with records of', paste0(results$SPP_NAME,  ':'), results$species_sites), '\n')
+cat(paste('Number of observations of', paste0(results$SPP_NAME,  ':'), sum(results$species_observations), '\n'))
+```
+
+### Species trend {#Species_trend}
+
+```{r species_trend, echo = FALSE, warning=FALSE, message=FALSE}
+plot(results)
+
+if('regions' %in% names(results)){
+  for(i in results$regions){
+    print(plot(results, reg_agg = i, main = i))
+  }
+}
+if('region_aggs' %in% names(results)){
+  for(i in names(results$region_aggs)){
+    print(plot(results, reg_agg = i, main = i))
+  }
+}
+```
+
+### Traceplots - Annnual occupancy estimates {#Traceplots_Annnual_occupancy_estimates}
+
+```{r traceplots_AO, fig.height=0.5*(results$max_year-results$min_year+1), echo = FALSE, warning=FALSE}
+array_sim <- results$BUGSoutput$sims.array
+comb.samples <- mcmc.list(
+  lapply(1:results$BUGSoutput$n.chains,
+         FUN = function(x, array_sim){
+           year_ests <- colnames(array_sim[,x,])[grepl('^psi.fs\\[', colnames(array_sim[,x,]))]
+           ar_temp <- array_sim[ , x, year_ests]
+           colnames(ar_temp) <- paste('Occupancy - Year', 1:ncol(ar_temp))
+           as.mcmc(ar_temp)
+           },
+         array_sim = array_sim)
+)
+plot(comb.samples)
+```
+
+
+### Traceplots - Annnual detectability estimates {#Traceplots_Annnual_detectability_estimates}
+
+```{r traceplots_AD, fig.height=0.5*(results$max_year-results$min_year+1), echo = FALSE}
+array_sim <- results$BUGSoutput$sims.array
+comb.samples <- mcmc.list(
+  lapply(1:results$BUGSoutput$n.chains,
+         FUN = function(x, array_sim){
+           year_ests <- colnames(array_sim[,x,])[grepl('^alpha.p\\[', colnames(array_sim[,x,]))]
+           ar_temp <- array_sim[ , x, year_ests]
+           colnames(ar_temp) <- paste('Detectability - Year', 1:ncol(ar_temp))
+           as.mcmc(ar_temp)
+           },
+         array_sim = array_sim)
+)
+plot(comb.samples)
+```
+
+### Traceplots - Other parameters {#Traceplots_Other_parameters}
+
+```{r traceplots_OTHER, fig.height=0.4*(results$max_year-results$min_year+1), echo = FALSE}
+array_sim <- results$BUGSoutput$sims.array
+comb.samples <- mcmc.list(
+  lapply(1:results$BUGSoutput$n.chains,
+         FUN = function(x, array_sim){
+           params_other <- colnames(array_sim[,x,])[!(grepl('^alpha.p\\[', colnames(array_sim[,x,])) | grepl('^psi.fs\\[', colnames(array_sim[,x,])))]
+           ar_temp <- array_sim[ , x, params_other]
+           # colnames(ar_temp) <- paste('Detectability - year', 1:ncol(ar_temp))
+           as.mcmc(ar_temp)
+           },
+         array_sim = array_sim)
+)
+plot(comb.samples, density = FALSE, smooth = FALSE, )
+```
+
+### Rhat values {#Rhat_values}
+
+```{r Rhat, echo = FALSE, fig.height=0.2*nrow(results$BUGSoutput$summary)}
+
+cols <- vals <- rev(results$BUGSoutput$summary[,'Rhat'])
+cols[vals <= 1.1] <- 'blue'
+cols[vals > 1.1] <- 'red'
+label_max <- max(4.1, max(nchar(names(vals)))/1.8)
+par(mar = c(5, label_max, 4, 2))
+barplot(vals,
+        horiz = TRUE,
+        col = cols,
+        las = 1,
+        xlab = 'Rhat',
+        main = 'Rhat values (threshold = 1.1)',
+        offset = 0,
+        width = rep(10, length(cols)),
+        yaxs = 'i')
+abline(v = 1.1, col = 'black', lty = 5)
+
+```

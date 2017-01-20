@@ -1,4 +1,4 @@
-getObsModel <- function(modeltype, verbose){
+getObsModel <- function(modeltype, verbose = FALSE){
   
   basemodel <- "logit(p[j]) <-  alpha.p[Year[j]]"
   addVar <- NULL
@@ -24,8 +24,7 @@ getObsModel <- function(modeltype, verbose){
                'dtype2.p*DATATYPE2[j] + dtype3.p*DATATYPE3[j]',
                sep = ' + ')
              addVar <- c(addVar,
-                         "dtype2.p ~ dnorm(0, 0.01)\ndtype3.p ~ dnorm(0, 0.01)\n",
-                         "for (t in 1:nyear) {\n   pdet.d2[t] <- exp(alpha.p[t]+dtype2.p)/(1 + exp(alpha.p[t]+dtype2.p))\n   pdet.d3[t] <- exp(alpha.p[t]+dtype3.p)/(1 + exp(alpha.p[t]+dtype3.p))\n}") 
+                         "dtype2.p ~ dnorm(0, 0.01)\ndtype3.p ~ dnorm(0, 0.01)\n") 
            },
            
            intercept = {
@@ -53,7 +52,7 @@ getObsModel <- function(modeltype, verbose){
                      '\n  ', basemodel, '\n',
                      '}')
   
-  if(verbose) cat('Observation model:\n');cat(fullModel);cat('\n')
+  if(verbose) cat(paste('Observation model:\n', fullModel, '\n'))
   
   return(fullModel)
   

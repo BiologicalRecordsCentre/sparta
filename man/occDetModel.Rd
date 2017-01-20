@@ -7,8 +7,8 @@
 occDetModel(taxa, site, time_period, species_list = unique(taxa),
   write_results = TRUE, output_dir = getwd(), nyr = 2,
   n_iterations = 5000, burnin = 1500, thinning = 3, n_chains = 3,
-  modeltype = "sparta", regional_codes = NULL, model.function = NULL,
-  seed = NULL, additional.parameters = NULL,
+  modeltype = "sparta", regional_codes = NULL, region_aggs = NULL,
+  model.function = NULL, seed = NULL, additional.parameters = NULL,
   additional.BUGS.elements = NULL, additional.init.values = NULL)
 }
 \arguments{
@@ -49,6 +49,13 @@ each row desginates a site and each column represents a region. The first column
 site name (as in \code{site}). Subsequent columns are named for each regions with 1 representing
 the site is in that region and 0 that it is not. NOTE a site should only be in one region}
 
+\item{region_aggs}{A named list giving aggregations of regions that you want trend
+estimates for. For example \code{region_aggs = list(GB = c('england', 'scotland', 'wales'))}
+will produced a trend for GB (Great Britain) as well as its constituent nations. Note that
+'england', scotland' and 'wales' must appear as names of columns in \code{regional_codes}. 
+More than one aggregate can be given, eg \code{region_aggs = list(GB = c('england', 'scotland',
+ 'wales'), UK = c('england', 'scotland', 'wales', 'northern_ireland'))}.}
+
 \item{model.function}{optionally a user defined BUGS model coded as a function (see \code{?jags},
 including the example there, for how this is done)}
 
@@ -64,8 +71,7 @@ to \code{R2jags::jags} 'data' argument}
 be added to the defaults.}
 }
 \value{
-A list of filepaths, one for each species run, giving the location of the
-        output saved as a .rdata file, containing an object called 'out'
+A list of occDet objects (see occDetFunc), as an occDetList class of object
 }
 \description{
 Run occupancy detection models as described in Isaac et al, 2014
@@ -75,25 +81,21 @@ This function requires both the R package R2jags and the program JAGS.
 These are not installed by default when sparta is loaded and so should be
 installed by the user. More details can be found in teh vignette.
 
-\code{modeltype} is used to choose the model as well as the initial values, and
-the parameter to monitor. At present this can take the following values.
+\code{modeltype} is used to choose the model as well as the initial values,
+and the parameter to monitor. There are 9 elements that define models, however not
+all combinations are available in sparta. You will get an error if you try and use
+a combination that is not supported. There is usually a good reason why that
+combination is not a good idea. Here are the model elements available.
 \itemize{
- \item{\code{halfcauchy}}{Stuff}
- \item{\code{inversegamma}}{Stuff}
- \item{\code{intercept}}{Stuff}
- \item{\code{centering}}{Stuff}
- \item{\code{indran}}{Stuff}
- \item{\code{ranwalk}}{Stuff}
- \item{\code{indran_halfcauchy}}{Stuff}
- \item{\code{indran_inversegamma}}{Stuff}
- \item{\code{indran_intercept}}{Stuff}
- \item{\code{indran_centering}}{Stuff}
- \item{\code{ranwalk_halfcauchy}}{Stuff}
- \item{\code{ranwalk_inversegamma}}{Stuff}
- \item{\code{ranwalk_intercept}}{Stuff}
- \item{\code{ranwalk_centering}}{Stuff}
- \item{\code{indran_true}}{edited to make it a "true" random effect - possibly}
- \item{\code{ranwalk_edit}}{attempted to fix first year always 0.5 issue.}
+ \item{\code{"sparta"}}{ - This uses the same model as in Isaac et al (2014)}
+ \item{\code{"indran"}}{ - Here the prior for the year effect of the state model is modelled as a random effect.  This allows the model to adapt to interannual variability.}
+ \item{\code{"inversegamma"}}{ - Includes inverse-gamma hyperpriors for random effects within the model}
+ \item{\code{"intercept"}}{ - Includes an intercept term in the state and observation model.  By including intercept terms, the occupancy and detection probabilities in each year are centred on an overall mean level.}
+ \item{\code{"centering"}}{ - Includes hierarchical centering of the model parameters.   Centring does not change the model explicitly but writes it in a way that allows parameter estimates to be updated simultaneously.}
+ \item{\code{"ranwalk"}}{ - Here the prior for the year effect of the state model is modelled as a random walk.  Each estimate for the year effect is dependent on that of the previous year.}
+ \item{\code{"halfcauchy"}}{ - Includes half-Cauchy hyperpriors for all random effects within the model.  The half-Cauchy is a special case of the Student’s t distribution with 1 degree of freedom. }
+ \item{\code{"catlistlength"}}{ - This specifies that list length should be considered as a catagorical variable. There are 3 classes, lists of length 1, 2-3, and 4 and over. If not set list length is treated as continious.}
+ \item{\code{"jul_date"}}{ - This adds Julian date to the model as a polynomial centered on the middle of the year.}
 }
 }
 \examples{
