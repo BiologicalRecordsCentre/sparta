@@ -215,6 +215,20 @@ test_that("Test occDetFunc with model types", {
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year"))
   
+  results <- occDetFunc(taxa_name = 'a',
+                        n_iterations = 50,
+                        burnin = 15, 
+                        occDetdata = visitData$occDetdata,
+                        spp_vis = visitData$spp_vis,
+                        write_results = FALSE,
+                        seed = 111, modeltype = c('ranwalk',
+                                                  'halfcauchy'))
+  expect_identical(results$SPP_NAME, 'a')
+  expect_identical(results$n.iter, 50)
+  expect_identical(names(results),
+                   c("model", "BUGSoutput", "parameters.to.save", "model.file", 
+                     "n.iter", "DIC", "SPP_NAME", "min_year", "max_year"))
+  
   sink()
   
 })
