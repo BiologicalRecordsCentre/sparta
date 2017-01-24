@@ -25,12 +25,11 @@ for (i in 1:nsite) {
 tau2  ~ dt(0, 1, 1)T(0,)
 
 # Observation model priors 
-eta.p0 <- log(p0/(1-p0))
-p0 ~ dbeta(p0.a, p0.b)
 for (t in 1:nyear) {
-  alpha.p[t] ~ dnorm(0, tau.lp)            
+  alpha.p[t] ~ dnorm(mu.lp, tau.lp)            
 }
 
+mu.lp ~ dnorm(0, 0.01)
 tau.lp ~ dt(0, 1, 1)T(0,)  
 
 # Derived parameters
