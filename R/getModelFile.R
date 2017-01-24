@@ -41,7 +41,7 @@ getModelFile <- function(modeltype, regional_codes = NULL, region_aggs = NULL, v
     
     ## Priors ##
     # year 1 for each region 
-    yr_1 <- paste(paste0('a_', regions, '[1] ~ dnorm(mu.a_', regions, ', 0.0001)'))
+    yr_1 <- paste(paste0('a_', regions, '[1] ~ dnorm(mu.a_', regions, ', 0.001)'))
     
     # hyper-priors for the first year for each region
     hp_yr1 <- paste(paste0('mu.a_', regions, ' ~ dnorm(0, 0.01)'))
@@ -98,7 +98,7 @@ getModelFile <- function(modeltype, regional_codes = NULL, region_aggs = NULL, v
                      '',
                      tau,
                      '',
-                     modelScript[20:length(modelScript)],
+                     modelScript[18:length(modelScript)],
                      '',
                      derived_regions,
                      '',

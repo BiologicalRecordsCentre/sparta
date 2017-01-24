@@ -163,8 +163,17 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                     "NAs are present in regional_codes, these will be replaced with 0's"))
       regional_codes[is.na(regional_codes)] <- 0
     }
+    
+    sites_no_region <- regional_codes$site[rowSums(regional_codes[,2:ncol(regional_codes)]) == 0]
+    sites_multi_region <- regional_codes$site[rowSums(regional_codes[,2:ncol(regional_codes)]) > 1]
+    
+    if(length(sites_no_region) > 0) stop(paste(length(sites_no_region), 'sites are not assigned to a region in regional_codes'))
+    if(length(sites_multi_region) > 0) stop(paste(length(sites_multi_region), 'sites are assigned to more than one region in regional_codes'))
+    
     site_counts <- table(regional_codes[,1])
-    bad_sites <- names(site_counts[site_counts > 1])
+    sites_multi_row <- names(site_counts[site_counts > 1])
+    bad_sites <- unique(c(sites_multi_row, sites_multi_region))
+    
     if(length(bad_sites) > 0){
       warning(paste(length(bad_sites), 'site(s) are present in more than one region and will be removed'))
       regional_codes <- regional_codes[!regional_codes[,1] %in% bad_sites, ]
@@ -211,7 +220,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   if(length(unique(occDetdata$year)) != nyear) stop('It looks like you have years with no data. This will crash BUGS')
   
   # Parameter you wish to monitor, shown in the output
-  parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a")
+  parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a", "mu.lp")
   
   # If not sparta add monitoring for eta.psi0
   if(!'sparta' %in% tolower(modeltype)) parameters <- c(parameters, "eta.p0", "eta.psi0")
@@ -250,9 +259,12 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   # are in the regional data and and visa versa. Ensures datasets
   # line up.
   if(!is.null(regional_codes)){
+    bad_sites_to_include <- sites_to_include[!sites_to_include %in% regional_codes$numeric_site_name]
+    if(length(bad_sites_to_include) >= 1) warning(paste(length(bad_sites_to_include), 'sites are in occurrence data but not in regional data and will be removed'))
     sites_to_include <- sites_to_include[sites_to_include %in% regional_codes$numeric_site_name]
     regional_codes <- regional_codes[regional_codes$numeric_site_name %in% sites_to_include, ]
   }
+  
   zst <- zst[row.names(zst) %in% sites_to_include,]
   i <- occDetdata$site %in% sites_to_include
   
