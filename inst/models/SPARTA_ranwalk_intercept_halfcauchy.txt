@@ -11,7 +11,7 @@ for (i in 1:nsite){
 # State model priors
 eta.psi0 <- log(psi0/(1-psi0))
 psi0 ~ dbeta(psi0.a, psi0.b)
-a[1] ~ dnorm(0, 0.0001)
+a[1] ~ dnorm(0, 0.001)
 for(t in 2:nyear){
   a[t] ~ dnorm(a[t-1], tau.a)
 }
