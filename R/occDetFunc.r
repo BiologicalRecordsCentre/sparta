@@ -123,8 +123,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # If doing regional we take control of model specification
   if(!is.null(regional_codes)){
-    message('When using regional data the model specification will be set to ranwalk, intercept, halfcauchy. jul_date and catlistlength can still be specified by the user')
-    modeltype <-c('ranwalk', 'intercept', 'halfcauchy',
+    message('When using regional data the model specification will be set to ranwalk, halfcauchy. jul_date and catlistlength can still be specified by the user')
+    modeltype <-c('ranwalk', 'halfcauchy',
                   c('jul_date', 'catlistlength')[c('jul_date', 'catlistlength') %in% modeltype])
   }  
   
@@ -302,18 +302,48 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     # use site_to_row_lookup to get the correct site names
     regional_codes$rownum <- site_to_row_lookup$rownum[match(x = regional_codes$numeric_site_name, 
                                                              table = site_to_row_lookup$site)]
+    
+    # removed unwanted bugs elements
+    bugs_data <- bugs_data[!names(bugs_data) %in% c('psi0.a', 'psi0.b')]
+    
     zero_sites <- NULL
     for(region_name in colnames(regional_codes)[2:(ncol(regional_codes)-2)]){
-      bugs_data[paste0('r_', region_name)] <- list(regional_codes[order(regional_codes$rownum), region_name])
-      bugs_data[paste0('nsite_r_', region_name)] <- list(sum(regional_codes[order(regional_codes$rownum), region_name]))
-      if(bugs_data[paste0('nsite_r_', region_name)] == 0){
+      
+      if(sum(regional_codes[ , region_name]) != 0){
+      
+        bugs_data[paste0('r_', region_name)] <- list(regional_codes[order(regional_codes$rownum), region_name])
+        bugs_data[paste0('nsite_r_', region_name)] <- list(sum(regional_codes[order(regional_codes$rownum), region_name]))
+        
+      } else {
+        
         zero_sites <- c(zero_sites, region_name)
+        
       }
-      # removed unwanted bugs elements
-      bugs_data <- bugs_data[!names(bugs_data) %in% c('psi0.a', 'psi0.b')]
     }
-    if(!is.null(zero_sites)) stop(paste('The following regions have no data and should not be modelled:',
-                                        paste(zero_sites, collapse = ', ')))
+    
+    if(!is.null(zero_sites)){
+      warning(paste('The following regions have no data and should not be modelled:',
+                    paste(zero_sites, collapse = ', '),
+                    '- These regions will not be included in the model'))
+      # remove parameters
+      parameters <- parameters[!parameters %in% c(paste0("psi.fs.r_", zero_sites),
+                                                  paste0("a_", zero_sites))]
+      # remove regions for regions_codes
+      regional_codes <- regional_codes[ ,!colnames(regional_codes) %in% zero_sites]
+      
+      # remove region aggregates
+      rem_aggs <- unlist(lapply(region_aggs, FUN = function(x) any(zero_sites %in% x)))
+      rem_aggs_names <- names(region_aggs)[rem_aggs]
+      
+      # remove aggs if you need to
+      if(length(rem_aggs_names) > 0){
+        warning(paste('The following region aggregates have to be removed as they contain a region with no data:',
+                      paste(rem_aggs_names, collapse = ', '),
+                      '- These region aggregates will not be included in the model'))
+        region_aggs <- region_aggs[!names(region_aggs) %in% rem_aggs_names]
+        parameters <- parameters[!parameters %in% paste0('psi.fs.r_', rem_aggs_names)]
+      }
+    } 
   }
   
   initiate <- function(z, nyear, bugs_data) {
