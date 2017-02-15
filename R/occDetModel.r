@@ -45,6 +45,7 @@
 #' to \code{R2jags::jags} 'data' argument
 #' @param additional.init.values A named list giving user specified initial values to 
 #' be added to the defaults.
+#' @param return_data Logical, if \code{TRUE} (default) the bugs data object is returned with the data
 #' 
 #' @details \code{modeltype} is used to choose the model as well as the initial values,
 #' and the parameter to monitor. There are 9 elements that define models, however not
@@ -130,7 +131,8 @@ occDetModel <- function(taxa, site, time_period,
                         region_aggs = NULL, model.function = NULL,
                         seed = NULL, additional.parameters = NULL,
                         additional.BUGS.elements = NULL,
-                        additional.init.values = NULL){
+                        additional.init.values = NULL,
+                        return_data = FALSE){
  
   # Error checking done in lower functions
     
@@ -170,7 +172,8 @@ occDetModel <- function(taxa, site, time_period,
                                       seed = seed,
                                       additional.parameters = additional.parameters,
                                       additional.BUGS.elements = additional.BUGS.elements,
-                                      additional.init.values = additional.init.values)
+                                      additional.init.values = additional.init.values,
+                                      return_data = return_data)
   }
   
   class(output) <- 'occDetList'

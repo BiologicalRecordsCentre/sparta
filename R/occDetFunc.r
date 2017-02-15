@@ -114,7 +114,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                         model.function = NULL, regional_codes = NULL,
                         region_aggs = NULL, additional.parameters = NULL,
                         additional.BUGS.elements = NULL, additional.init.values = NULL,
-                        return_data = TRUE){
+                        return_data = FALSE){
   
   J_success <- requireNamespace("R2jags", quietly = TRUE)
   

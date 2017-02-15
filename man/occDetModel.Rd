@@ -9,7 +9,8 @@ occDetModel(taxa, site, time_period, species_list = unique(taxa),
   n_iterations = 5000, burnin = 1500, thinning = 3, n_chains = 3,
   modeltype = "sparta", regional_codes = NULL, region_aggs = NULL,
   model.function = NULL, seed = NULL, additional.parameters = NULL,
-  additional.BUGS.elements = NULL, additional.init.values = NULL)
+  additional.BUGS.elements = NULL, additional.init.values = NULL,
+  return_data = FALSE)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}
@@ -69,6 +70,8 @@ to \code{R2jags::jags} 'data' argument}
 
 \item{additional.init.values}{A named list giving user specified initial values to 
 be added to the defaults.}
+
+\item{return_data}{Logical, if \code{TRUE} (default) the bugs data object is returned with the data}
 }
 \value{
 A list of occDet objects (see occDetFunc), as an occDetList class of object
