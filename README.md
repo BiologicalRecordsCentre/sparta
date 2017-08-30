@@ -30,7 +30,7 @@ new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"
 if(length(new.packages)) install.packages(new.packages)
 
 # Now install sparta
-install_github("sparta", username = 'BiologicalRecordsCentre')
+install_github('BiologicalRecordsCentre/sparta')
 
 # Load sparta
 library(sparta)
