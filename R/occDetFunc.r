@@ -149,9 +149,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   init.vals <- replicate(n_chains, initiate(z = zst, i = init, nyear = nyear),
                          simplify = F)
   
-#  if(identical(model.file, occDetBUGScode)){
-#    warning('The current formulation of the priors on the state model are strongly informative (at 0 or 1) on the occupancy scale, this is not ideal, as it can cause issues when modelling species with sparse data.  We are currently investigating solutions to this issue as part of overall development work on the occupancy model.  A quick fix is to logit transform the prior for the year and site effects as shown on page 573 of Kery and Royle (2015) Applied hierarchical modelling in ecology')
-#  }
+  if(identical(model.file, occDetBUGScode)){
+    warning('The current formulation of the priors on the state model are strongly informative (at 0 or 1) on the occupancy scale, this is not ideal, as it can cause issues when modelling species with sparse data.  We are currently investigating solutions to this issue as part of overall development work on the occupancy model.  A quick fix is to logit transform the prior for the year and site effects as shown on page 573 of Kery and Royle (2015) Applied hierarchical modelling in ecology')
+  }
             
   error_status <- try(    
     out <- R2jags::jags(bugs_data, init.vals, parameters, model.file = model.file,
