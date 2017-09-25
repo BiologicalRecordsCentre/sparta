@@ -72,4 +72,3 @@ Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (201
 \keyword{occupancy,}
 \keyword{species,}
 \keyword{trends,}
-

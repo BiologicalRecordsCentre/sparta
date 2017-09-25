@@ -25,4 +25,3 @@ Path to html report
 \description{
 Create HTML Report for an \code{occDet} object.
 }
-

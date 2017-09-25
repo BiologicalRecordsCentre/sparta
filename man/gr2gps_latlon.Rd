@@ -35,4 +35,3 @@ gr2gps_latlon('SU616896')
 \keyword{latitude}
 \keyword{longitude}
 \keyword{mapping}
-

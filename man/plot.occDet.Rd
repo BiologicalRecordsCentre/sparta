@@ -21,4 +21,3 @@ If '' (default) then the overall occupancy estimates are plotted}
 \description{
 Plot occDet Objects
 }
-

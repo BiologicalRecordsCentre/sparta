@@ -71,4 +71,3 @@ recsOverTime(df$time_period, col = 'blue', main = 'Records of Species A',
 
 }
 }
-

@@ -24,13 +24,13 @@ htmlSummary <- function(occDet,
   temp_f <- tempfile()
   saveRDS(occDet, file = temp_f)
   
-  output_path <- rmarkdown::render(html_template,
-                                   params = list(dataFile = temp_f),
-                                   output_dir = output_dir,
-                                   output_file = output_file,
-                                   intermediates_dir = tempdir(),
-                                   quiet = TRUE,
-                                   ...)
+  output_path <- render(html_template,
+                        params = list(dataFile = temp_f),
+                        output_dir = output_dir,
+                        output_file = output_file,
+                        intermediates_dir = tempdir(),
+                        quiet = TRUE,
+                        ...)
   
   if(open) browseURL(output_path)
   return(output_path)

@@ -63,4 +63,3 @@ dataDiagnostics(taxa, site, time_period)
 dataDiagnostics(taxa, site, as.numeric(format(time_period, '\%Y')))
 }
 }
-

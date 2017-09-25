@@ -65,4 +65,3 @@ results <- occDetModel(taxa = taxa,
                             bayesOut = results$a)   
 }                   
 }
-
