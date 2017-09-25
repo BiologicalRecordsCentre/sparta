@@ -69,8 +69,7 @@ be added to the defaults.}
 \item{return_data}{Logical, if \code{TRUE} (default) the bugs data object is returned with the data}
 }
 \value{
-A list of filepaths, one for each species run, giving the location of the
-        output saved as a .rdata file, containing an object called 'out'
+A list including the model, bugs model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
 }
 \description{
 Run occupancy detection models using the output from \code{formatOccData}

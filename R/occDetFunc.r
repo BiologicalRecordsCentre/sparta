@@ -61,8 +61,7 @@
 #'  \item{\code{"jul_date"}}{ - This adds Julian date to the model as a polynomial centered on the middle of the year. Note your data must include Julian day (use formatOccData(..., includeJDay = TRUE))}
 #' }
 #'
-#' @return A list of filepaths, one for each species run, giving the location of the
-#'         output saved as a .rdata file, containing an object called 'out'
+#' @return A list including the model, bugs model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
 #'          
 #' @keywords trends, species, distribution, occupancy, bayesian, modeling
 #' @references Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
