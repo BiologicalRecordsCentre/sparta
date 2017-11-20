@@ -21,7 +21,7 @@
 #'        has run. This prevents loss of data should anything go wrong.
 #' @param output_dir character, the output directory were the output for each taxa will be saved
 #'        as .rdata files. This will defualt to the working directory
-#' @param modeltype A character string that specifies the model to use. See details. If
+#' @param modeltype A character string or vector of strings that specifies the model to use. See details. If
 #' used then model.function is ignored.
 #' @param regional_codes A data.frame object detailing which site is associated with which region.
 #' each row desginates a site and each column represents a region. The first column represents the 
@@ -57,9 +57,12 @@
 #'  \item{\code{"centering"}}{ - Includes hierarchical centering of the model parameters.   Centring does not change the model explicitly but writes it in a way that allows parameter estimates to be updated simultaneously.}
 #'  \item{\code{"ranwalk"}}{ - Here the prior for the year effect of the state model is modelled as a random walk.  Each estimate for the year effect is dependent on that of the previous year.}
 #'  \item{\code{"halfcauchy"}}{ - Includes half-Cauchy hyperpriors for all random effects within the model.  The half-Cauchy is a special case of the Student’s t distribution with 1 degree of freedom. }
-#'  \item{\code{"catlistlength"}}{ - This specifies that list length should be considered as a catagorical variable. There are 3 classes, lists of length 1, 2-3, and 4 and over. If not set list length is treated as continious.}
+#'  \item{\code{"catlistlength"}}{ - This specifies that list length should be considered as a catagorical variable. There are 3 classes, lists of length 1, 2-3, and 4 and over. If none of the list length options are specifed 'contlistlength' is used}
+#'  \item{\code{"contlistlength"}}{ - This specifies that list length should be considered as a continious variable. If none of the list length options are specifed 'contlistlength' is used}
+#'  \item{\code{"nolistlength"}}{ - This specifies that no list length should be used. If none of the list length options are specifed 'contlistlength' is used}
 #'  \item{\code{"jul_date"}}{ - This adds Julian date to the model as a polynomial centered on the middle of the year. Note your data must include Julian day (use formatOccData(..., includeJDay = TRUE))}
 #' }
+#' These options are provided as a vector of characters, e.g. \code{modeltype = c('indran', 'centering', 'halfcauchy', 'catlistlength')}
 #'
 #' @return A list including the model, bugs model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
 #'          
@@ -127,8 +130,13 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                   c('jul_date', 'catlistlength')[c('jul_date', 'catlistlength') %in% modeltype])
   }  
   
-  if(!'catlistlength' %in% modeltype) modeltype <- c(modeltype, 'contlistlength')
-  
+  if(!'catlistlength' %in% modeltype & !'nolistlength' %in% modeltype){
+    modeltype <- c(modeltype, 'contlistlength')
+  } 
+  if(!any(c('catlistlength', 'nolistlength', 'contlistlength') %in% modeltype)){
+    stop('modeltype should contain one of "catlistlength", "nolistlength", "contlistlength",
+         which specify the list-length effect to be included')
+  }
   errorChecks(n_iterations = n_iterations, burnin = burnin,
               thinning = thinning, n_chains = n_chains, seed = seed)
   
@@ -241,7 +249,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                     paste0("psi.fs.r_", regions),
                     paste0("a_", regions))
     # ignore some parameters not used in regions model
-    parameters <- parameters[!parameters %in% c('eta.psi0', 'a')]
+    parameters <- parameters[!parameters %in% c('eta.psi0', 'a', 'eta.p0')]
   }
   
   # add parameters for regional aggregates

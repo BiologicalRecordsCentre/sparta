@@ -13,7 +13,7 @@ getModelFile <- function(modeltype, regional_codes = NULL, region_aggs = NULL, v
   
   # match only attibutes that effect model file selection
   modeltype_file <- modeltype[!tolower(modeltype) %in% c('catlistlength', 'jul_date',
-                                                         'contlistlength')]
+                                                         'contlistlength', 'nolistlength')]
   
   matches <- lapply(mods, FUN = function(x) all(modeltype_file %in% x) & all(x %in% modeltype_file))
   

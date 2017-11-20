@@ -97,9 +97,12 @@ combination is not a good idea. Here are the model elements available.
  \item{\code{"centering"}}{ - Includes hierarchical centering of the model parameters.   Centring does not change the model explicitly but writes it in a way that allows parameter estimates to be updated simultaneously.}
  \item{\code{"ranwalk"}}{ - Here the prior for the year effect of the state model is modelled as a random walk.  Each estimate for the year effect is dependent on that of the previous year.}
  \item{\code{"halfcauchy"}}{ - Includes half-Cauchy hyperpriors for all random effects within the model.  The half-Cauchy is a special case of the Student’s t distribution with 1 degree of freedom. }
- \item{\code{"catlistlength"}}{ - This specifies that list length should be considered as a catagorical variable. There are 3 classes, lists of length 1, 2-3, and 4 and over. If not set list length is treated as continious.}
+ \item{\code{"catlistlength"}}{ - This specifies that list length should be considered as a catagorical variable. There are 3 classes, lists of length 1, 2-3, and 4 and over. If none of the list length options are specifed 'contlistlength' is used}
+ \item{\code{"contlistlength"}}{ - This specifies that list length should be considered as a continious variable. If none of the list length options are specifed 'contlistlength' is used}
+ \item{\code{"nolistlength"}}{ - This specifies that no list length should be used. If none of the list length options are specifed 'contlistlength' is used}
  \item{\code{"jul_date"}}{ - This adds Julian date to the model as a polynomial centered on the middle of the year.}
 }
+These options are provided as a vector of characters, e.g. \code{modeltype = c('indran', 'centering', 'halfcauchy', 'catlistlength')}
 }
 \examples{
 \dontrun{
@@ -148,6 +151,27 @@ results <- occDetModel(taxa = taxa,
                        thinning = 2,
                        seed = 125, 
                        modeltype = c("indran", "intercept"))
+                       
+# run with regions
+
+# Create region definitions
+regions <- data.frame(site = unique(site),
+                      region1 = c(rep(1, 20), rep(0, 30)),
+                      region2 = c(rep(0, 20), rep(1, 15), rep(0, 15)),
+                      region3 = c(rep(0, 20), rep(0, 15), rep(1, 15)))
+ 
+results <- occDetModel(taxa = taxa,
+                       site = site,
+                       time_period = time_period,
+                       species_list = 'a',
+                       write_results = FALSE,
+                       n_iterations = 1000,
+                       burnin = 10,
+                       thinning = 2,
+                       seed = 125, 
+                       modeltype = c("indran", "intercept"),
+                       regional_codes = regions,
+                       region_aggs = list(agg1 = c('region1', 'region2')))       
 }
 }
 \references{

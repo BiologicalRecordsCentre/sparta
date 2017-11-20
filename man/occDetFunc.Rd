@@ -37,7 +37,7 @@ has run. This prevents loss of data should anything go wrong.}
 \item{output_dir}{character, the output directory were the output for each taxa will be saved
 as .rdata files. This will defualt to the working directory}
 
-\item{modeltype}{A character string that specifies the model to use. See details. If
+\item{modeltype}{A character string or vector of strings that specifies the model to use. See details. If
 used then model.function is ignored.}
 
 \item{seed}{numeric, uses \code{set.seed} to set the randon number seed. Setting
@@ -92,9 +92,12 @@ combination is not a good idea. Here are the model elements available.
  \item{\code{"centering"}}{ - Includes hierarchical centering of the model parameters.   Centring does not change the model explicitly but writes it in a way that allows parameter estimates to be updated simultaneously.}
  \item{\code{"ranwalk"}}{ - Here the prior for the year effect of the state model is modelled as a random walk.  Each estimate for the year effect is dependent on that of the previous year.}
  \item{\code{"halfcauchy"}}{ - Includes half-Cauchy hyperpriors for all random effects within the model.  The half-Cauchy is a special case of the Student’s t distribution with 1 degree of freedom. }
- \item{\code{"catlistlength"}}{ - This specifies that list length should be considered as a catagorical variable. There are 3 classes, lists of length 1, 2-3, and 4 and over. If not set list length is treated as continious.}
+ \item{\code{"catlistlength"}}{ - This specifies that list length should be considered as a catagorical variable. There are 3 classes, lists of length 1, 2-3, and 4 and over. If none of the list length options are specifed 'contlistlength' is used}
+ \item{\code{"contlistlength"}}{ - This specifies that list length should be considered as a continious variable. If none of the list length options are specifed 'contlistlength' is used}
+ \item{\code{"nolistlength"}}{ - This specifies that no list length should be used. If none of the list length options are specifed 'contlistlength' is used}
  \item{\code{"jul_date"}}{ - This adds Julian date to the model as a polynomial centered on the middle of the year. Note your data must include Julian day (use formatOccData(..., includeJDay = TRUE))}
 }
+These options are provided as a vector of characters, e.g. \code{modeltype = c('indran', 'centering', 'halfcauchy', 'catlistlength')}
 }
 \examples{
 \dontrun{
