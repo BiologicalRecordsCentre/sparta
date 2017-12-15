@@ -63,9 +63,9 @@ list are not used for estimating TFactors. Default is \code{NULL} and all sites 
 used.}
 
 \item{phi}{Target frequency of frequency-weighted mean frequency. Default is 0.74 as in
-Hill (2011). If this value is smaller than the 98.5 percentile of input phi it is
-automatically increased and a warning message is generated. This is limited to
-0.50 to 0.95.}
+Hill (2011). If set to \code{NULL}, phi will start at 0.74 and will be increased if
+the value is smaller than the 98.5 percentile of input phi, limited to
+to a maximum of 0.95.}
 
 \item{alpha}{the proportion of the expected number of species in a cell to be treated as
 benchmarks. Default is 0.27 as in Hill (2011). This is limited to 0.08 to 0.50.}
