@@ -7,3 +7,5 @@ pre_vignette
 .travis.yml
 logo.png
 frescalo.exe
+^docs$
+vignettes\sparta_vignette.Rmd
