@@ -13,4 +13,3 @@ This is a fictional occurrence dataset of 70 species of unicorn in the UK.
 \author{
 Tom August, 2015-07-01
 }
-

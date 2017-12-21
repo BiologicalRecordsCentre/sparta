@@ -4,9 +4,12 @@
 \alias{occDetFunc}
 \title{Occupancy detection Function}
 \usage{
-occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 3,
+occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 2,
   burnin = 1500, thinning = 3, n_chains = 3, write_results = TRUE,
-  output_dir = getwd(), model.file = occDetBUGScode, seed = NULL)
+  output_dir = getwd(), modeltype = "sparta", seed = NULL,
+  model.function = NULL, regional_codes = NULL, region_aggs = NULL,
+  additional.parameters = NULL, additional.BUGS.elements = NULL,
+  additional.init.values = NULL, return_data = FALSE)
 }
 \arguments{
 \item{taxa_name}{A character giving the name of the species to be modelled.}
@@ -18,7 +21,7 @@ occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 3,
 \item{n_iterations}{numeric, An MCMC parameter - The number of interations}
 
 \item{nyr}{numeric, the minimum number of years on which a site must have records for it
-to be included in the models}
+to be included in the models. Defaults to 2}
 
 \item{burnin}{numeric, An MCMC parameter - The length of the burn in}
 
@@ -34,15 +37,39 @@ has run. This prevents loss of data should anything go wrong.}
 \item{output_dir}{character, the output directory were the output for each taxa will be saved
 as .rdata files. This will defualt to the working directory}
 
-\item{model.file}{optionally a user defined BUGS model coded as a function (see \code{?jags},
-including the example there, for how this is done)}
+\item{modeltype}{A character string or vector of strings that specifies the model to use. See details. If
+used then model.function is ignored.}
 
 \item{seed}{numeric, uses \code{set.seed} to set the randon number seed. Setting
 this number ensures repeatabl analyses}
+
+\item{model.function}{optionally a user defined BUGS model coded as a function (see \code{?jags},
+including the example there, for how this is done)}
+
+\item{regional_codes}{A data.frame object detailing which site is associated with which region.
+each row desginates a site and each column represents a region. The first column represents the 
+site name (as in \code{site}). Subsequent columns are named for each regions with 1 representing
+the site is in that region and 0 that it is not. NOTE a site should only be in one region}
+
+\item{region_aggs}{A named list giving aggregations of regions that you want trend
+estimates for. For example \code{region_aggs = list(GB = c('england', 'scotland', 'wales'))}
+will produced a trend for GB (Great Britain) as well as its constituent nations. Note that
+'england', scotland' and 'wales' must appear as names of columns in \code{regional_codes}. 
+More than one aggregate can be given, eg \code{region_aggs = list(GB = c('england', 'scotland',
+ 'wales'), UK = c('england', 'scotland', 'wales', 'northern_ireland'))}.}
+
+\item{additional.parameters}{A character vector of additional parameters to monitor}
+
+\item{additional.BUGS.elements}{A named list giving additioanl bugs elements passed 
+to \code{R2jags::jags} 'data' argument}
+
+\item{additional.init.values}{A named list giving user specified initial values to 
+be added to the defaults.}
+
+\item{return_data}{Logical, if \code{TRUE} (default) the bugs data object is returned with the data}
 }
 \value{
-A list of filepaths, one for each species run, giving the location of the
-        output saved as a .rdata file, containing an object called 'out'
+A list including the model, bugs model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
 }
 \description{
 Run occupancy detection models using the output from \code{formatOccData}
@@ -51,6 +78,26 @@ Run occupancy detection models using the output from \code{formatOccData}
 This function requires both the R package R2jags and the program JAGS.
 These are not installed by default when sparta is loaded and so should be
 installed by the user. More details can be found in teh vignette.
+
+\code{modeltype} is used to choose the model as well as the initial values,
+and the parameter to monitor. There are 9 elements that define models, however not
+all combinations are available in sparta. You will get an error if you try and use
+a combination that is not supported. There is usually a good reason why that
+combination is not a good idea. Here are the model elements available.
+\itemize{
+ \item{\code{"sparta"}}{ - This uses the same model as in Isaac et al (2014)}
+ \item{\code{"indran"}}{ - Here the prior for the year effect of the state model is modelled as a random effect.  This allows the model to adapt to interannual variability.}
+ \item{\code{"inversegamma"}}{ - Includes inverse-gamma hyperpriors for random effects within the model}
+ \item{\code{"intercept"}}{ - Includes an intercept term in the state and observation model.  By including intercept terms, the occupancy and detection probabilities in each year are centred on an overall mean level.}
+ \item{\code{"centering"}}{ - Includes hierarchical centering of the model parameters.   Centring does not change the model explicitly but writes it in a way that allows parameter estimates to be updated simultaneously.}
+ \item{\code{"ranwalk"}}{ - Here the prior for the year effect of the state model is modelled as a random walk.  Each estimate for the year effect is dependent on that of the previous year.}
+ \item{\code{"halfcauchy"}}{ - Includes half-Cauchy hyperpriors for all random effects within the model.  The half-Cauchy is a special case of the Student’s t distribution with 1 degree of freedom. }
+ \item{\code{"catlistlength"}}{ - This specifies that list length should be considered as a catagorical variable. There are 3 classes, lists of length 1, 2-3, and 4 and over. If none of the list length options are specifed 'contlistlength' is used}
+ \item{\code{"contlistlength"}}{ - This specifies that list length should be considered as a continious variable. If none of the list length options are specifed 'contlistlength' is used}
+ \item{\code{"nolistlength"}}{ - This specifies that no list length should be used. If none of the list length options are specifed 'contlistlength' is used}
+ \item{\code{"jul_date"}}{ - This adds Julian date to the model as a polynomial centered on the middle of the year. Note your data must include Julian day (use formatOccData(..., includeJDay = TRUE))}
+}
+These options are provided as a vector of characters, e.g. \code{modeltype = c('indran', 'centering', 'halfcauchy', 'catlistlength')}
 }
 \examples{
 \dontrun{
@@ -70,7 +117,7 @@ rDates <- first + (runif(nSamples)*dt)
 # taxa are set as random letters
 taxa <- sample(letters, size = n, TRUE)
 
-# three sites are visited randomly
+# sites are visited randomly
 site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 
 # the date of visit is selected at random from those created earlier
@@ -99,4 +146,3 @@ Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (201
 \keyword{occupancy,}
 \keyword{species,}
 \keyword{trends,}
-

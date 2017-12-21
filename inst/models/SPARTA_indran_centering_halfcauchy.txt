@@ -1,0 +1,42 @@
+# JAGS code for SPARTA model plus independent random effect prior
+# on the state model year effect + centering + halfcauchy hyperpriors
+
+# State model
+for (i in 1:nsite){ 
+  for (t in 1:nyear){   
+    z[i,t] ~ dbern(muZ[i,t]) 
+    logit(muZ[i,t])<- a[t] + eta[i] 
+  }}   
+
+# State model priors
+eta.psi0 <- log(psi0/(1-psi0))
+psi0 ~ dbeta(psi0.a, psi0.b)
+for(t in 1:nyear){
+a[t] ~ dnorm(eta.psi0, tau.a)
+}
+
+tau.a <- 1/(sd.a * sd.a)
+sd.a ~ dt(0, 1, 1)T(0,) 
+
+for (i in 1:nsite) {
+  eta[i] ~ dnorm(0, tau2)       
+} 
+
+tau2 <- 1/(sigma2 * sigma2) 
+sigma2 ~ dt(0, 1, 1)T(0,)
+  
+# Observation model priors
+eta.p0 <- log(p0/(1-p0))
+p0 ~ dbeta(p0.a, p0.b)
+
+for (t in 1:nyear) {
+  alpha.p[t] ~ dnorm(eta.p0, tau.lp)            
+}
+
+tau.lp <- 1 / (sd.lp * sd.lp)                 
+sd.lp ~ dt(0, 1, 1)T(0,) 
+  
+# Derived parameters
+for (t in 1:nyear) {  
+  psi.fs[t] <- sum(z[1:nsite,t])/nsite
+} 

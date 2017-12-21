@@ -48,4 +48,3 @@ Telfer, M.G., Preston, C.D., & Rothery, P. (2002) A general method for
             measuring relative change in range size from biological atlas data.
             Biological Conservation, 107, 99-109.
 }
-

@@ -15,6 +15,7 @@ We are in the process of re-writing much of sparta to add in things we learnt fr
 ----------------
 
 To **install** the development version of sparta, it's easiest to use the `devtools` package:
+
 ```r
 # install.packages("devtools")
 # NOTE: If you have not installed devtools before you will need to restart you R

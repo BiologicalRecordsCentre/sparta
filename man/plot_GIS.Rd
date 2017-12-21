@@ -118,4 +118,3 @@ using the \code{readShapePoly()} function contained in the 'maptools' R package.
 \keyword{GIS,}
 \keyword{mapping,}
 \keyword{shapefile}
-

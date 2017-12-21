@@ -4,7 +4,7 @@
 \alias{formatOccData}
 \title{Format data for Occupancy detection models}
 \usage{
-formatOccData(taxa, site, time_period)
+formatOccData(taxa, site, time_period, includeJDay = FALSE)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}
@@ -13,6 +13,9 @@ formatOccData(taxa, site, time_period)
 
 \item{time_period}{A numeric vector of user defined time periods, or a date vector,
 as long as the number of observations.}
+
+\item{includeJDay}{Logical. If \code{TRUE} a Julian day column is returned in the
+occDetData object}
 }
 \value{
 A list of length 2 the first element 'spp_vis' is a data.frame with visit
@@ -20,7 +23,8 @@ A list of length 2 the first element 'spp_vis' is a data.frame with visit
  the following columns. Values in taxa columns are either \code{TRUE} or
  \code{FALSE} depending on whether they were observed on that visit. The second
  element ('occDetData') is a dataframe giving the site, list length (the number of
- species observed on a visit) and year for each visit.
+ species observed on a visit) and year for each visit. Optionally this also includes
+ a Julian Day column
 }
 \description{
 This takes occurrene data in the form of a vector of taxa names, locations
@@ -68,4 +72,3 @@ Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (201
 \keyword{occupancy,}
 \keyword{species,}
 \keyword{trends,}
-

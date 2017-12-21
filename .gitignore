@@ -5,3 +5,7 @@
 *-Ex.R
 .Rproj.user
 *.Rproj
+
+# etc
+frescalo.exe
+sparta.Rproj

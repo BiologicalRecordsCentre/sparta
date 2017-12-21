@@ -1,0 +1,43 @@
+# JAGS code for SPARTA model plus random walk prior
+# on the year effect of the state model + centering + inversegamma hyperpriors
+
+# State model
+for (i in 1:nsite){ 
+  for (t in 1:nyear){   
+    z[i,t] ~ dbern(muZ[i,t]) 
+    logit(muZ[i,t])<- a[t] + eta[i] 
+  }}   
+
+# State model priors
+eta.psi0 <- log(psi0/(1-psi0))
+psi0 ~ dbeta(psi0.a, psi0.b)
+aa[1] ~ dnorm(0, 1)
+a[1] <- eta.psi0 # edited to match RC 23/06/2016 - was set to 0
+for(t in 2:nyear){
+  aa[t] ~ dnorm(aa[t-1], tau.a)
+  a[t] <- eta.psi0 + aa[t] - aa[1]
+}
+tau.a ~ dgamma(0.001, 0.001)
+sd.a <- pow(tau.a, -0.5)
+
+for (i in 1:nsite) {
+  eta[i] ~ dnorm(0, tau2)       
+} 
+
+tau2 ~ dgamma(0.001, 0.001) 
+sigma2 <- pow(tau2, -0.5)
+
+# Observation model priors 
+eta.p0 <- log(p0/(1-p0))
+p0 ~ dbeta(p0.a, p0.b)
+for (t in 1:nyear) {
+  alpha.p[t] ~ dnorm(eta.p0, tau.lp)            
+}
+
+tau.lp ~ dgamma(0.001, 0.001)
+sigma.lp <- pow(tau.lp, -0.5)    
+
+# Derived parameters
+for (t in 1:nyear) {  
+  psi.fs[t] <- sum(z[1:nsite, t])/nsite
+}

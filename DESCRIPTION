@@ -1,10 +1,14 @@
 Package: sparta
 Type: Package
 Title: Trend Analysis for Unstructured Data
-Version: 0.1.30
-Date: 2015-06-05
-Author: Tom August <tomaug@ceh.ac.uk>, Gary Powney, Colin Harrower, Mark Hill,
-    Nick Isaac
+Version: 0.1.39
+Date: 2017-01-12
+Authors@R: c(person("Tom", "August", role = c("aut", "cre"), email = "tomaug@ceh.ac.uk"),
+             person("Gary", "Powney", role = c("aut")),
+             person("Charlie", "Outhwaite", role = c("aut")),
+             person("Colin", "Harrower", role = c("aut")),
+             person("Mark", "Hill", role = c("aut")),
+             person("Nick", "Isaac", role = c("aut")))
 Maintainer: Tom August <tomaug@ceh.ac.uk>
 Description: Methods used to analyse trends in unstructured
     occurrence datasets such as those collected by volunteer recording
@@ -19,12 +23,14 @@ Imports:
     sp,
     reshape2,
     ggplot2,
-    gdata
+    gdata,
+    R2jags,
+    LearnBayes,
+    rmarkdown
 Suggests:
     testthat (>= 0.8.0),
-    R2jags,
     roxygen2,
     knitr
 VignetteBuilder: knitr
 LazyData: TRUE
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

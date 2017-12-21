@@ -8,14 +8,17 @@
 #' @param site A character vector of site names, as long as the number of observations.
 #' @param time_period A numeric vector of user defined time periods, or a date vector,
 #'        as long as the number of observations.
+#' @param includeJDay Logical. If \code{TRUE} a Julian day column is returned in the
+#'        occDetData object
 #' 
 #' @return A list of length 2 the first element 'spp_vis' is a data.frame with visit
 #'  (unique combination of site and time period) in the first column and taxa for all
 #'  the following columns. Values in taxa columns are either \code{TRUE} or
 #'  \code{FALSE} depending on whether they were observed on that visit. The second
 #'  element ('occDetData') is a dataframe giving the site, list length (the number of
-#'  species observed on a visit) and year for each visit.  
-#'          
+#'  species observed on a visit) and year for each visit. Optionally this also includes
+#'  a Julian Day column
+#'           
 #' @keywords trends, species, distribution, occupancy, bayesian, modeling
 #' @references Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
 #'             Statistics for citizen science: extracting signals of change from noisy ecological data.
@@ -53,7 +56,7 @@
 #' @importFrom dplyr distinct
 #' @importFrom reshape2 dcast
 
-formatOccData <- function(taxa, site, time_period){
+formatOccData <- function(taxa, site, time_period, includeJDay = FALSE){
 
   # Do error checks
   errorChecks(taxa = taxa, site = site, time_period = time_period)
@@ -84,8 +87,18 @@ formatOccData <- function(taxa, site, time_period){
   temp$pres <- TRUE # add TRUE column which will populate the spp with visit matrix/dataframe
   spp_vis <- dcast(temp, formula = visit ~ species_name, value.var = "pres", fill = FALSE) # This is the dataframe that contains a row per visit and a column for each species present or not.  USed to create the focal column in the next step
   
-  # create occDetdata which is the main file sent to bugs (1 row per visist) - this will have "focal" added to it within the species loop
-  occDetdata <- unique(taxa_data[,c("visit", "site", "L", "year")])
+  
+  # Add Julian Day if needed
+  if(includeJDay){
+    taxa_data$Jul_date <-as.numeric(
+      format(as.POSIXlt(taxa_data[,"time_period"],
+                        format = "%Y-%m-%d"), "%j")
+      )
+    occDetdata <- unique(taxa_data[,c("visit", "site", "L", "year", "Jul_date")])
+  } else {
+    # create occDetdata which is the main file sent to bugs (1 row per visist) - this will have "focal" added to it within the species loop
+    occDetdata <- unique(taxa_data[,c("visit", "site", "L", "year")])
+  }
   
   return(list(spp_vis = spp_vis, occDetdata = occDetdata))
   

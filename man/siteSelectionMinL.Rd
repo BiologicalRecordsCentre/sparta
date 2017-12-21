@@ -29,4 +29,3 @@ for this function that performs the complete site selection process as outlined 
 \references{
 needed
 }
-

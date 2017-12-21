@@ -34,4 +34,3 @@ gps_latlon2gr(51.60233, -1.111254)
 \keyword{latitude}
 \keyword{longitude}
 \keyword{mapping}
-

@@ -82,4 +82,3 @@ recording effort is not known. 2011. \emph{Methods in Ecology and Evolution}, 3 
 \keyword{frescalo,}
 \keyword{trends,}
 \keyword{weights}
-

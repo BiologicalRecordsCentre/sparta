@@ -47,4 +47,3 @@ tps <- date2timeperiod(Date = Date, time_periods = time_periods)
 tps <- date2timeperiod(Date = data.frame(start = Date, end = (Date+100)),
                        time_periods = time_periods) 
 }
-
