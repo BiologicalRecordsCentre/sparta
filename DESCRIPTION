@@ -3,8 +3,12 @@ Type: Package
 Title: Trend Analysis for Unstructured Data
 Version: 0.1.39
 Date: 2017-01-12
-Author: Tom August <tomaug@ceh.ac.uk>, Gary Powney, Charlie Outhwaite,
-    Colin Harrower, Mark Hill, Nick Isaac
+Authors@R: c(person("Tom", "August", role = c("aut", "cre"), email = "tomaug@ceh.ac.uk"),
+             person("Gary", "Powney", role = c("aut")),
+             person("Charlie", "Outhwaite", role = c("aut")),
+             person("Colin", "Harrower", role = c("aut")),
+             person("Mark", "Hill", role = c("aut")),
+             person("Nick", "Isaac", role = c("aut")))
 Maintainer: Tom August <tomaug@ceh.ac.uk>
 Description: Methods used to analyse trends in unstructured
     occurrence datasets such as those collected by volunteer recording
@@ -21,7 +25,8 @@ Imports:
     ggplot2,
     gdata,
     R2jags,
-    LearnBayes
+    LearnBayes,
+    rmarkdown
 Suggests:
     testthat (>= 0.8.0),
     roxygen2,
