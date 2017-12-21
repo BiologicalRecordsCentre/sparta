@@ -16,14 +16,26 @@ We are in the process of re-writing much of sparta to add in things we learnt fr
 
 To **install** the development version of sparta, it's easiest to use the `devtools` package:
 
-    # install.packages("devtools")
-    # NOTE: If you have not installed devtools before you will need to restart you R
-    # session before installing to avoid problems
-    
-    library(devtools)
-    install_github("BiologicalRecordsCentre/sparta")
-    
-    library(sparta)
+```r
+# install.packages("devtools")
+# NOTE: If you have not installed devtools before you will need to restart you R
+# session before installing to avoid problems
+
+library(devtools)
+
+# Some users have reported issues with devtools not correctly installing
+# dependencies. Run the following lines to avoid these issues
+list.of.packages <- c("minqa", "lme4", "gtools", "gtable", "scales",
+                      "assertthat", "magrittr", "tibble", "stringr")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+
+# Now install sparta
+install_github('BiologicalRecordsCentre/sparta')
+
+# Load sparta
+library(sparta)
+```
 
 If you have difficulties installing sparta using this method try updating your version of R to the most up-to-date version available. If you still have problems please contact us or use the issues page.
 
