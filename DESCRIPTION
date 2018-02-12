@@ -12,7 +12,7 @@ Authors@R: c(person("Tom", "August", role = c("aut", "cre"), email = "tomaug@ceh
 Maintainer: Tom August <tomaug@ceh.ac.uk>
 Description: Methods used to analyse trends in unstructured
     occurrence datasets such as those collected by volunteer recording
-    schemes.
+    schemes
 License: MIT + file LICENSE
 Depends:
     R (>= 3.1.0),
