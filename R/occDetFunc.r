@@ -33,6 +33,8 @@
 #' 'england', scotland' and 'wales' must appear as names of columns in \code{regional_codes}. 
 #' More than one aggregate can be given, eg \code{region_aggs = list(GB = c('england', 'scotland',
 #'  'wales'), UK = c('england', 'scotland', 'wales', 'northern_ireland'))}.
+#' @param max_year numeric, final year to which analysis will be run, this can be set if it is beyond
+#' the limit of the dataset.  Defaults to final year of the dataset.
 #' @param seed numeric, uses \code{set.seed} to set the randon number seed. Setting
 #'        this number ensures repeatabl analyses
 #' @param model.function optionally a user defined BUGS model coded as a function (see \code{?jags},
@@ -112,8 +114,8 @@
 
 occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 2,
                         burnin = 1500, thinning = 3, n_chains = 3, write_results = TRUE,
-                        output_dir = getwd(),  modeltype = 'sparta', seed = NULL,
-                        model.function = NULL, regional_codes = NULL,
+                        output_dir = getwd(),  modeltype = 'sparta', max_year = NULL, 
+                        seed = NULL, model.function = NULL, regional_codes = NULL,
                         region_aggs = NULL, additional.parameters = NULL,
                         additional.BUGS.elements = NULL, additional.init.values = NULL,
                         return_data = FALSE){
@@ -203,28 +205,52 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     }
   }
   
-  # Record the max and min year
+  # Record the min year
   min_year <- min(occDetdata$year)
-  max_year <- max(occDetdata$year)
   
-  # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
-  occDetdata$year <- occDetdata$year - min(occDetdata$year) + 1
-  site_match <- data.frame(original_site = occDetdata$site, new_site_name = as.numeric(as.factor(occDetdata$site)))
-  site_match <- unique(site_match)
-  occDetdata$site <- as.numeric(as.factor(occDetdata$site))
-  
-  # Convert the regional table to these numeric versions of site names
-  if(!is.null(regional_codes)){
-    regional_codes$numeric_site_name <- site_match$new_site_name[match(x = as.character(regional_codes[,1]),
-                                                             table = as.character(site_match$original_site))]
+  # if the max_year is not null, edit the zst table to add the additional years required
+  if(!is.null(max_year)){
+    
+    # check that max_year is a numeric value
+    if(!is.numeric(max_year)) stop('max_year should be a numeric value')
+    
+    # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
+    occDetdata$year <- occDetdata$year - min(occDetdata$year) + 1
+    occDetdata$site <- as.numeric(as.factor(occDetdata$site))
+    
+    # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
+    zst <- acast(occDetdata, site ~ factor(year), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
+    nyear <- max_year - min_year + 1
+    
+    # if nyear is greater than the number of years due to different specification of max_year, 
+    # add on additional columns to zst so that inital values can be create for these years.
+    
+    if(nyear > ncol(zst)){
+      # work out how many columns need to be added
+      to_add <- nyear - ncol(zst)
+      zst <- cbind(zst, matrix(0, ncol = to_add, nrow = nrow(zst)))
+      # add column names
+      colnames(zst) <- 1:nyear 
+    }
+    
+    # if a value has not been selected for max_year then continue as before
+  }else{
+    
+    # record the max year
+    max_year <- max(occDetdata$year)
+    
+    # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
+    occDetdata$year <- occDetdata$year - min(occDetdata$year) + 1
+    occDetdata$site <- as.numeric(as.factor(occDetdata$site))
+    
+    # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
+    zst <- acast(occDetdata, site ~ factor(year), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
+    nyear <- max_year - min_year + 1
+    
   }
   
-  # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
-  zst <- acast(occDetdata, site ~ factor(year), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
-  nyear <- max_year - min_year + 1
-  
   # look for missing years
-  if(length(unique(occDetdata$year)) != nyear) stop('It looks like you have years with no data. This will crash BUGS')
+  #if(length(unique(occDetdata$year)) != nyear) stop('It looks like you have years with no data. This will crash BUGS')
   
   # Parameter you wish to monitor, shown in the output
   parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a", "mu.lp")

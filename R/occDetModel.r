@@ -38,6 +38,8 @@
 #' 'england', scotland' and 'wales' must appear as names of columns in \code{regional_codes}. 
 #' More than one aggregate can be given, eg \code{region_aggs = list(GB = c('england', 'scotland',
 #'  'wales'), UK = c('england', 'scotland', 'wales', 'northern_ireland'))}.
+#' @param max_year numeric, final year to which analysis will be run, this can be set if it is beyond
+#' the limit of the dataset.  Defaults to final year of the dataset.
 #' @param seed numeric, uses \code{set.seed} to set the randon number seed. Setting
 #'        this number ensures repeatabl analyses
 #' @param additional.parameters A character vector of additional parameters to monitor
@@ -152,7 +154,7 @@ occDetModel <- function(taxa, site, time_period,
                         output_dir = getwd(), nyr = 2, n_iterations = 5000,
                         burnin = 1500, thinning = 3, n_chains = 3, 
                         modeltype = 'sparta', regional_codes = NULL,
-                        region_aggs = NULL, model.function = NULL,
+                        region_aggs = NULL, model.function = NULL, max_year = NULL,
                         seed = NULL, additional.parameters = NULL,
                         additional.BUGS.elements = NULL,
                         additional.init.values = NULL,
@@ -193,7 +195,8 @@ occDetModel <- function(taxa, site, time_period,
                                       regional_codes = regional_codes,
                                       region_aggs = region_aggs,
                                       model.function = model.function,
-                                      seed = seed,
+                                      seed = seed, 
+                                      max_year = max_year,
                                       additional.parameters = additional.parameters,
                                       additional.BUGS.elements = additional.BUGS.elements,
                                       additional.init.values = additional.init.values,
