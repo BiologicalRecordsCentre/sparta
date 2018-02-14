@@ -205,6 +205,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     }
   }
   
+  # Record the min year
+  min_year <- min(occDetdata$year)
   
   # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
   occDetdata$year <- occDetdata$year - min(occDetdata$year) + 1
@@ -218,8 +220,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                                                                        table = as.character(site_match$original_site))]
   }
   
-  # Record the min year
-  min_year <- min(occDetdata$year)
+
   
   # if the max_year is not null, edit the zst table to add the additional years required
   if(!is.null(max_year)){
