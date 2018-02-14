@@ -8,9 +8,9 @@ occDetModel(taxa, site, time_period, species_list = unique(taxa),
   write_results = TRUE, output_dir = getwd(), nyr = 2,
   n_iterations = 5000, burnin = 1500, thinning = 3, n_chains = 3,
   modeltype = "sparta", regional_codes = NULL, region_aggs = NULL,
-  model.function = NULL, seed = NULL, additional.parameters = NULL,
-  additional.BUGS.elements = NULL, additional.init.values = NULL,
-  return_data = FALSE)
+  model.function = NULL, max_year = NULL, seed = NULL,
+  additional.parameters = NULL, additional.BUGS.elements = NULL,
+  additional.init.values = NULL, return_data = FALSE)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}
@@ -59,6 +59,9 @@ More than one aggregate can be given, eg \code{region_aggs = list(GB = c('englan
 
 \item{model.function}{optionally a user defined BUGS model coded as a function (see \code{?jags},
 including the example there, for how this is done)}
+
+\item{max_year}{numeric, final year to which analysis will be run, this can be set if it is beyond
+the limit of the dataset.  Defaults to final year of the dataset.}
 
 \item{seed}{numeric, uses \code{set.seed} to set the randon number seed. Setting
 this number ensures repeatabl analyses}

@@ -205,6 +205,19 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     }
   }
   
+  
+  # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
+  occDetdata$year <- occDetdata$year - min(occDetdata$year) + 1
+  site_match <- data.frame(original_site = occDetdata$site, new_site_name = as.numeric(as.factor(occDetdata$site)))
+  site_match <- unique(site_match)
+  occDetdata$site <- as.numeric(as.factor(occDetdata$site))
+  
+  # Convert the regional table to these numeric versions of site names
+  if(!is.null(regional_codes)){
+    regional_codes$numeric_site_name <- site_match$new_site_name[match(x = as.character(regional_codes[,1]),
+                                                                       table = as.character(site_match$original_site))]
+  }
+  
   # Record the min year
   min_year <- min(occDetdata$year)
   
@@ -213,11 +226,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     # check that max_year is a numeric value
     if(!is.numeric(max_year)) stop('max_year should be a numeric value')
-    
-    # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
-    occDetdata$year <- occDetdata$year - min(occDetdata$year) + 1
-    occDetdata$site <- as.numeric(as.factor(occDetdata$site))
-    
+
     # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
     zst <- acast(occDetdata, site ~ factor(year), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
     nyear <- max_year - min_year + 1
@@ -238,11 +247,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     # record the max year
     max_year <- max(occDetdata$year)
-    
-    # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
-    occDetdata$year <- occDetdata$year - min(occDetdata$year) + 1
-    occDetdata$site <- as.numeric(as.factor(occDetdata$site))
-    
+
     # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
     zst <- acast(occDetdata, site ~ factor(year), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
     nyear <- max_year - min_year + 1

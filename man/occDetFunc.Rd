@@ -6,10 +6,11 @@
 \usage{
 occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 2,
   burnin = 1500, thinning = 3, n_chains = 3, write_results = TRUE,
-  output_dir = getwd(), modeltype = "sparta", seed = NULL,
-  model.function = NULL, regional_codes = NULL, region_aggs = NULL,
-  additional.parameters = NULL, additional.BUGS.elements = NULL,
-  additional.init.values = NULL, return_data = FALSE)
+  output_dir = getwd(), modeltype = "sparta", max_year = NULL,
+  seed = NULL, model.function = NULL, regional_codes = NULL,
+  region_aggs = NULL, additional.parameters = NULL,
+  additional.BUGS.elements = NULL, additional.init.values = NULL,
+  return_data = FALSE)
 }
 \arguments{
 \item{taxa_name}{A character giving the name of the species to be modelled.}
@@ -39,6 +40,9 @@ as .rdata files. This will defualt to the working directory}
 
 \item{modeltype}{A character string or vector of strings that specifies the model to use. See details. If
 used then model.function is ignored.}
+
+\item{max_year}{numeric, final year to which analysis will be run, this can be set if it is beyond
+the limit of the dataset.  Defaults to final year of the dataset.}
 
 \item{seed}{numeric, uses \code{set.seed} to set the randon number seed. Setting
 this number ensures repeatabl analyses}
