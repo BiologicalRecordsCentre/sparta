@@ -49,11 +49,35 @@
 #' be added to the defaults.
 #' @param return_data Logical, if \code{TRUE} (default) the bugs data object is returned with the data
 #' 
-#' @details \code{modeltype} is used to choose the model as well as the initial values,
-#' and the parameter to monitor. There are 9 elements that define models, however not
-#' all combinations are available in sparta. You will get an error if you try and use
+#' @details \code{modeltype} is used to choose the model as well as the associated initial values,
+#' and parameters to monitor. Elements to choose from can be separated into the following components:
+#' A. Prior type on the year effect
+#' B. Hyperprior type
+#' C. List length specification
+#' D. Julian date inclusion
+#' 
+#' A. Prior type: this has 3 options, each of which was tested in Outhwaite et al (in review)
+#'   1. sparta - This uses the same model as in Isaac et al (2014)
+#'   2. indran - This is the adaptive stationary model
+#'   3. ranwalk - This is the random walk model
+#' 
+#' B. Hyperprior type: This has 3 options, each of these are discussed in Outhwaite et al (in review
+#'   1. halfuniform - the original formulation in Isaac et al (2014)
+#'   2. halfcauchy - preferred form, tested in Outhwaite et al (in review)
+#'   3. inversegamma - alternative form presented in the literature
+#' 
+#' C. List length specification:  This has 3 options
+#'   1. catlistlength - list length as a categorical variable
+#'   2. contlistlength - list length as a continuous variable
+#'   3. nolistlength - no list length variable
+#' 
+#' D. Julian date: this is an additional option for including Julian date within the detection model
+#'   1. jul_date
+#' 
+#' Not all combinations are available in sparta. You will get an error if you try and use
 #' a combination that is not supported. There is usually a good reason why that
 #' combination is not a good idea. Here are the model elements available.
+#' 
 #' \itemize{
 #'  \item{\code{"sparta"}}{ - This uses the same model as in Isaac et al (2014)}
 #'  \item{\code{"indran"}}{ - Here the prior for the year effect of the state model is modelled as a random effect.  This allows the model to adapt to interannual variability.}
