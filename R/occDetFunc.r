@@ -48,48 +48,44 @@
 #'
 #' @details \code{modeltype} is used to choose the model as well as the associated initial values,
 #' and parameters to monitor. Elements to choose from can be separated into the following components:
-#' A. Prior type on the year effect
-#' B. Hyperprior type
-#' C. List length specification
-#' D. Julian date inclusion
 #' 
-#' A. Prior type: this has 3 options, each of which was tested in Outhwaite et al (in review)
-#'   1. sparta - This uses the same model as in Isaac et al (2014)
-#'   2. indran - This is the adaptive stationary model
-#'   3. ranwalk - This is the random walk model
+#' A. Prior type: this has 3 options, each of which was tested in Outhwaite et al (in review):
+#'   1. sparta - This uses the same model as in Isaac et al (2014).
+#'   2. indran - This is the adaptive stationary model.
+#'   3. ranwalk - This is the random walk model.
 #' 
-#' B. Hyperprior type: This has 3 options, each of these are discussed in Outhwaite et al (in review
-#'   1. halfuniform - the original formulation in Isaac et al (2014)
-#'   2. halfcauchy - preferred form, tested in Outhwaite et al (in review)
-#'   3. inversegamma - alternative form presented in the literature
+#' B. Hyperprior type: This has 3 options, each of these are discussed in Outhwaite et al (in review):
+#'   1. halfuniform - the original formulation in Isaac et al (2014).
+#'   2. halfcauchy - preferred form, tested in Outhwaite et al (in review).
+#'   3. inversegamma - alternative form presented in the literature.
 #' 
-#' C. List length specification:  This has 3 options
-#'   1. catlistlength - list length as a categorical variable
-#'   2. contlistlength - list length as a continuous variable
-#'   3. nolistlength - no list length variable
+#' C. List length specification:  This has 3 options:
+#'   1. catlistlength - list length as a categorical variable.
+#'   2. contlistlength - list length as a continuous variable.
+#'   3. nolistlength - no list length variable.
 #' 
-#' D. Julian date: this is an additional option for including Julian date within the detection model
-#'   1. jul_date
+#' D. Julian date: this is an additional option for including Julian date within the detection model:
+#'   1. jul_date.
 #' 
 #' Not all combinations are available in sparta. You will get an error if you try and use
 #' a combination that is not supported. There is usually a good reason why that
-#' combination is not a good idea. Here are the model elements available.
+#' combination is not a good idea. Here are the model elements available:
 #' 
 #' \itemize{
 #'  \item{\code{"sparta"}}{ - This uses the same model as in Isaac et al (2014)}
 #'  \item{\code{"indran"}}{ - Here the prior for the year effect of the state model is modelled as a random effect.  This allows the model to adapt to interannual variability.}
-#'  \item{\code{"inversegamma"}}{ - Includes inverse-gamma hyperpriors for random effects within the model}
-#'  \item{\code{"intercept"}}{ - Includes an intercept term in the state and observation model.  By including intercept terms, the occupancy and detection probabilities in each year are centred on an overall mean level.}
-#'  \item{\code{"centering"}}{ - Includes hierarchical centering of the model parameters.   Centring does not change the model explicitly but writes it in a way that allows parameter estimates to be updated simultaneously.}
 #'  \item{\code{"ranwalk"}}{ - Here the prior for the year effect of the state model is modelled as a random walk.  Each estimate for the year effect is dependent on that of the previous year.}
 #'  \item{\code{"halfcauchy"}}{ - Includes half-Cauchy hyperpriors for all random effects within the model.  The half-Cauchy is a special case of the Student’s t distribution with 1 degree of freedom. }
+#'  \item{\code{"inversegamma"}}{ - Includes inverse-gamma hyperpriors for random effects within the model}
 #'  \item{\code{"catlistlength"}}{ - This specifies that list length should be considered as a catagorical variable. There are 3 classes, lists of length 1, 2-3, and 4 and over. If none of the list length options are specifed 'contlistlength' is used}
 #'  \item{\code{"contlistlength"}}{ - This specifies that list length should be considered as a continious variable. If none of the list length options are specifed 'contlistlength' is used}
 #'  \item{\code{"nolistlength"}}{ - This specifies that no list length should be used. If none of the list length options are specifed 'contlistlength' is used}
-#'  \item{\code{"jul_date"}}{ - This adds Julian date to the model as a polynomial centered on the middle of the year. Note your data must include Julian day (use formatOccData(..., includeJDay = TRUE))}
+#'  \item{\code{"jul_date"}}{ - This adds Julian date to the model as a polynomial centered on the middle of the year.}
+#'  \item{\code{"intercept"}}{ - No longer available.  Includes an intercept term in the state and observation model.  By including intercept terms, the occupancy and detection probabilities in each year are centred on an overall mean level.}
+#'  \item{\code{"centering"}}{ - No longer available.  Includes hierarchical centering of the model parameters.   Centring does not change the model explicitly but writes it in a way that allows parameter estimates to be updated simultaneously.}
 #' }
-#' These options are provided as a vector of characters, e.g. \code{modeltype = c('indran', 'centering', 'halfcauchy', 'catlistlength')}
-#'
+#' These options are provided as a vector of characters, e.g. \code{modeltype = c('indran', 'halfcauchy', 'catlistlength')}
+#' 
 #' @return A list including the model, bugs model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
 #'          
 #' @keywords trends, species, distribution, occupancy, bayesian, modeling
@@ -233,7 +229,6 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   min_year <- min(occDetdata$year)
   
   # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
-  occDetdata$year <- occDetdata$year - min(occDetdata$year) + 1
   site_match <- data.frame(original_site = occDetdata$site, new_site_name = as.numeric(as.factor(occDetdata$site)))
   site_match <- unique(site_match)
   occDetdata$site <- as.numeric(as.factor(occDetdata$site))
@@ -278,6 +273,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     nyear <- max_year - min_year + 1
     
   }
+  
+  # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
+  occDetdata$year <- occDetdata$year - min(occDetdata$year) + 1
   
   # look for missing years
   #if(length(unique(occDetdata$year)) != nyear) stop('It looks like you have years with no data. This will crash BUGS')
