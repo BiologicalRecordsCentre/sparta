@@ -227,10 +227,22 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   if(length(unique(occDetdata$year)) != nyear) stop('It looks like you have years with no data. This will crash BUGS')
   
   # Parameter you wish to monitor, shown in the output
-  parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a", "mu.lp")
+  parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a")
   
   # If not sparta add monitoring for eta.psi0
-  if(!'sparta' %in% tolower(modeltype)) parameters <- c(parameters, "eta.p0", "eta.psi0")
+  if(!'sparta' %in% tolower(modeltype)) {
+    parameters <- c(parameters, "eta.p0", "eta.psi0")
+  }
+  
+  # Id ranwalk + halfcauchy monitor mu.lp 
+  if(all(c('ranwalk', 'halfcauchy') %in% modeltype)){
+    parameters <- c(parameters, "mu.lp")
+  }
+  
+  # Id sparta monitor mu.lp 
+  if('sparta' %in% tolower(modeltype)) {
+    parameters <- c(parameters, "mu.lp")
+  }
   
   # Add user specified paramters if given
   if(!is.null(additional.parameters)) parameters <- c(parameters, additional.parameters)
