@@ -236,10 +236,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # If ranwalk + halfcauchy monitor mu.lp 
   if(all(c('ranwalk', 'halfcauchy') %in% modeltype)){
-    if(!'centering' %in% tolower(modeltype) | !'intercept' %in% tolower(modeltype)){
-      parameters <- parameters
-    } else {
-    parameters <- c(parameters, "mu.lp")
+    if(!'centering' %in% tolower(modeltype) & !'intercept' %in% tolower(modeltype)){
+      parameters <- c(parameters, "mu.lp")
     }
   }
   
