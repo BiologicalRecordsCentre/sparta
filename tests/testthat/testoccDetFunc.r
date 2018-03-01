@@ -22,6 +22,12 @@ site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 # the date of visit is selected at random from those created earlier
 time_period <- sample(rDates, size = n, TRUE)
 
+# set up regions for some testing
+regions <- data.frame(site = unique(site),
+                      region1 = c(rep(1, 20), rep(0, 30)),
+                      region2 = c(rep(0, 20), rep(1, 15), rep(0, 15)),
+                      region3 = c(rep(0, 20), rep(0, 15), rep(1, 15)))
+
 # format data
 suppressWarnings({visitData <- formatOccData(taxa = taxa, site = site,
                                              time_period = time_period)})
@@ -340,3 +346,43 @@ test_that("Test occDetFunc with catagorical list length", {
   sink()
   
 })  
+
+test_that("Test occDetFunc using regions and region aggregates", {
+  
+  sink(file=ifelse(Sys.info()["sysname"] == "Windows",
+                   "NUL",
+                   "/dev/null"))
+  
+  results <- occDetFunc(taxa_name = 'a',
+                        n_iterations = 50,
+                        burnin = 15, 
+                        occDetdata = visitData$occDetdata,
+                        spp_vis = visitData$spp_vis,
+                        write_results = FALSE,
+                        seed = 111,
+                        modeltype = c("ranwalk", "halfcauchy"),
+                        regional_codes = regions,
+                        region_aggs = list(agg1 = c('region1', 'region2')))
+  
+  expect_identical(results$SPP_NAME, 'a')
+  expect_identical(results$n.iter, 50)
+  expect_identical(names(results),
+                   c("model", "BUGSoutput", "parameters.to.save", "model.file", 
+                     "n.iter", "DIC", "SPP_NAME", "min_year", "max_year",
+                     "nsites", "nvisits", "species_sites", "species_observations",
+                     "regions", "region_aggs"))
+  expect_identical(results$regions,
+                   c("region1", "region2", "region3"))
+  expect_identical(names(results$region_aggs), "agg1")
+  RNs <- row.names(results$BUGSoutput$summary)
+  expect_true("a_region1[1]" %in% RNs)
+  expect_true("a_region2[1]" %in% RNs)
+  expect_true("a_region3[1]" %in% RNs)
+  expect_true("psi.fs.r_region1[1]" %in% RNs)
+  expect_true("psi.fs.r_region2[1]" %in% RNs)
+  expect_true("psi.fs.r_region3[1]" %in% RNs)
+  expect_true("psi.fs.r_agg1[1]" %in% RNs)
+
+  sink()
+  
+}) 
