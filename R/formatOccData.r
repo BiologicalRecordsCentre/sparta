@@ -9,7 +9,7 @@
 #' @param time_period A numeric vector of user defined time periods, or a date vector,
 #'        as long as the number of observations.
 #' @param includeJDay Logical. If \code{TRUE} a Julian day column is returned in the
-#'        occDetData object
+#'        occDetData object, centered on 1 July.
 #' 
 #' @return A list of length 2 the first element 'spp_vis' is a data.frame with visit
 #'  (unique combination of site and time period) in the first column and taxa for all
@@ -23,6 +23,9 @@
 #' @references Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
 #'             Statistics for citizen science: extracting signals of change from noisy ecological data.
 #'             Methods in Ecology and Evolution, 5 (10), 1052-1060.
+#' @references van Strien, A.J., Termaat, T., Groenendijk, D., Mensing, V. & Kéry, M. (2010).
+#'             Site-occupancy models may offer new opportunities for dragonfly monitoring based on daily species lists.
+#'             Basic and Applied Ecology, 11, 495-503.
 #' @examples
 #' \dontrun{
 #' 
@@ -91,9 +94,11 @@ formatOccData <- function(taxa, site, time_period, includeJDay = FALSE){
   # Add Julian Day if needed
   if(includeJDay){
     taxa_data$Jul_date <-as.numeric(
-      format(as.POSIXlt(taxa_data[,"time_period"],
+            format(as.POSIXlt(taxa_data[,"time_period"],
                         format = "%Y-%m-%d"), "%j")
       )
+    #center on the 1st of July by subtracting 182
+    taxa_data$Jul_date <- taxa_data$Jul_date - 182
     occDetdata <- unique(taxa_data[,c("visit", "site", "L", "year", "Jul_date")])
   } else {
     # create occDetdata which is the main file sent to bugs (1 row per visist) - this will have "focal" added to it within the species loop
