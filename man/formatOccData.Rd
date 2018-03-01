@@ -4,18 +4,22 @@
 \alias{formatOccData}
 \title{Format data for Occupancy detection models}
 \usage{
-formatOccData(taxa, site, time_period, includeJDay = FALSE)
+formatOccData(taxa, site, survey, closure_period = NULL,
+  includeJDay = FALSE)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}
 
 \item{site}{A character vector of site names, as long as the number of observations.}
 
-\item{time_period}{A numeric vector of user defined time periods, or a date vector,
-as long as the number of observations.}
+\item{survey}{A vector as long as the number of observations. 
+This must be a Date if either closure_period is not supplied or if includeJDay = \code{TRUE}}
+
+\item{closure_period}{An optional vector of integers specifying the closure period. 
+If \code{FALSE} then closure_period will be extracted as the year from the survey.}
 
 \item{includeJDay}{Logical. If \code{TRUE} a Julian day column is returned in the
-occDetData object}
+occDetData object, centered on 1 July.}
 }
 \value{
 A list of length 2 the first element 'spp_vis' is a data.frame with visit
@@ -24,11 +28,11 @@ A list of length 2 the first element 'spp_vis' is a data.frame with visit
  \code{FALSE} depending on whether they were observed on that visit. The second
  element ('occDetData') is a dataframe giving the site, list length (the number of
  species observed on a visit) and year for each visit. Optionally this also includes
- a Julian Day column
+ a Julian Day column, centered on 1 July.
 }
 \description{
 This takes occurrene data in the form of a vector of taxa names, locations
-and time_period (usually a date) and converts them into the form needed for
+and survey (usually a date) and converts them into the form needed for
 occupancy models (see value section)
 }
 \examples{
@@ -37,14 +41,14 @@ occupancy models (see value section)
 # Create data
 n <- 15000 #size of dataset
 nyr <- 20 # number of years in data
-nSamples <- 100 # set number of dates
+nSurveys <- 100 # set number of dates
 nSites <- 50 # set number of sites
 
 # Create somes dates
 first <- as.Date(strptime("2010/01/01", "\%Y/\%m/\%d")) 
 last <- as.Date(strptime(paste(2010+(nyr-1),"/12/31", sep=''), "\%Y/\%m/\%d")) 
 dt <- last-first 
-rDates <- first + (runif(nSamples)*dt)
+rDates <- first + (runif(nSurveys)*dt)
 
 # taxa are set as random letters
 taxa <- sample(letters, size = n, TRUE)
@@ -53,18 +57,50 @@ taxa <- sample(letters, size = n, TRUE)
 site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 
 # the date of visit is selected at random from those created earlier
-time_period <- sample(rDates, size = n, TRUE)
+survey <- sample(rDates, size = n, TRUE)
 
 # run the model with these data for one species
 formatted_data <- formatOccData(taxa = taxa,
                                 site = site,
-                                time_period = time_period)
+                                survey = survey,
+                                includeJDay = TRUE)
+}
+\dontrun{
+
+# Create data with coarser survey information
+n <- 1500 #number of species observation in dataset
+np <- 10 # number of closure periods in data
+nSurveys <- 100 # set number of surveys
+nSites <- 20 # set number of sites
+
+# taxa are set as random letters
+taxa <- sample(letters, size = n, TRUE)
+
+# three sites are visited randomly
+site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
+
+# the date of visit is selected at random from those created earlier
+survey <- sample(nSurveys, size = n, TRUE)
+
+# allocate the surveys randomly to closure periods 
+cp <- sample(1:np, nSurveys, TRUE)
+closure_period <- cp[survey]
+
+# run the model with these data for one species
+formatted_data <- formatOccData(taxa = taxa,
+                                site = site,
+                                survey = survey,
+                                closure_period = closure_period)
 }
 }
 \references{
 Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
             Statistics for citizen science: extracting signals of change from noisy ecological data.
             Methods in Ecology and Evolution, 5 (10), 1052-1060.
+
+van Strien, A.J., Termaat, T., Groenendijk, D., Mensing, V. & Kéry, M. (2010).
+            Site-occupancy models may offer new opportunities for dragonfly monitoring based on daily species lists.
+            Basic and Applied Ecology, 11, 495-503.
 }
 \keyword{bayesian,}
 \keyword{distribution,}

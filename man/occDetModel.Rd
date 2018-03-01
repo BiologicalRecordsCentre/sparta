@@ -4,7 +4,7 @@
 \alias{occDetModel}
 \title{Occupancy detection models}
 \usage{
-occDetModel(taxa, site, time_period, species_list = unique(taxa),
+occDetModel(taxa, site, survey, species_list = unique(taxa),
   write_results = TRUE, output_dir = getwd(), nyr = 2,
   n_iterations = 5000, burnin = 1500, thinning = 3, n_chains = 3,
   modeltype = "sparta", regional_codes = NULL, region_aggs = NULL,
@@ -17,8 +17,8 @@ occDetModel(taxa, site, time_period, species_list = unique(taxa),
 
 \item{site}{A character vector of site names, as long as the number of observations.}
 
-\item{time_period}{A numeric vector of user defined time periods, or a date vector,
-as long as the number of observations.}
+\item{survey}{A  vector as long as the number of observations. 
+This must be a Date if either closure_period is not supplied or if includeJDay = \code{TRUE}}
 
 \item{species_list}{A character vector of taxa names for which models should be run. This is
 optional and by default models will be run for all taxa}
@@ -127,13 +127,13 @@ taxa <- sample(letters, size = n, TRUE)
 site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 
 # the date of visit is selected at random from those created earlier
-time_period <- sample(rDates, size = n, TRUE)
+survey <- sample(rDates, size = n, TRUE)
 
 # run the model with these data for one species
 # using defaults
 results <- occDetModel(taxa = taxa,
                        site = site,
-                       time_period = time_period,
+                       survey = survey,
                        species_list = 'a',
                        write_results = FALSE,
                        n_iterations = 1000,
@@ -143,7 +143,7 @@ results <- occDetModel(taxa = taxa,
 # run with a different model type
 results <- occDetModel(taxa = taxa,
                        site = site,
-                       time_period = time_period,
+                       survey = survey,
                        species_list = 'a',
                        write_results = FALSE,
                        n_iterations = 1000,
@@ -162,7 +162,7 @@ regions <- data.frame(site = unique(site),
  
 results <- occDetModel(taxa = taxa,
                        site = site,
-                       time_period = time_period,
+                       survey = survey,
                        species_list = 'a',
                        write_results = FALSE,
                        n_iterations = 1000,

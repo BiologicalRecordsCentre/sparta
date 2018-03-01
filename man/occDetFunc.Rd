@@ -20,7 +20,7 @@ occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 2,
 
 \item{n_iterations}{numeric, An MCMC parameter - The number of interations}
 
-\item{nyr}{numeric, the minimum number of years on which a site must have records for it
+\item{nyr}{numeric, the minimum number of periods on which a site must have records for it
 to be included in the models. Defaults to 2}
 
 \item{burnin}{numeric, An MCMC parameter - The length of the burn in}
@@ -121,10 +121,10 @@ taxa <- sample(letters, size = n, TRUE)
 site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 
 # the date of visit is selected at random from those created earlier
-time_period <- sample(rDates, size = n, TRUE)
+survey <- sample(rDates, size = n, TRUE)
 
 # Format the data
-visitData <- formatOccData(taxa = taxa, site = site, time_period = time_period)
+visitData <- formatOccData(taxa = taxa, site = site, survey = survey)
 
 # run the model with these data for one species (very small number of iterations)
 results <- occDetFunc(taxa_name = taxa[1],

@@ -8,8 +8,8 @@
 #' 
 #' @param taxa A character vector of taxon names, as long as the number of observations.
 #' @param site A character vector of site names, as long as the number of observations.
-#' @param time_period A numeric vector of user defined time periods, or a date vector,
-#'        as long as the number of observations.
+#' @param survey A  vector as long as the number of observations. 
+#'        This must be a Date if either closure_period is not supplied or if includeJDay = \code{TRUE}
 #' @param species_list A character vector of taxa names for which models should be run. This is
 #'        optional and by default models will be run for all taxa
 #' @param write_results logical, should results be saved to \code{output_dir}. This is
@@ -96,13 +96,13 @@
 #' site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 #' 
 #' # the date of visit is selected at random from those created earlier
-#' time_period <- sample(rDates, size = n, TRUE)
+#' survey <- sample(rDates, size = n, TRUE)
 #'
 #' # run the model with these data for one species
 #' # using defaults
 #' results <- occDetModel(taxa = taxa,
 #'                        site = site,
-#'                        time_period = time_period,
+#'                        survey = survey,
 #'                        species_list = 'a',
 #'                        write_results = FALSE,
 #'                        n_iterations = 1000,
@@ -112,7 +112,7 @@
 #' # run with a different model type
 #' results <- occDetModel(taxa = taxa,
 #'                        site = site,
-#'                        time_period = time_period,
+#'                        survey = survey,
 #'                        species_list = 'a',
 #'                        write_results = FALSE,
 #'                        n_iterations = 1000,
@@ -131,7 +131,7 @@
 #'  
 #' results <- occDetModel(taxa = taxa,
 #'                        site = site,
-#'                        time_period = time_period,
+#'                        survey = survey,
 #'                        species_list = 'a',
 #'                        write_results = FALSE,
 #'                        n_iterations = 1000,
@@ -147,7 +147,7 @@
 #'             causes rapid declines of native European ladybirds. Diversity & Distributions,
 #'             18, 717-725.
 
-occDetModel <- function(taxa, site, time_period,
+occDetModel <- function(taxa, site, survey,
                         species_list = unique(taxa), write_results = TRUE,
                         output_dir = getwd(), nyr = 2, n_iterations = 5000,
                         burnin = 1500, thinning = 3, n_chains = 3, 
@@ -171,7 +171,7 @@ occDetModel <- function(taxa, site, time_period,
   # reformat the data into visits
   visitData <- formatOccData(taxa = taxa,
                              site = site,
-                             time_period = time_period,
+                             survey = survey,
                              includeJDay = includeJDay)
   
   ### loop through the species list running the Bayesian occupancy model function ###

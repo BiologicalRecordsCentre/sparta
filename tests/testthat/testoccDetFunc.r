@@ -20,11 +20,11 @@ taxa <- sample(letters, size = n, TRUE)
 site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 
 # the date of visit is selected at random from those created earlier
-time_period <- sample(rDates, size = n, TRUE)
+survey <- sample(rDates, size = n, TRUE)
 
 # format data
 suppressWarnings({visitData <- formatOccData(taxa = taxa, site = site,
-                                             time_period = time_period)})
+                                             survey = survey)})
 
 test_that("Test occDetFunc errors", {
   
@@ -252,7 +252,7 @@ test_that("Test occDetFunc with julian date", {
                    "/dev/null"))
   
   suppressWarnings({visitData <- formatOccData(taxa = taxa, site = site,
-                                               time_period = time_period,
+                                               survey = survey,
                                                includeJDay = TRUE)})
   
   results <- occDetFunc(taxa_name = 'a',
@@ -300,7 +300,7 @@ test_that("Test occDetFunc with catagorical list length", {
                    "/dev/null"))
   
   suppressWarnings({visitData <- formatOccData(taxa = taxa, site = site,
-                                               time_period = time_period,
+                                               survey = survey,
                                                includeJDay = TRUE)})
   
   results <- occDetFunc(taxa_name = 'a',

@@ -20,11 +20,14 @@ taxa <- sample(letters, size = n, TRUE)
 site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 
 # the date of visit is selected at random from those created earlier
-time_period <- sample(rDates, size = n, TRUE)
+survey <- sample(rDates, size = n, TRUE)
+
+# set the closure period to be in 2 year bins
+closure_period <- ceiling((as.numeric(format(rDates,'%Y')) - 2009)/2)
 
 test_that("Test formatOccData", {
 
-  expect_warning(visitData <- formatOccData(taxa = taxa, site = site, time_period = time_period),
+  expect_warning(visitData <- formatOccData(taxa = taxa, site = site, survey = survey),
                  '854 out of 15000 observations will be removed as duplicates')
   
   head_spp_vis <- structure(list(visit = c("A102010-02-17", "A102010-04-14", "A102010-04-22", 
@@ -62,7 +65,7 @@ test_that("Test formatOccData", {
                             "A39", "A4", "A40", "A41", "A42", "A43", "A44", "A45", "A46", 
                             "A47", "A48", "A49", "A5", "A50", "A6", "A7", "A8", "A9"), class = "factor"), 
                             L = c(5L, 2L, 1L, 5L, 5L, 1L), year = c(2010, 2010, 2010, 
-                            2010, 2010, 2011)), .Names = c("visit", "site", "L", "year"
+                            2010, 2010, 2011)), .Names = c("visit", "site", "L", "TP"
                             ), row.names = c(1L, 6L, 8L, 9L, 14L, 19L), class = "data.frame")
   
   expect_identical(head(visitData$spp_vis), head_spp_vis)
@@ -72,11 +75,16 @@ test_that("Test formatOccData", {
 
 test_that("Test formatOccData errors", {
   
-  expect_error(visitData <- formatOccData(taxa = head(taxa), site = site, time_period = time_period),
-               'The following arguements are not of equal length: taxa, site, time_period')
-  expect_error(visitData <- formatOccData(taxa = taxa, site = head(site), time_period = time_period),
-               'The following arguements are not of equal length: taxa, site, time_period')
-  expect_error(visitData <- formatOccData(taxa = taxa, site = site, time_period = head(time_period)),
-               'The following arguements are not of equal length: taxa, site, time_period')
+  expect_error(visitData <- formatOccData(taxa = head(taxa), site = site, survey = survey),
+               'The following arguements are not of equal length: taxa, site, survey')
+  expect_error(visitData <- formatOccData(taxa = taxa, site = head(site), survey = survey, closure_period = closure_period),
+               'The following arguements are not of equal length: taxa, site, survey, closure_period')
+  expect_error(visitData <- formatOccData(taxa = taxa, site = site, survey = head(survey), closure_period = closure_period),
+               'The following arguements are not of equal length: taxa, site, survey, closure_period')
+  expect_error(visitData <- formatOccData(taxa = taxa, site = site, survey = survey, closure_period=head(closure_period)),
+               'The following arguements are not of equal length: taxa, site, survey, closure_period')
   
 })
+
+
+

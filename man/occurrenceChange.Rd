@@ -47,12 +47,12 @@ taxa <- sample(letters, size = n, TRUE)
 site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 
 # the date of visit is selected at random from those created earlier
-time_period <- sample(rDates, size = n, TRUE)
+survey <- sample(rDates, size = n, TRUE)
 
 # run the model with these data for one species
 results <- occDetModel(taxa = taxa,
                        site = site,
-                       time_period = time_period,
+                       survey = survey,
                        species_list = c('a','m','g'),
                        write_results = FALSE,
                        n_iterations = 1000,

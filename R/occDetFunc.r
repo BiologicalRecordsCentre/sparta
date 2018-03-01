@@ -10,7 +10,7 @@
 #' @param occDetdata The 2nd element of the object returned by formatOccData.
 #' @param spp_vis The 1st element of the object returned by formatOccData.
 #' @param n_iterations numeric, An MCMC parameter - The number of interations
-#' @param nyr numeric, the minimum number of years on which a site must have records for it
+#' @param nyr numeric, the minimum number of periods on which a site must have records for it
 #'        to be included in the models. Defaults to 2
 #' @param burnin numeric, An MCMC parameter - The length of the burn in
 #' @param thinning numeric, An MCMC parameter - The thinning factor
@@ -92,10 +92,10 @@
 #' site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 #' 
 #' # the date of visit is selected at random from those created earlier
-#' time_period <- sample(rDates, size = n, TRUE)
+#' survey <- sample(rDates, size = n, TRUE)
 #'
 #' # Format the data
-#' visitData <- formatOccData(taxa = taxa, site = site, time_period = time_period)
+#' visitData <- formatOccData(taxa = taxa, site = site, survey = survey)
 #'
 #' # run the model with these data for one species (very small number of iterations)
 #' results <- occDetFunc(taxa_name = taxa[1],
@@ -203,12 +203,12 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     }
   }
   
-  # Record the max and min year
-  min_year <- min(occDetdata$year)
-  max_year <- max(occDetdata$year)
+  # Record the max and min values of TP
+  min_TP <- min(occDetdata$TP)
+  max_TP <- max(occDetdata$TP)
   
-  # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
-  occDetdata$year <- occDetdata$year - min(occDetdata$year) + 1
+  # TP and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
+  occDetdata$TP <- occDetdata$TP - min(occDetdata$TP) + 1
   site_match <- data.frame(original_site = occDetdata$site, new_site_name = as.numeric(as.factor(occDetdata$site)))
   site_match <- unique(site_match)
   occDetdata$site <- as.numeric(as.factor(occDetdata$site))
@@ -219,12 +219,12 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                                                              table = as.character(site_match$original_site))]
   }
   
-  # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
-  zst <- acast(occDetdata, site ~ factor(year), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
-  nyear <- max_year - min_year + 1
+  # need to get a measure of whether the species was on that site in that time period, unequivocally, in zst
+  zst <- acast(occDetdata, site ~ factor(TP), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
+  nTP <- max_TP - min_TP + 1
   
-  # look for missing years
-  if(length(unique(occDetdata$year)) != nyear) stop('It looks like you have years with no data. This will crash BUGS')
+  # look for time periods with no data
+  if(length(unique(occDetdata$TP)) != nTP) stop('It looks like you have time periods with no data. This will crash BUGS')
   
   # Parameter you wish to monitor, shown in the output
   parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a", "mu.lp")
@@ -259,7 +259,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # only include sites which have more than nyr of records
   # and are in the regional data if used
-  yps <- rowSums(acast(occDetdata, site ~ year, length, value.var = 'L') > 0)
+  yps <- rowSums(acast(occDetdata, site ~ TP, length, value.var = 'L') > 0)
   sites_to_include <- names(yps[yps >= nyr])
   
   # If we are using regional data makes sure all 'good' sites
@@ -282,8 +282,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # HERE IS THE BUGS DATA
   bugs_data <- with(merge(occDetdata[i,], site_to_row_lookup), # adds rownum to occDetdata (used below)
-                    list(y = as.numeric(focal), Year = year, Site = rownum, 
-                         nyear = nyear, nsite = nrow(zst), nvisit = nrow(occDetdata[i,])))
+                    list(y = as.numeric(focal), Year = TP, Site = rownum, 
+                         nyear = nTP, nsite = nrow(zst), nvisit = nrow(occDetdata[i,])))
   
   # added extra elements to bugs data if needed
   occDetData_temp <- merge(occDetdata[i,], site_to_row_lookup)
@@ -353,11 +353,11 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     } 
   }
   
-  initiate <- function(z, nyear, bugs_data) {
+  initiate <- function(z, nTP, bugs_data) {
     init <- list (z = z,
                   alpha.p = rep(runif(1, -2, 2),
-                                nyear),
-                  a = rep(runif(1, -2, 2), nyear),
+                                nTP),
+                  a = rep(runif(1, -2, 2), nTP),
                   eta = rep(runif(1, -2, 2), bugs_data$nsite))
 
     # add extra init values if needed
@@ -383,7 +383,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # set the initial values... 
   init.vals <- replicate(n_chains, initiate(z = zst,
-                                            nyear = nyear,
+                                            nTP = nTP,
                                             bugs_data = bugs_data),
                          simplify = F)
   
@@ -435,8 +435,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     return(NULL)
   } else {
     out$SPP_NAME <- taxa_name
-    out$min_year <- min_year
-    out$max_year <- max_year
+    out$min_year <- min_TP
+    out$max_year <- max_TP
     out$nsites <- bugs_data$nsite
     out$nvisits <- bugs_data$nvisit
     out$species_sites <- length(unique(bugs_data$Site[bugs_data$y == 1]))
