@@ -234,14 +234,18 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     parameters <- c(parameters, "eta.p0", "eta.psi0")
   }
   
-  # Id ranwalk + halfcauchy monitor mu.lp 
+  # If ranwalk + halfcauchy monitor mu.lp 
   if(all(c('ranwalk', 'halfcauchy') %in% modeltype)){
+    if(!'centering' %in% tolower(modeltype) | !'intercept' %in% tolower(modeltype)){
+      parameters <- parameters
+    } else {
     parameters <- c(parameters, "mu.lp")
+    }
   }
   
-  # Id sparta monitor mu.lp 
-  if('sparta' %in% tolower(modeltype)) {
-    parameters <- c(parameters, "mu.lp")
+  # If sparta monitor mu.lp 
+  if(tolower(modeltype) == 'sparta') {
+    parameters <- c(parameters, 'mu.lp')
   }
   
   # Add user specified paramters if given
