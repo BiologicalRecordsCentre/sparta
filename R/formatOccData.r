@@ -25,7 +25,7 @@
 #'             Methods in Ecology and Evolution, 5 (10), 1052-1060.
 #' @references van Strien, A.J., Termaat, T., Groenendijk, D., Mensing, V. & Kéry, M. (2010).
 #'             Site-occupancy models may offer new opportunities for dragonfly monitoring based on daily species lists.
-#'             Basic and Applied Ecology, 11, 495–503.
+#'             Basic and Applied Ecology, 11, 495-503.
 #' @examples
 #' \dontrun{
 #' 
