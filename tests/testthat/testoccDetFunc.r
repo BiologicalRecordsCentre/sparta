@@ -382,6 +382,21 @@ test_that("Test occDetFunc using regions and region aggregates", {
   expect_true("psi.fs.r_region2[1]" %in% RNs)
   expect_true("psi.fs.r_region3[1]" %in% RNs)
   expect_true("psi.fs.r_agg1[1]" %in% RNs)
+  
+  regions$region4 <- 0
+  
+  # test with a region with no data
+  expect_warning(results <- occDetFunc(taxa_name = 'a',
+                        n_iterations = 50,
+                        burnin = 15, 
+                        occDetdata = visitData$occDetdata,
+                        spp_vis = visitData$spp_vis,
+                        write_results = FALSE,
+                        seed = 111,
+                        modeltype = c("ranwalk", "halfcauchy"),
+                        regional_codes = regions,
+                        region_aggs = list(agg1 = c('region1', 'region2'))),
+                 'The following regions have no data and')
 
   sink()
   
