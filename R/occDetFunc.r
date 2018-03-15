@@ -252,6 +252,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     # check that max_year is a numeric value
     if(!is.numeric(max_year)) stop('max_year should be a numeric value')
+    
+    # check that max_year is greater than the final year of the dataset
+    if(max_year <= max(occDetdata$year)) stop('max_year should be greater than the final year of available data')
 
     # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
     zst <- acast(occDetdata, site ~ factor(year), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state

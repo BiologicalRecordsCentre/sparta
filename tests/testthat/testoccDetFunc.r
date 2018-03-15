@@ -71,6 +71,26 @@ test_that("Test occDetFunc errors", {
                                     seed = 111),
               'It looks like you have years with no data. This will crash BUGS')
  
+ expect_error(results <- occDetFunc(taxa_name = 'a',
+                                    n_iterations = 50,
+                                    burnin = 15, 
+                                    occDetdata = visitData$occDetdata,
+                                    spp_vis = visitData$spp_vis,
+                                    max_year = "2028",
+                                    write_results = FALSE,
+                                    seed = 111),
+              'max_year should be a numeric value')
+ 
+ expect_error(results <- occDetFunc(taxa_name = 'a',
+                                    n_iterations = 50,
+                                    burnin = 15, 
+                                    occDetdata = visitData$occDetdata,
+                                    spp_vis = visitData$spp_vis,
+                                    max_year = 2028,
+                                    write_results = FALSE,
+                                    seed = 111),
+              'max_year should be greater than the final year of available data')
+ 
 })
 
 test_that("Test occDetFunc with defaults", {
