@@ -32,6 +32,16 @@ regions <- data.frame(site = unique(site),
 suppressWarnings({visitData <- formatOccData(taxa = taxa, site = site,
                                              time_period = time_period)})
 
+## additional data for testing missing years
+# remove one year 
+time_period_missing <- sub("2018-", "2019-", time_period)
+time_period_missing <- as.Date(time_period_missing)
+
+# format data
+suppressWarnings({visitData_missing <- formatOccData(taxa = taxa, site = site,
+                                                     time_period = time_period_missing)})
+
+
 test_that("Test occDetFunc errors", {
   
  expect_error(results <- occDetFunc(taxa_name = 'a',
@@ -50,7 +60,17 @@ test_that("Test occDetFunc errors", {
                                     spp_vis = visitData$spp_vis,
                                     write_results = FALSE,
                                     seed = 111),
-              'taxa_name is not the name of a taxa in spp_vis')    
+              'taxa_name is not the name of a taxa in spp_vis')
+
+ expect_error(results <- occDetFunc(taxa_name = 'a',
+                                    n_iterations = 50,
+                                    burnin = 15, 
+                                    occDetdata = visitData_missing$occDetdata,
+                                    spp_vis = visitData_missing$spp_vis,
+                                    write_results = FALSE,
+                                    seed = 111),
+              'It looks like you have years with no data. This will crash BUGS')
+ 
 })
 
 test_that("Test occDetFunc with defaults", {
