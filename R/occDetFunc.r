@@ -225,6 +225,13 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     }
   }
   
+  
+  # look for missing years before time frame can be extended using max_year parameter
+  years <- (max(occDetdata$year) - min(occDetdata$year))-1
+  if(length(unique(occDetdata$year)) != years) stop('It looks like you have years with no data. This will crash BUGS')
+  
+  
+  
   # Record the min year
   min_year <- min(occDetdata$year)
   
@@ -277,9 +284,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
   occDetdata$year <- occDetdata$year - min(occDetdata$year) + 1
   
-  # look for missing years
-  #if(length(unique(occDetdata$year)) != nyear) stop('It looks like you have years with no data. This will crash BUGS')
-  
+
   # Parameter you wish to monitor, shown in the output
   parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a")
   
