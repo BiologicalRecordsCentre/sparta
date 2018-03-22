@@ -12,6 +12,8 @@
 #' @param bayesOut occDet object as returned from occDetModel
 #' @param change A character string that specifies the type of change to be calculated, the default
 #' is annual growth rate.
+#' @param region A character string specifying the region name if change is to be determined regional estimates of occupancy.
+#' Region names must match those in the model output.
 #' 
 #' 
 #' @details \code{change} is used to specify which change measure to be calculated.
@@ -70,18 +72,39 @@
 #' }                   
 #' @export
 
-occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate'){
+occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate', region = NULL){
   
+  # error checks for years
   if(!firstYear %in% bayesOut$min_year:bayesOut$max_year) stop('firstYear must be in the year range of the data')
   if(!lastYear %in% bayesOut$min_year:bayesOut$max_year) stop('lastYear must be in the year range of the data')
   
+  # error checks for change
   if(!class(change) == 'character') stop('Change must be a character string identifying the change metric.  Either: difference, percentdif, growthrate or lineargrowth')
-  
   if(!change %in% c('difference', 'percentdif', 'growthrate', 'lineargrowth')) stop('The change metric must be one of the following: difference, percentdif, growthrate or lineargrowth')
   
-  occ_it <- bayesOut$BUGSoutput$sims.list$psi.fs
+  # error check for region
+  if(!class(region) == 'character') stop('region must be a character string identifying the regional estimates that change is to be calculated for.')
+  
+  
+  
+  
+  # extract the sims list, if there is a region code, use the psi.fs for that region
+  if(!is.null(region)){
+  reg_code <- paste("psi.fs.r_", region, sep = "")
+  
+  occ_it <- bayesOut$BUGSoutput$sims.list
+  occ_it <- occ_it[[grep(reg_code, names(occ_it))]]
+  
+  }else{
+    occ_it <- bayesOut$BUGSoutput$sims.list$psi.fs
+    
+  }
+  
+  
   colnames(occ_it) <- bayesOut$min_year:bayesOut$max_year
   years <- firstYear:lastYear
+  
+  ### loops depend on which change metric has been specified
   
   if(change == 'lineargrowth'){
   prediction <- function(years, series){
@@ -110,6 +133,7 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   } # end of loop for linear growth rate
   
   
+  
   if(change == 'difference'){
     
     res_tab <- data.frame(occ_it[, 1], occ_it[, ncol(occ_it)], row.names = NULL)
@@ -117,6 +141,7 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
     res_tab$change = res_tab[,2] - res_tab[,1]
     
   } # end of loop for simple difference
+  
   
   
   if(change == 'percentdif'){
@@ -128,6 +153,7 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   } # end of loop for percentage difference
   
   
+  
   if(change == 'growthrate'){
     
     nyr <- length(years)
@@ -137,6 +163,7 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
     
   }
   
+  # return the mean, quantiles, and the data
   return(list(mean = mean(res_tab$change),
               CIs = quantile(res_tab$change, probs = c(0.025, 0.975)),
               data = res_tab))

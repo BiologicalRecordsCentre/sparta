@@ -4,7 +4,7 @@
 \alias{occurrenceChange}
 \title{Calculate percentage change between two years using Bayesian output}
 \usage{
-occurrenceChange(firstYear, lastYear, bayesOut)
+occurrenceChange(firstYear, lastYear, bayesOut, change = "growthrate")
 }
 \arguments{
 \item{firstYear}{numeric, the first year over which the change is to be estimated}
@@ -12,6 +12,9 @@ occurrenceChange(firstYear, lastYear, bayesOut)
 \item{lastYear}{numeric, the last year over which the change is to be estimated}
 
 \item{bayesOut}{occDet object as returned from occDetModel}
+
+\item{change}{A character string that specifies the type of change to be calculated, the default
+is annual growth rate.}
 }
 \value{
 A list giving the mean, credible intervals and raw data from the
@@ -24,6 +27,19 @@ values for the two years are then used to calculates a percentage
 change. The results is a percentage change estimate for each of the
 interations of the model. This distribution of the results is used to
 calculate the mean estimate and the 95% credibale intervals.
+}
+\details{
+\code{change} is used to specify which change measure to be calculated.
+There are four options to choose from: difference, percentdif, growthrate and
+lineargrowth.
+
+difference calculates the simple difference between the first and last year.
+
+percentdif calculates the percentage difference between the first and last year.
+
+growthrate calculates the annual growth rate across years.
+
+lineargrowth calculates the linear growth rate from a linear model.
 }
 \examples{
 \dontrun{
