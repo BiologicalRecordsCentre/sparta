@@ -4,7 +4,8 @@
 \alias{occurrenceChange}
 \title{Calculate percentage change between two years using Bayesian output}
 \usage{
-occurrenceChange(firstYear, lastYear, bayesOut, change = "growthrate")
+occurrenceChange(firstYear, lastYear, bayesOut, change = "growthrate",
+  region = NULL)
 }
 \arguments{
 \item{firstYear}{numeric, the first year over which the change is to be estimated}
@@ -15,6 +16,9 @@ occurrenceChange(firstYear, lastYear, bayesOut, change = "growthrate")
 
 \item{change}{A character string that specifies the type of change to be calculated, the default
 is annual growth rate.}
+
+\item{region}{A character string specifying the region name if change is to be determined regional estimates of occupancy.
+Region names must match those in the model output.}
 }
 \value{
 A list giving the mean, credible intervals and raw data from the
