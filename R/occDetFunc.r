@@ -225,7 +225,13 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     }
   }
   
-  # Record the min year
+  
+  # look for missing years before time frame can be extended using max_year parameter
+  years <- (max(occDetdata$year) - min(occDetdata$year))+1
+  if(length(unique(occDetdata$year)) != years) stop('It looks like you have years with no data. This will crash BUGS')
+  
+  
+    # Record the min year
   min_year <- min(occDetdata$year)
   
   # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
@@ -246,6 +252,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     # check that max_year is a numeric value
     if(!is.numeric(max_year)) stop('max_year should be a numeric value')
+    
+    # check that max_year is greater than the final year of the dataset
+    if(max_year <= max(occDetdata$year)) stop('max_year should be greater than the final year of available data')
 
     # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
     zst <- acast(occDetdata, site ~ factor(year), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
@@ -277,9 +286,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
   occDetdata$year <- occDetdata$year - min(occDetdata$year) + 1
   
-  # look for missing years
-  #if(length(unique(occDetdata$year)) != nyear) stop('It looks like you have years with no data. This will crash BUGS')
-  
+
   # Parameter you wish to monitor, shown in the output
   parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a")
   

@@ -10,6 +10,25 @@
 #' @param firstYear numeric, the first year over which the change is to be estimated
 #' @param lastYear numeric, the last year over which the change is to be estimated
 #' @param bayesOut occDet object as returned from occDetModel
+#' @param change A character string that specifies the type of change to be calculated, the default
+#' is annual growth rate.  See details for options.
+#' @param region A character string specifying the region name if change is to be determined regional estimates of occupancy.
+#' Region names must match those in the model output.
+#' 
+#' 
+#' @details \code{change} is used to specify which change measure to be calculated.
+#' There are four options to choose from: difference, percentdif, growthrate and
+#' lineargrowth.
+#' 
+#' difference calculates the simple difference between the first and last year.
+#' 
+#' percentdif calculates the percentage difference between the first and last year.
+#' 
+#' growthrate calculates the annual growth rate across years.
+#' 
+#' lineargrowth calculates the linear growth rate from a linear model.
+#'
+#' 
 #' @return A list giving the mean, credible intervals and raw data from the
 #' estimations.
 #' @examples
@@ -53,15 +72,41 @@
 #' }                   
 #' @export
 
-occurrenceChange <- function(firstYear, lastYear, bayesOut){
+occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate', region = NULL){
   
+  # error checks for years
   if(!firstYear %in% bayesOut$min_year:bayesOut$max_year) stop('firstYear must be in the year range of the data')
   if(!lastYear %in% bayesOut$min_year:bayesOut$max_year) stop('lastYear must be in the year range of the data')
   
-  occ_it <- bayesOut$BUGSoutput$sims.list$psi.fs
+  # error checks for change
+  if(!class(change) == 'character') stop('Change must be a character string identifying the change metric.  Either: difference, percentdif, growthrate or lineargrowth')
+  if(!change %in% c('difference', 'percentdif', 'growthrate', 'lineargrowth')) stop('The change metric must be one of the following: difference, percentdif, growthrate or lineargrowth')
+  
+  # error check for region
+  if(!class(region) == 'character') stop('region must be a character string identifying the regional estimates that change is to be calculated for.')
+  if(!region %in% bayesOut$region) stop('region must match that used in the model output file, check spelling.')
+  
+  
+  
+  # extract the sims list, if there is a region code, use the psi.fs for that region
+  if(!is.null(region)){
+    reg_code <- paste("psi.fs.r_", region, sep = "")
+  
+    occ_it <- bayesOut$BUGSoutput$sims.list
+    occ_it <- occ_it[[grep(reg_code, names(occ_it))]]
+  
+  }else{
+    occ_it <- bayesOut$BUGSoutput$sims.list$psi.fs
+    
+  }
+  
+  
   colnames(occ_it) <- bayesOut$min_year:bayesOut$max_year
   years <- firstYear:lastYear
   
+  ### loops depend on which change metric has been specified
+  
+  if(change == 'lineargrowth'){
   prediction <- function(years, series){
     
     # cut data
@@ -83,9 +128,43 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut){
     
   }
   
-  predictions <- do.call(rbind, apply(X = occ_it, MARGIN = 1, years = years, FUN = prediction))
+  res_tab <- do.call(rbind, apply(X = occ_it, MARGIN = 1, years = years, FUN = prediction))
   
-  return(list(mean = mean(predictions$change),
-              CIs = quantile(predictions$change, probs = c(0.025, 0.975)),
-              data = predictions))
+  } # end of loop for linear growth rate
+  
+  
+  
+  if(change == 'difference'){
+    
+    res_tab <- data.frame(occ_it[, 1], occ_it[, ncol(occ_it)], row.names = NULL)
+    colnames(res_tab) <- as.character(c(min(years), max(years)))
+    res_tab$change = res_tab[,2] - res_tab[,1]
+    
+  } # end of loop for simple difference
+  
+  
+  
+  if(change == 'percentdif'){
+    
+    res_tab <- data.frame(occ_it[, 1], occ_it[, ncol(occ_it)], row.names = NULL)
+    colnames(res_tab) <- as.character(c(min(years), max(years)))
+    res_tab$change = ((res_tab[,2] - res_tab[,1])/res_tab[,1])*100
+    
+  } # end of loop for percentage difference
+  
+  
+  
+  if(change == 'growthrate'){
+    
+    nyr <- length(years)
+    res_tab <- data.frame(occ_it[, 1], occ_it[, ncol(occ_it)], row.names = NULL)
+    colnames(res_tab) <- as.character(c(min(years), max(years)))
+    res_tab$change = (((res_tab[,2]/res_tab[,1])^(1/nyr))-1)*100
+    
+  }
+  
+  # return the mean, quantiles, and the data
+  return(list(mean = mean(res_tab$change),
+              CIs = quantile(res_tab$change, probs = c(0.025, 0.975)),
+              data = res_tab))
 }
