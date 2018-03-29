@@ -11,7 +11,7 @@
 #' @param lastYear numeric, the last year over which the change is to be estimated
 #' @param bayesOut occDet object as returned from occDetModel
 #' @param change A character string that specifies the type of change to be calculated, the default
-#' is annual growth rate.
+#' is annual growth rate.  See details for options.
 #' @param region A character string specifying the region name if change is to be determined regional estimates of occupancy.
 #' Region names must match those in the model output.
 #' 
@@ -84,16 +84,16 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   
   # error check for region
   if(!class(region) == 'character') stop('region must be a character string identifying the regional estimates that change is to be calculated for.')
-  
+  if(!region %in% bayesOut$region) stop('region must match that used in the model output file, check spelling.')
   
   
   
   # extract the sims list, if there is a region code, use the psi.fs for that region
   if(!is.null(region)){
-  reg_code <- paste("psi.fs.r_", region, sep = "")
+    reg_code <- paste("psi.fs.r_", region, sep = "")
   
-  occ_it <- bayesOut$BUGSoutput$sims.list
-  occ_it <- occ_it[[grep(reg_code, names(occ_it))]]
+    occ_it <- bayesOut$BUGSoutput$sims.list
+    occ_it <- occ_it[[grep(reg_code, names(occ_it))]]
   
   }else{
     occ_it <- bayesOut$BUGSoutput$sims.list$psi.fs
