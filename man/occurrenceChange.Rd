@@ -15,7 +15,7 @@ occurrenceChange(firstYear, lastYear, bayesOut, change = "growthrate",
 \item{bayesOut}{occDet object as returned from occDetModel}
 
 \item{change}{A character string that specifies the type of change to be calculated, the default
-is annual growth rate.}
+is annual growth rate.  See details for options.}
 
 \item{region}{A character string specifying the region name if change is to be determined regional estimates of occupancy.
 Region names must match those in the model output.}

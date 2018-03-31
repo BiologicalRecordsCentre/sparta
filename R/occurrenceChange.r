@@ -84,7 +84,7 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   
   # error check for region
   if(!class(region) == 'character') stop('region must be a character string identifying the regional estimates that change is to be calculated for.')
-  if(!region %in% bayesOut$region) stop('region must match that used in the model output file, check spelling.')
+  if(!region %in% bayesOut$regions) stop('region must match that used in the model output file, check spelling.')
   
   
   
@@ -103,6 +103,11 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   
   colnames(occ_it) <- bayesOut$min_year:bayesOut$max_year
   years <- firstYear:lastYear
+  
+  ## edit values that are 0 or 1 to prevent estimates of inf later on
+  occ_it[occ_it == 0] <- 0.0001
+  occ_it[occ_it == 1] <- 0.9999
+  
   
   ### loops depend on which change metric has been specified
   
