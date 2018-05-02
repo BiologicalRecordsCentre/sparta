@@ -83,9 +83,10 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   if(!change %in% c('difference', 'percentdif', 'growthrate', 'lineargrowth')) stop('The change metric must be one of the following: difference, percentdif, growthrate or lineargrowth')
   
   # error check for region
-  if(!class(region) == 'character') stop('region must be a character string identifying the regional estimates that change is to be calculated for.')
-  if(!region %in% bayesOut$regions) stop('region must match that used in the model output file, check spelling.')
-  
+  if(!is.null(region)){
+    if(!class(region) == 'character') stop('region must be a character string identifying the regional estimates that change is to be calculated for.')
+    if(!region %in% bayesOut$regions) stop('region must match that used in the model output file, check spelling.')
+  }
   
   
   # extract the sims list, if there is a region code, use the psi.fs for that region
