@@ -141,8 +141,9 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   
   
   if(change == 'difference'){
-    
-    res_tab <- data.frame(occ_it[, 1], occ_it[, ncol(occ_it)], row.names = NULL)
+    first <- years[1]
+    last <- years[length(years)]
+    res_tab <- data.frame(occ_it[, grep(first,colnames(occ_it))], occ_it[, grep(last,colnames(occ_it))], row.names = NULL)
     colnames(res_tab) <- as.character(c(min(years), max(years)))
     res_tab$change = res_tab[,2] - res_tab[,1]
     
@@ -151,8 +152,9 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   
   
   if(change == 'percentdif'){
-    
-    res_tab <- data.frame(occ_it[, 1], occ_it[, ncol(occ_it)], row.names = NULL)
+    first <- years[1]
+    last <- years[length(years)]
+    res_tab <- data.frame(occ_it[, grep(first,colnames(occ_it))], occ_it[, grep(last,colnames(occ_it))], row.names = NULL)
     colnames(res_tab) <- as.character(c(min(years), max(years)))
     res_tab$change = ((res_tab[,2] - res_tab[,1])/res_tab[,1])*100
     
@@ -163,7 +165,9 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   if(change == 'growthrate'){
     
     nyr <- length(years)
-    res_tab <- data.frame(occ_it[, 1], occ_it[, ncol(occ_it)], row.names = NULL)
+    first <- years[1]
+    last <- years[length(years)]
+    res_tab <- data.frame(occ_it[, grep(first,colnames(occ_it))], occ_it[, grep(last,colnames(occ_it))], row.names = NULL)
     colnames(res_tab) <- as.character(c(min(years), max(years)))
     res_tab$change = (((res_tab[,2]/res_tab[,1])^(1/nyr))-1)*100
     
