@@ -93,7 +93,7 @@ A. Prior type: this has 3 options, each of which was tested in Outhwaite et al (
 
 B. Hyperprior type: This has 3 options, each of these are discussed in Outhwaite et al (in review):
   1. halfuniform - the original formulation in Isaac et al (2014).
-  2. halfcauchy - preferred form, tested in Outhwaite et al (in review).
+  2. halfcauchy - preferred form, tested in Outhwaite et al (2018).
   3. inversegamma - alternative form presented in the literature.
 
 C. List length specification:  This has 3 options:
@@ -163,6 +163,8 @@ results <- occDetFunc(taxa_name = taxa[1],
 Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
             Statistics for citizen science: extracting signals of change from noisy ecological data.
             Methods in Ecology and Evolution, 5 (10), 1052-1060.
+            Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac, N.J.B. (2018).
+            Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. Ecological Indicators, 93, 333–343.
 }
 \keyword{bayesian,}
 \keyword{distribution,}

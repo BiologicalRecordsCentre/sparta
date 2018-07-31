@@ -56,7 +56,7 @@
 #' 
 #' B. Hyperprior type: This has 3 options, each of these are discussed in Outhwaite et al (in review):
 #'   1. halfuniform - the original formulation in Isaac et al (2014).
-#'   2. halfcauchy - preferred form, tested in Outhwaite et al (in review).
+#'   2. halfcauchy - preferred form, tested in Outhwaite et al (2018).
 #'   3. inversegamma - alternative form presented in the literature.
 #' 
 #' C. List length specification:  This has 3 options:
@@ -92,6 +92,8 @@
 #' @references Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
 #'             Statistics for citizen science: extracting signals of change from noisy ecological data.
 #'             Methods in Ecology and Evolution, 5 (10), 1052-1060.
+#'             Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac, N.J.B. (2018).
+#'             Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. Ecological Indicators, 93, 333–343.
 #' @examples
 #' \dontrun{
 #' 
@@ -456,11 +458,13 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     model.file <- model.function
   }
   
+  modelcode <- paste(readLines(model.file), collapse = '\n')
+  
   ### REVIEW CODE
   cat('#### PLEASE REVIEW THE BELOW ####\n\n')
   cat('Your model settings:', paste(modeltype, collapse = ', '))
   cat('\n\nModel File:\n\n')
-  cat(paste(readLines(model.file), collapse = '\n'))
+  cat(modelcode)
   cat('\n\nbugs_data:\n\n')
   cat(str(bugs_data))
   cat('\n\ninit.vals:\n\n')
@@ -495,6 +499,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     if(!is.null(regional_codes)) out$regions <- head(tail(colnames(regional_codes), -1), -2)
     if(!is.null(region_aggs)) out$region_aggs <- region_aggs
     if(return_data) out$bugs_data <- bugs_data
+    out$modelcode <- modelcode
     class(out) <- 'occDet'
     if(write_results) save(out, file = file.path(output_dir, paste(taxa_name, ".rdata", sep = "")))  
     return(out)
