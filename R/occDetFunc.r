@@ -91,9 +91,9 @@
 #' @keywords trends, species, distribution, occupancy, bayesian, modeling
 #' @references Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
 #'             Statistics for citizen science: extracting signals of change from noisy ecological data.
-#'             Methods in Ecology and Evolution, 5 (10), 1052-1060.
+#'             Methods in Ecology and Evolution, 5: 1052-1060.
 #'             Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac, N.J.B. (2018).
-#'             Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. Ecological Indicators, 93, 333–343.
+#'             Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. Ecological Indicators, 93: 333-343.
 #' @examples
 #' \dontrun{
 #' 
@@ -499,7 +499,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     if(!is.null(regional_codes)) out$regions <- head(tail(colnames(regional_codes), -1), -2)
     if(!is.null(region_aggs)) out$region_aggs <- region_aggs
     if(return_data) out$bugs_data <- bugs_data
-    out$modelcode <- modelcode
+    attr(out, 'modelcode') <- modelcode
     class(out) <- 'occDet'
     if(write_results) save(out, file = file.path(output_dir, paste(taxa_name, ".rdata", sep = "")))  
     return(out)
