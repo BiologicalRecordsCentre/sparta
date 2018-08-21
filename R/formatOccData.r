@@ -135,7 +135,7 @@ formatOccData <- function(taxa, site, survey, closure_period = NULL, includeJDay
     taxa_data$TP <- as.numeric(format(taxa_data$survey,'%Y')) # take year from date year 
   }
   
-  # remove duplicates
+  # remove duplicates (in order that List Length is correctly calculated)
   taxa_data <- distinct(taxa_data)
   
   # add list length column
@@ -159,10 +159,10 @@ formatOccData <- function(taxa, site, survey, closure_period = NULL, includeJDay
       )
     #center on the 1st of July by subtracting 182
     taxa_data$Jul_date <- taxa_data$Jul_date - 182
-    occDetdata <- taxa_data[,c("visit", "site", "L", "TP", "Jul_date")]
+    occDetdata <- unique(taxa_data[,c("visit", "site", "L", "TP", "Jul_date")])
   } else {
     # create occDetdata which is the main file sent to bugs (1 row per visist) - this will have "focal" added to it within the species loop
-    occDetdata <- taxa_data[,c("visit", "site", "L", "TP")]
+    occDetdata <- unique(taxa_data[,c("visit", "site", "L", "TP")])
   }
   
   return(list(spp_vis = spp_vis, occDetdata = occDetdata))

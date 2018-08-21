@@ -19,7 +19,7 @@
 siteSelectionMinTP <- function(taxa, site, time_period, minTP){
   
   # Error checks
-  errorChecks(taxa, site, time_period)
+  errorChecks(taxa = taxa, site = site, time_period = time_period)
   if(!is.numeric(minTP)) stop('minTP must be numeric')
 
   # Create a data.frame from the vectors
