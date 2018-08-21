@@ -86,14 +86,15 @@
 #' }
 #' These options are provided as a vector of characters, e.g. \code{modeltype = c('indran', 'halfcauchy', 'catlistlength')}
 #' 
-#' @return A list including the model, bugs model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
+#' @return A list including the model, JAGS model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
 #'          
 #' @keywords trends, species, distribution, occupancy, bayesian, modeling
 #' @references Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
 #'             Statistics for citizen science: extracting signals of change from noisy ecological data.
-#'             Methods in Ecology and Evolution, 5: 1052-1060.
-#'             Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac, N.J.B. (2018).
-#'             Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. Ecological Indicators, 93: 333-343.
+#'             \emph{Methods in Ecology and Evolution}, 5: 1052-1060.
+#' @references Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac, N.J.B. (2018).
+#'             Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. 
+#'             \emph{Ecological Indicators}, 93: 333-343.
 #' @examples
 #' \dontrun{
 #' 
@@ -282,10 +283,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   # Parameter you wish to monitor, shown in the output
   parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a", "mu.lp")
   
-  # If not sparta add monitoring for eta.psi0
-  if(!'sparta' %in% tolower(modeltype)) parameters <- c(parameters, "eta.p0", "eta.psi0")
-  
-  # Add user specified paramters if given
+   # Add user specified paramters if given
   if(!is.null(additional.parameters)) parameters <- c(parameters, additional.parameters)
   
   # Add parameters for each of the model types
@@ -302,7 +300,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                     paste0("psi.fs.r_", regions),
                     paste0("a_", regions))
     # ignore some parameters not used in regions model
-    parameters <- parameters[!parameters %in% c('eta.psi0', 'a', 'eta.p0')]
+    parameters <- parameters[!parameters %in% c('a')]
   }
   
   # add parameters for regional aggregates
