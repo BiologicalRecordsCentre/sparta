@@ -95,7 +95,7 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
 
     occ_it <- bayesOut$BUGSoutput$sims.list
     occ_it <- occ_it[[grep(reg_code, names(occ_it))]]
-    
+
   }else{
     occ_it <- bayesOut$BUGSoutput$sims.list$psi.fs
     
@@ -114,7 +114,7 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   
   if(change == 'lineargrowth'){
       prediction <- function(years, series){
-      
+
       # cut data
       data_table <- data.frame(occ = series[as.character(years)], year = (years - min(years) + 1))
       
@@ -165,9 +165,10 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
     colnames(res_tab) <- as.character(c(min(years), max(years)))
     res_tab$change = (((res_tab[,2]/res_tab[,1])^(1/nyr))-1)*100
   } # end of loop for growth rate
-  
+
   # return the mean, quantiles, and the data
   return(list(mean = mean(res_tab$change),
               CIs = quantile(res_tab$change, probs = c(0.025, 0.975)),
               data = res_tab))
+
 }
