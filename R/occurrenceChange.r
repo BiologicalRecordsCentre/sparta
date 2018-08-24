@@ -53,12 +53,12 @@
 #' site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 #' 
 #' # the date of visit is selected at random from those created earlier
-#' time_period <- sample(rDates, size = n, TRUE)
+#' survey <- sample(rDates, size = n, TRUE)
 #'
 #' # run the model with these data for one species
 #' results <- occDetModel(taxa = taxa,
 #'                        site = site,
-#'                        time_period = time_period,
+#'                        survey = survey,
 #'                        species_list = c('a','m','g'),
 #'                        write_results = FALSE,
 #'                        n_iterations = 1000,
@@ -92,10 +92,10 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   # extract the sims list, if there is a region code, use the psi.fs for that region
   if(!is.null(region)){
     reg_code <- paste("psi.fs.r_", region, sep = "")
-  
+
     occ_it <- bayesOut$BUGSoutput$sims.list
     occ_it <- occ_it[[grep(reg_code, names(occ_it))]]
-  
+
   }else{
     occ_it <- bayesOut$BUGSoutput$sims.list$psi.fs
     
@@ -113,31 +113,30 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   ### loops depend on which change metric has been specified
   
   if(change == 'lineargrowth'){
-  prediction <- function(years, series){
+      prediction <- function(years, series){
+
+      # cut data
+      data_table <- data.frame(occ = series[as.character(years)], year = (years - min(years) + 1))
+      
+      # run model
+      model <- glm(occ ~ year, data = data_table, family = 'binomial')
+      
+      # create predicted values
+      predicted <- plogis(predict(model))
+      names(predicted) <- years
+      
+      # build results
+      results <- data.frame(predicted[1], predicted[length(predicted)], row.names = NULL)
+      colnames(results) <- as.character(c(min(years), max(years)))
+      results$change = (results[,2] - results[,1]) / results[,1]
+      
+      return(results)
+      
+    }
+
+    res_tab <- do.call(rbind, apply(X = occ_it, MARGIN = 1, years = years, FUN = prediction))
     
-    # cut data
-    data_table <- data.frame(occ = series[as.character(years)], year = (years - min(years) + 1))
-    
-    # run model
-    model <- glm(occ ~ year, data = data_table, family = 'binomial')
-    
-    # create predicted values
-    predicted <- plogis(predict(model))
-    names(predicted) <- years
-    
-    # build results
-    results <- data.frame(predicted[1], predicted[length(predicted)], row.names = NULL)
-    colnames(results) <- as.character(c(min(years), max(years)))
-    results$change = (results[,2] - results[,1]) / results[,1]
-    
-    return(results)
-    
-  }
-  
-  res_tab <- do.call(rbind, apply(X = occ_it, MARGIN = 1, years = years, FUN = prediction))
-  
   } # end of loop for linear growth rate
-  
   
   
   if(change == 'difference'){
@@ -146,9 +145,7 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
     res_tab <- data.frame(occ_it[, grep(first,colnames(occ_it))], occ_it[, grep(last,colnames(occ_it))], row.names = NULL)
     colnames(res_tab) <- as.character(c(min(years), max(years)))
     res_tab$change = res_tab[,2] - res_tab[,1]
-    
   } # end of loop for simple difference
-  
   
   
   if(change == 'percentdif'){
@@ -157,24 +154,21 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
     res_tab <- data.frame(occ_it[, grep(first,colnames(occ_it))], occ_it[, grep(last,colnames(occ_it))], row.names = NULL)
     colnames(res_tab) <- as.character(c(min(years), max(years)))
     res_tab$change = ((res_tab[,2] - res_tab[,1])/res_tab[,1])*100
-    
   } # end of loop for percentage difference
   
   
-  
   if(change == 'growthrate'){
-    
     nyr <- length(years)
     first <- years[1]
     last <- years[length(years)]
     res_tab <- data.frame(occ_it[, grep(first,colnames(occ_it))], occ_it[, grep(last,colnames(occ_it))], row.names = NULL)
     colnames(res_tab) <- as.character(c(min(years), max(years)))
     res_tab$change = (((res_tab[,2]/res_tab[,1])^(1/nyr))-1)*100
-    
-  }
-  
+  } # end of loop for growth rate
+
   # return the mean, quantiles, and the data
   return(list(mean = mean(res_tab$change),
               CIs = quantile(res_tab$change, probs = c(0.025, 0.975)),
               data = res_tab))
+
 }

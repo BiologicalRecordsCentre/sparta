@@ -20,7 +20,7 @@ taxa <- sample(letters, size = n, TRUE)
 site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 
 # the date of visit is selected at random from those created earlier
-time_period <- sample(rDates, size = n, TRUE)
+survey <- sample(rDates, size = n, TRUE)
 
 # set up regions for some testing
 regions <- data.frame(site = unique(site),
@@ -30,16 +30,16 @@ regions <- data.frame(site = unique(site),
 
 # format data
 suppressWarnings({visitData <- formatOccData(taxa = taxa, site = site,
-                                             time_period = time_period)})
+                                             survey = survey)})
 
 ## additional data for testing missing years
 # remove one year 
-time_period_missing <- sub("2018-", "2019-", time_period)
+time_period_missing <- sub("2018-", "2019-", survey)
 time_period_missing <- as.Date(time_period_missing)
 
 # format data
 suppressWarnings({visitData_missing <- formatOccData(taxa = taxa, site = site,
-                                                     time_period = time_period_missing)})
+                                                     survey = time_period_missing)})
 
 
 test_that("Test occDetFunc errors", {
@@ -298,7 +298,7 @@ test_that("Test occDetFunc with julian date", {
                    "/dev/null"))
   
   suppressWarnings({visitData <- formatOccData(taxa = taxa, site = site,
-                                               time_period = time_period,
+                                               survey = survey,
                                                includeJDay = TRUE)})
   
   results <- occDetFunc(taxa_name = 'a',
@@ -346,7 +346,7 @@ test_that("Test occDetFunc with catagorical list length", {
                    "/dev/null"))
   
   suppressWarnings({visitData <- formatOccData(taxa = taxa, site = site,
-                                               time_period = time_period,
+                                               survey = survey,
                                                includeJDay = TRUE)})
   
   results <- occDetFunc(taxa_name = 'a',

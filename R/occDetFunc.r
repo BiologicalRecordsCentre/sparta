@@ -10,7 +10,7 @@
 #' @param occDetdata The 2nd element of the object returned by formatOccData.
 #' @param spp_vis The 1st element of the object returned by formatOccData.
 #' @param n_iterations numeric, An MCMC parameter - The number of interations
-#' @param nyr numeric, the minimum number of years on which a site must have records for it
+#' @param nyr numeric, the minimum number of periods on which a site must have records for it
 #'        to be included in the models. Defaults to 2
 #' @param burnin numeric, An MCMC parameter - The length of the burn in
 #' @param thinning numeric, An MCMC parameter - The thinning factor
@@ -56,7 +56,7 @@
 #' 
 #' B. Hyperprior type: This has 3 options, each of these are discussed in Outhwaite et al (in review):
 #'   1. halfuniform - the original formulation in Isaac et al (2014).
-#'   2. halfcauchy - preferred form, tested in Outhwaite et al (in review).
+#'   2. halfcauchy - preferred form, tested in Outhwaite et al (2018).
 #'   3. inversegamma - alternative form presented in the literature.
 #' 
 #' C. List length specification:  This has 3 options:
@@ -86,12 +86,15 @@
 #' }
 #' These options are provided as a vector of characters, e.g. \code{modeltype = c('indran', 'halfcauchy', 'catlistlength')}
 #' 
-#' @return A list including the model, bugs model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
+#' @return A list including the model, JAGS model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
 #'          
 #' @keywords trends, species, distribution, occupancy, bayesian, modeling
 #' @references Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
 #'             Statistics for citizen science: extracting signals of change from noisy ecological data.
-#'             Methods in Ecology and Evolution, 5 (10), 1052-1060.
+#'             \emph{Methods in Ecology and Evolution}, 5: 1052-1060.
+#' @references Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac, N.J.B. (2018).
+#'             Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. 
+#'             \emph{Ecological Indicators}, 93: 333-343.
 #' @examples
 #' \dontrun{
 #' 
@@ -114,10 +117,10 @@
 #' site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 #' 
 #' # the date of visit is selected at random from those created earlier
-#' time_period <- sample(rDates, size = n, TRUE)
+#' survey <- sample(rDates, size = n, TRUE)
 #'
 #' # Format the data
-#' visitData <- formatOccData(taxa = taxa, site = site, time_period = time_period)
+#' visitData <- formatOccData(taxa = taxa, site = site, survey = survey)
 #'
 #' # run the model with these data for one species (very small number of iterations)
 #' results <- occDetFunc(taxa_name = taxa[1],
@@ -224,15 +227,13 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                  ']')) 
     }
   }
-  
-  
+
   # look for missing years before time frame can be extended using max_year parameter
-  years <- (max(occDetdata$year) - min(occDetdata$year))+1
-  if(length(unique(occDetdata$year)) != years) stop('It looks like you have years with no data. This will crash BUGS')
+  years <- (max(occDetdata$TP) - min(occDetdata$TP))+1
+  if(length(unique(occDetdata$TP)) != years) stop('It looks like you have years with no data. This will crash BUGS')
   
-  
-    # Record the min year
-  min_year <- min(occDetdata$year)
+  # Record the max and min values of TP
+  min_year <- min(occDetdata$TP)
   
   # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
   site_match <- data.frame(original_site = occDetdata$site, new_site_name = as.numeric(as.factor(occDetdata$site)))
@@ -245,7 +246,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                                                                        table = as.character(site_match$original_site))]
   }
   
-
+  # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
+  zst <- acast(occDetdata, site ~ factor(TP), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
   
   # if the max_year is not null, edit the zst table to add the additional years required
   if(!is.null(max_year)){
@@ -254,47 +256,38 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     if(!is.numeric(max_year)) stop('max_year should be a numeric value')
     
     # check that max_year is greater than the final year of the dataset
-    if(max_year <= max(occDetdata$year)) stop('max_year should be greater than the final year of available data')
+    if(max_year <= max(occDetdata$TP)) stop('max_year should be greater than the final year of available data')
 
-    # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
-    zst <- acast(occDetdata, site ~ factor(year), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
-    nyear <- max_year - min_year + 1
+    nTP <- max_year - min_year + 1
     
     # if nyear is greater than the number of years due to different specification of max_year, 
     # add on additional columns to zst so that inital values can be create for these years.
     
-    if(nyear > ncol(zst)){
+    if(nTP > ncol(zst)){
       # work out how many columns need to be added
-      to_add <- nyear - ncol(zst)
+      to_add <- nTP - ncol(zst)
       zst <- cbind(zst, matrix(0, ncol = to_add, nrow = nrow(zst)))
       # add column names
-      colnames(zst) <- 1:nyear 
+      colnames(zst) <- 1:nTP 
     }
     
     # if a value has not been selected for max_year then continue as before
   }else{
-    
     # record the max year
-    max_year <- max(occDetdata$year)
-
-    # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
-    zst <- acast(occDetdata, site ~ factor(year), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
-    nyear <- max_year - min_year + 1
-    
+    max_year <- max(occDetdata$TP)
+    nTP <- max_year - min_year + 1
   }
   
-  # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
-  occDetdata$year <- occDetdata$year - min(occDetdata$year) + 1
-  
+  # look for time periods with no data
+  if(length(unique(occDetdata$TP)) != nTP) stop('It looks like you have time periods with no data. This will crash BUGS')
+
+   # TP and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
+  occDetdata$TP <- occDetdata$TP - min(occDetdata$TP) + 1
 
   # Parameter you wish to monitor, shown in the output
   parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a")
   
-  # If not sparta add monitoring for eta.psi0
-  if(!'sparta' %in% tolower(modeltype)) {
-    parameters <- c(parameters, "eta.p0", "eta.psi0")
-  }
-  
+
   # If ranwalk + halfcauchy monitor mu.lp 
   if(all(c('ranwalk', 'halfcauchy') %in% modeltype)){
     if(!'centering' %in% tolower(modeltype) & !'intercept' %in% tolower(modeltype)){
@@ -303,8 +296,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   }
   
   # If sparta monitor mu.lp 
-  if(tolower(modeltype) == 'sparta') {
-    parameters <- c(parameters, 'mu.lp')
+  if('sparta' %in% tolower(modeltype)) {
+    parameters <- c(parameters, "mu.lp")
   }
   
   # Add user specified paramters if given
@@ -324,7 +317,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                     paste0("psi.fs.r_", regions),
                     paste0("a_", regions))
     # ignore some parameters not used in regions model
-    parameters <- parameters[!parameters %in% c('eta.psi0', 'a', 'eta.p0')]
+    parameters <- parameters[!parameters %in% c('a')]
   }
   
   # add parameters for regional aggregates
@@ -334,7 +327,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # only include sites which have more than nyr of records
   # and are in the regional data if used
-  yps <- rowSums(acast(occDetdata, site ~ year, length, value.var = 'L') > 0)
+  yps <- rowSums(acast(occDetdata, site ~ TP, length, value.var = 'L') > 0)
   sites_to_include <- names(yps[yps >= nyr])
   
   # If we are using regional data makes sure all 'good' sites
@@ -357,8 +350,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # HERE IS THE BUGS DATA
   bugs_data <- with(merge(occDetdata[i,], site_to_row_lookup), # adds rownum to occDetdata (used below)
-                    list(y = as.numeric(focal), Year = year, Site = rownum, 
-                         nyear = nyear, nsite = nrow(zst), nvisit = nrow(occDetdata[i,])))
+                    list(y = as.numeric(focal), Year = TP, Site = rownum, 
+                         nyear = nTP, nsite = nrow(zst), nvisit = nrow(occDetdata[i,])))
   
   # added extra elements to bugs data if needed
   occDetData_temp <- merge(occDetdata[i,], site_to_row_lookup)
@@ -428,11 +421,11 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     } 
   }
   
-  initiate <- function(z, nyear, bugs_data) {
+  initiate <- function(z, nTP, bugs_data) {
     init <- list (z = z,
                   alpha.p = rep(runif(1, -2, 2),
-                                nyear),
-                  a = rep(runif(1, -2, 2), nyear),
+                                nTP),
+                  a = rep(runif(1, -2, 2), nTP),
                   eta = rep(runif(1, -2, 2), bugs_data$nsite))
 
     # add extra init values if needed
@@ -458,7 +451,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # set the initial values... 
   init.vals <- replicate(n_chains, initiate(z = zst,
-                                            nyear = nyear,
+                                            nTP = nTP,
                                             bugs_data = bugs_data),
                          simplify = F)
   
@@ -480,11 +473,13 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     model.file <- model.function
   }
   
+  modelcode <- paste(readLines(model.file), collapse = '\n')
+  
   ### REVIEW CODE
   cat('#### PLEASE REVIEW THE BELOW ####\n\n')
   cat('Your model settings:', paste(modeltype, collapse = ', '))
   cat('\n\nModel File:\n\n')
-  cat(paste(readLines(model.file), collapse = '\n'))
+  cat(modelcode)
   cat('\n\nbugs_data:\n\n')
   cat(str(bugs_data))
   cat('\n\ninit.vals:\n\n')
@@ -519,6 +514,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     if(!is.null(regional_codes)) out$regions <- head(tail(colnames(regional_codes), -1), -2)
     if(!is.null(region_aggs)) out$region_aggs <- region_aggs
     if(return_data) out$bugs_data <- bugs_data
+    attr(out, 'modelcode') <- modelcode
     class(out) <- 'occDet'
     if(write_results) save(out, file = file.path(output_dir, paste(taxa_name, ".rdata", sep = "")))  
     return(out)

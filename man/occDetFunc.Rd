@@ -21,7 +21,7 @@ occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 2,
 
 \item{n_iterations}{numeric, An MCMC parameter - The number of interations}
 
-\item{nyr}{numeric, the minimum number of years on which a site must have records for it
+\item{nyr}{numeric, the minimum number of periods on which a site must have records for it
 to be included in the models. Defaults to 2}
 
 \item{burnin}{numeric, An MCMC parameter - The length of the burn in}
@@ -73,7 +73,7 @@ be added to the defaults.}
 \item{return_data}{Logical, if \code{TRUE} (default) the bugs data object is returned with the data}
 }
 \value{
-A list including the model, bugs model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
+A list including the model, JAGS model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
 }
 \description{
 Run occupancy detection models using the output from \code{formatOccData}
@@ -93,7 +93,7 @@ A. Prior type: this has 3 options, each of which was tested in Outhwaite et al (
 
 B. Hyperprior type: This has 3 options, each of these are discussed in Outhwaite et al (in review):
   1. halfuniform - the original formulation in Isaac et al (2014).
-  2. halfcauchy - preferred form, tested in Outhwaite et al (in review).
+  2. halfcauchy - preferred form, tested in Outhwaite et al (2018).
   3. inversegamma - alternative form presented in the literature.
 
 C. List length specification:  This has 3 options:
@@ -145,10 +145,10 @@ taxa <- sample(letters, size = n, TRUE)
 site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 
 # the date of visit is selected at random from those created earlier
-time_period <- sample(rDates, size = n, TRUE)
+survey <- sample(rDates, size = n, TRUE)
 
 # Format the data
-visitData <- formatOccData(taxa = taxa, site = site, time_period = time_period)
+visitData <- formatOccData(taxa = taxa, site = site, survey = survey)
 
 # run the model with these data for one species (very small number of iterations)
 results <- occDetFunc(taxa_name = taxa[1],
@@ -162,7 +162,11 @@ results <- occDetFunc(taxa_name = taxa[1],
 \references{
 Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
             Statistics for citizen science: extracting signals of change from noisy ecological data.
-            Methods in Ecology and Evolution, 5 (10), 1052-1060.
+            \emph{Methods in Ecology and Evolution}, 5: 1052-1060.
+
+Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac, N.J.B. (2018).
+            Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. 
+            \emph{Ecological Indicators}, 93: 333-343.
 }
 \keyword{bayesian,}
 \keyword{distribution,}
