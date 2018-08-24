@@ -27,7 +27,7 @@ A list of length 2 the first element 'spp_vis' is a data.frame with visit
  the following columns. Values in taxa columns are either \code{TRUE} or
  \code{FALSE} depending on whether they were observed on that visit. The second
  element ('occDetData') is a dataframe giving the site, list length (the number of
- species observed on a visit) and year for each visit. Optionally this also includes
+ species observed on a visit) and year (or time period) for each visit. Optionally this also includes
  a Julian Day column, centered on 1 July.
 }
 \description{
@@ -96,11 +96,11 @@ formatted_data <- formatOccData(taxa = taxa,
 \references{
 Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
             Statistics for citizen science: extracting signals of change from noisy ecological data.
-            Methods in Ecology and Evolution, 5 (10), 1052-1060.
+            \emph{Methods in Ecology and Evolution}, 5 (10), 1052-1060.
 
 van Strien, A.J., Termaat, T., Groenendijk, D., Mensing, V. & Kéry, M. (2010).
             Site-occupancy models may offer new opportunities for dragonfly monitoring based on daily species lists.
-            Basic and Applied Ecology, 11, 495-503.
+            \emph{Basic and Applied Ecology}, 11, 495-503.
 }
 \keyword{bayesian,}
 \keyword{distribution,}

@@ -200,7 +200,11 @@ results <- occDetModel(taxa = taxa,
 \references{
 Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
             Statistics for citizen science: extracting signals of change from noisy ecological data.
-            Methods in Ecology and Evolution, 5 (10), 1052-1060.
+            \emph{Methods in Ecology and Evolution}, 5: 1052-1060.
+
+Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac, N.J.B. (2018).
+            Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. 
+            \emph{Ecological Indicators}, 93: 333-343.
 
 Roy, H.E., Adriaens, T., Isaac, N.J.B. et al. (2012) Invasive alien predator
             causes rapid declines of native European ladybirds. Diversity & Distributions,

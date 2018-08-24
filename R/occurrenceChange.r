@@ -92,7 +92,7 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   # extract the sims list, if there is a region code, use the psi.fs for that region
   if(!is.null(region)){
     reg_code <- paste("psi.fs.r_", region, sep = "")
-    
+
     occ_it <- bayesOut$BUGSoutput$sims.list
     occ_it <- occ_it[[grep(reg_code, names(occ_it))]]
     
@@ -113,7 +113,7 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   ### loops depend on which change metric has been specified
   
   if(change == 'lineargrowth'){
-    prediction <- function(years, series){
+      prediction <- function(years, series){
       
       # cut data
       data_table <- data.frame(occ = series[as.character(years)], year = (years - min(years) + 1))
@@ -133,11 +133,10 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
       return(results)
       
     }
-    
+
     res_tab <- do.call(rbind, apply(X = occ_it, MARGIN = 1, years = years, FUN = prediction))
     
   } # end of loop for linear growth rate
-  
   
   
   if(change == 'difference'){
@@ -146,9 +145,7 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
     res_tab <- data.frame(occ_it[, grep(first,colnames(occ_it))], occ_it[, grep(last,colnames(occ_it))], row.names = NULL)
     colnames(res_tab) <- as.character(c(min(years), max(years)))
     res_tab$change = res_tab[,2] - res_tab[,1]
-    
   } # end of loop for simple difference
-  
   
   
   if(change == 'percentdif'){
@@ -157,21 +154,17 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
     res_tab <- data.frame(occ_it[, grep(first,colnames(occ_it))], occ_it[, grep(last,colnames(occ_it))], row.names = NULL)
     colnames(res_tab) <- as.character(c(min(years), max(years)))
     res_tab$change = ((res_tab[,2] - res_tab[,1])/res_tab[,1])*100
-    
   } # end of loop for percentage difference
   
   
-  
   if(change == 'growthrate'){
-    
     nyr <- length(years)
     first <- years[1]
     last <- years[length(years)]
     res_tab <- data.frame(occ_it[, grep(first,colnames(occ_it))], occ_it[, grep(last,colnames(occ_it))], row.names = NULL)
     colnames(res_tab) <- as.character(c(min(years), max(years)))
     res_tab$change = (((res_tab[,2]/res_tab[,1])^(1/nyr))-1)*100
-    
-  }
+  } # end of loop for growth rate
   
   # return the mean, quantiles, and the data
   return(list(mean = mean(res_tab$change),

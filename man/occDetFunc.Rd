@@ -73,7 +73,7 @@ be added to the defaults.}
 \item{return_data}{Logical, if \code{TRUE} (default) the bugs data object is returned with the data}
 }
 \value{
-A list including the model, bugs model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
+A list including the model, JAGS model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
 }
 \description{
 Run occupancy detection models using the output from \code{formatOccData}
@@ -162,9 +162,11 @@ results <- occDetFunc(taxa_name = taxa[1],
 \references{
 Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
             Statistics for citizen science: extracting signals of change from noisy ecological data.
-            Methods in Ecology and Evolution, 5: 1052-1060.
-            Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac, N.J.B. (2018).
-            Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. Ecological Indicators, 93: 333-343.
+            \emph{Methods in Ecology and Evolution}, 5: 1052-1060.
+
+Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac, N.J.B. (2018).
+            Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. 
+            \emph{Ecological Indicators}, 93: 333-343.
 }
 \keyword{bayesian,}
 \keyword{distribution,}

@@ -228,9 +228,13 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     }
   }
   
+  # look for missing years before time frame can be extended using max_year parameter
+  years <- (max(occDetdata$TP) - min(occDetdata$TP))+1
+  if(length(unique(occDetdata$TP)) != years) stop('It looks like you have years with no data. This will crash BUGS')
+  
   # Record the max and min values of TP
   min_year <- min(occDetdata$TP)
-
+  
   # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
   site_match <- data.frame(original_site = occDetdata$site, new_site_name = as.numeric(as.factor(occDetdata$site)))
   site_match <- unique(site_match)
@@ -250,6 +254,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     # check that max_year is a numeric value
     if(!is.numeric(max_year)) stop('max_year should be a numeric value')
+    
+    # check that max_year is greater than the final year of the dataset
+    if(max_year <= max(occDetdata$TP)) stop('max_year should be greater than the final year of available data')
 
     nTP <- max_year - min_year + 1
     
@@ -277,13 +284,23 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
    # TP and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
   occDetdata$TP <- occDetdata$TP - min(occDetdata$TP) + 1
   
-  # look for missing years
-  #if(length(unique(occDetdata$year)) != nyear) stop('It looks like you have years with no data. This will crash BUGS')
-
   # Parameter you wish to monitor, shown in the output
-  parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a", "mu.lp")
+  parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a")
   
-   # Add user specified paramters if given
+
+  # If ranwalk + halfcauchy monitor mu.lp 
+  if(all(c('ranwalk', 'halfcauchy') %in% modeltype)){
+    if(!'centering' %in% tolower(modeltype) & !'intercept' %in% tolower(modeltype)){
+      parameters <- c(parameters, "mu.lp")
+    }
+  }
+  
+  # If sparta monitor mu.lp 
+  if('sparta' %in% tolower(modeltype)) {
+    parameters <- c(parameters, "mu.lp")
+  }
+  
+  # Add user specified paramters if given
   if(!is.null(additional.parameters)) parameters <- c(parameters, additional.parameters)
   
   # Add parameters for each of the model types
