@@ -81,8 +81,8 @@
 #'  \item{\code{"contlistlength"}}{ - This specifies that list length should be considered as a continious variable. If none of the list length options are specifed 'contlistlength' is used}
 #'  \item{\code{"nolistlength"}}{ - This specifies that no list length should be used. If none of the list length options are specifed 'contlistlength' is used}
 #'  \item{\code{"jul_date"}}{ - This adds Julian date to the model as a polynomial centered on the middle of the year.}
-#'  \item{\code{"intercept"}}{ - No longer available.  Includes an intercept term in the state and observation model.  By including intercept terms, the occupancy and detection probabilities in each year are centred on an overall mean level.}
-#'  \item{\code{"centering"}}{ - No longer available.  Includes hierarchical centering of the model parameters.   Centring does not change the model explicitly but writes it in a way that allows parameter estimates to be updated simultaneously.}
+#'  \item{\code{"intercept"}}{ - No longer available. Includes an intercept term in the state and observation model.  By including intercept terms, the occupancy and detection probabilities in each year are centred on an overall mean level.}
+#'  \item{\code{"centering"}}{ - No longer available. Includes hierarchical centering of the model parameters.   Centring does not change the model explicitly but writes it in a way that allows parameter estimates to be updated simultaneously.}
 #' }
 #' These options are provided as a vector of characters, e.g. \code{modeltype = c('indran', 'halfcauchy', 'catlistlength')}
 #' 
