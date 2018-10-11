@@ -64,8 +64,22 @@
 #' }
 #' These options are provided as a vector of characters, e.g. \code{modeltype = c('indran', 'centering', 'halfcauchy', 'catlistlength')}
 #'
-#' @return A list including the model, bugs model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
-#'          
+#' @return A list of elements that give results of the model as well as details decribing the model run. These include:
+#' \itemize{
+#'  \item{\code{"model"}}{ - }
+#'  \item{\code{"BUGSoutput"}}{ - }
+#'  \item{\code{"parameters.to.save"}}{ - }
+#'  \item{\code{"model.file"}}{ - }
+#'  \item{\code{"n.iter"}}{ - }
+#'  \item{\code{"DIC"}}{ - }
+#'  \item{\code{"SPP_NAME"}}{ - }
+#'  \item{\code{"min_year"}}{ - }
+#'  \item{\code{"max_year"}}{ - }
+#'  \item{\code{"nsites"}}{ - }
+#'  \item{\code{"nvisits"}}{ - }
+#'  \item{\code{"species_sites"}}{ - }
+#'  \item{\code{"species_observations"}}{ - }
+#' }
 #' @keywords trends, species, distribution, occupancy, bayesian, modeling
 #' @references Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
 #'             Statistics for citizen science: extracting signals of change from noisy ecological data.
