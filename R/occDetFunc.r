@@ -91,14 +91,14 @@
 #' \itemize{
 #'  \item{\code{"out$BUGSoutput$summary"}}{ - A summary table of the monitored parameter. The posterior distribution for each parameter is summaried with the mean, standard deviation, various credible intervals, a formal convergence metric (Rhat), and a measure of effective sample size (n.eff).}
 #'  \item{\code{"out$BUGSoutput$sims.list"}}{ - A list of the posterior distribution for each monitored parameter. Use sims.array and sims.matrix if a different format of the posteriors is desired.}
-#'  \item{"out$SPP_NAME"}{ - The name of the study species.}
-#'  \item{"out$min_year"}{ - First year of data included in the occupancy model run.}
-#'  \item{"out$max_year"}{ - Final year of data included in the occupancy model run.}
-#'  \item{"out$nsite"}{ - The number of unique sites included int he occupancy model run.}
-#'  \item{"out$nvisits"}{ - The number of unique visits included int he occupancy model run.}
-#'  \item{"out$species_sites"}{ - The number of unique sites the species of interest was recorded in.}
-#'  \item{"out$species_observations"}{ - The number of unique records for the species of interest.}
-#'  \item{"out$regions"}{ - The names of the regions included in the model run.}
+#'  \item{\code{"out$SPP_NAME"}}{ - The name of the study species.}
+#'  \item{\code{"out$min_year"}}{ - First year of data included in the occupancy model run.}
+#'  \item{\code{"out$max_year"}}{ - Final year of data included in the occupancy model run.}
+#'  \item{\code{"out$nsite"}}{ - The number of unique sites included int he occupancy model run.}
+#'  \item{\code{"out$nvisits"}}{ - The number of unique visits included int he occupancy model run.}
+#'  \item{\code{"out$species_sites"}}{ - The number of unique sites the species of interest was recorded in.}
+#'  \item{\code{"out$species_observations"}}{ - The number of unique records for the species of interest.}
+#'  \item{\code{"out$regions"}}{ - The names of the regions included in the model run.}
 #' }
 #'          
 #' @keywords trends, species, distribution, occupancy, bayesian, modeling
