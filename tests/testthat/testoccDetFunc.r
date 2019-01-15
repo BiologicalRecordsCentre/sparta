@@ -20,7 +20,7 @@ taxa <- sample(letters, size = n, TRUE)
 site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 
 # the date of visit is selected at random from those created earlier
-time_period <- sample(rDates, size = n, TRUE)
+survey <- sample(rDates, size = n, TRUE)
 
 # set up regions for some testing
 regions <- data.frame(site = unique(site),
@@ -30,7 +30,17 @@ regions <- data.frame(site = unique(site),
 
 # format data
 suppressWarnings({visitData <- formatOccData(taxa = taxa, site = site,
-                                             time_period = time_period)})
+                                             survey = survey)})
+
+## additional data for testing missing years
+# remove one year 
+time_period_missing <- sub("2018-", "2019-", survey)
+time_period_missing <- as.Date(time_period_missing)
+
+# format data
+suppressWarnings({visitData_missing <- formatOccData(taxa = taxa, site = site,
+                                                     survey = time_period_missing)})
+
 
 test_that("Test occDetFunc errors", {
   
@@ -50,7 +60,37 @@ test_that("Test occDetFunc errors", {
                                     spp_vis = visitData$spp_vis,
                                     write_results = FALSE,
                                     seed = 111),
-              'taxa_name is not the name of a taxa in spp_vis')    
+              'taxa_name is not the name of a taxa in spp_vis')
+
+ expect_error(results <- occDetFunc(taxa_name = 'a',
+                                    n_iterations = 50,
+                                    burnin = 15, 
+                                    occDetdata = visitData_missing$occDetdata,
+                                    spp_vis = visitData_missing$spp_vis,
+                                    write_results = FALSE,
+                                    seed = 111),
+              'It looks like you have years with no data. This will crash BUGS')
+ 
+ expect_error(results <- occDetFunc(taxa_name = 'a',
+                                    n_iterations = 50,
+                                    burnin = 15, 
+                                    occDetdata = visitData$occDetdata,
+                                    spp_vis = visitData$spp_vis,
+                                    max_year = "2028",
+                                    write_results = FALSE,
+                                    seed = 111),
+              'max_year should be a numeric value')
+ 
+ expect_error(results <- occDetFunc(taxa_name = 'a',
+                                    n_iterations = 50,
+                                    burnin = 15, 
+                                    occDetdata = visitData$occDetdata,
+                                    spp_vis = visitData$spp_vis,
+                                    max_year = 2028,
+                                    write_results = FALSE,
+                                    seed = 111),
+              'max_year should be greater than the final year of available data')
+ 
 })
 
 test_that("Test occDetFunc with defaults", {
@@ -258,7 +298,7 @@ test_that("Test occDetFunc with julian date", {
                    "/dev/null"))
   
   suppressWarnings({visitData <- formatOccData(taxa = taxa, site = site,
-                                               time_period = time_period,
+                                               survey = survey,
                                                includeJDay = TRUE)})
   
   results <- occDetFunc(taxa_name = 'a',
@@ -306,7 +346,7 @@ test_that("Test occDetFunc with catagorical list length", {
                    "/dev/null"))
   
   suppressWarnings({visitData <- formatOccData(taxa = taxa, site = site,
-                                               time_period = time_period,
+                                               survey = survey,
                                                includeJDay = TRUE)})
   
   results <- occDetFunc(taxa_name = 'a',

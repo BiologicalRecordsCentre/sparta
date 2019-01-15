@@ -47,7 +47,7 @@
 siteSelection <- function(taxa, site, time_period, minL, minTP, LFirst = TRUE){
   
   # Run error checks 
-  errorChecks(taxa, site, time_period)
+  errorChecks(taxa = taxa, site = site, time_period = time_period)
    
   # If list length first
   if(LFirst){
