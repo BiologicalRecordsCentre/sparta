@@ -20,9 +20,9 @@ taxa <- sample(letters, size = n, TRUE)
 site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 
 # the date of visit is selected at random from those created earlier
-time_period <- sample(rDates, size = n, TRUE)
+survey <- sample(rDates, size = n, TRUE)
 
-df <- data.frame(taxa, site, time_period)
+df <- data.frame(taxa, site, survey)
 
 test_that("Test occDetModel", {
   
@@ -32,7 +32,7 @@ test_that("Test occDetModel", {
   results <- occDetModel(taxa = df$taxa,
                          write_results = FALSE,
                          site = df$site,
-                         time_period = df$time_period,
+                         survey = df$survey,
                          species_list = c('a','m','g'),
                          n_iterations = 100,
                          burnin = 10,

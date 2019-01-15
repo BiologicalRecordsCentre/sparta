@@ -1,7 +1,8 @@
 #' @importFrom dplyr distinct
 
-errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate = NULL,
-                        endDate = NULL, Date = NULL, time_periodsDF = NULL, dist = NULL, sim = NULL,
+errorChecks <- function(taxa = NULL, site = NULL, survey = NULL, closure_period = NULL, time_period = NULL, 
+                        startDate = NULL, endDate = NULL, Date = NULL, 
+                        time_periodsDF = NULL, dist = NULL, sim = NULL,
                         dist_sub = NULL, sim_sub = NULL, minSite = NULL, useIterations = NULL,
                         iterations = NULL, overdispersion = NULL, verbose = NULL,
                         list_length = NULL, site_effect = NULL, family = NULL,
@@ -14,6 +15,8 @@ errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate 
   # Create a list of all non-null arguements that should be of equal length
   valid_argumentsTEMP <- list(taxa=taxa,
                           site=site,
+                          survey=survey,
+                          closure_period=closure_period,
                           time_period=time_period,
                           startDate=startDate,
                           endDate=endDate)
@@ -26,6 +29,16 @@ errorChecks <- function(taxa = NULL, site = NULL, time_period = NULL, startDate 
     if(abs(max(lengths) - min(lengths)) > .Machine$double.eps ^ 0.5){
       stop(paste('The following arguements are not of equal length:', paste(names(valid_arguments), collapse = ', ')))
     }
+  }
+  
+  if(!is.null(taxa) & !is.null(site) & !is.null(survey)){
+    
+    df <- data.frame(taxa, site, survey)
+    NR1 <- nrow(df)
+    NR2 <- nrow(distinct(df))
+    
+    if(NR1 != NR2) warning(paste(NR1 - NR2, 'out of', NR1, 'observations will be removed as duplicates'))
+    
   }
   
   if(!is.null(taxa) & !is.null(site) & !is.null(time_period)){

@@ -10,7 +10,7 @@
 #' @param occDetdata The 2nd element of the object returned by formatOccData.
 #' @param spp_vis The 1st element of the object returned by formatOccData.
 #' @param n_iterations numeric, An MCMC parameter - The number of interations
-#' @param nyr numeric, the minimum number of years on which a site must have records for it
+#' @param nyr numeric, the minimum number of periods on which a site must have records for it
 #'        to be included in the models. Defaults to 2
 #' @param burnin numeric, An MCMC parameter - The length of the burn in
 #' @param thinning numeric, An MCMC parameter - The thinning factor
@@ -33,6 +33,8 @@
 #' 'england', scotland' and 'wales' must appear as names of columns in \code{regional_codes}. 
 #' More than one aggregate can be given, eg \code{region_aggs = list(GB = c('england', 'scotland',
 #'  'wales'), UK = c('england', 'scotland', 'wales', 'northern_ireland'))}.
+#' @param max_year numeric, final year to which analysis will be run, this can be set if it is beyond
+#' the limit of the dataset.  Defaults to final year of the dataset.
 #' @param seed numeric, uses \code{set.seed} to set the randon number seed. Setting
 #'        this number ensures repeatabl analyses
 #' @param model.function optionally a user defined BUGS model coded as a function (see \code{?jags},
@@ -44,23 +46,59 @@
 #' be added to the defaults.
 #' @param return_data Logical, if \code{TRUE} (default) the bugs data object is returned with the data
 #'
-#' @details \code{modeltype} is used to choose the model as well as the initial values,
-#' and the parameter to monitor. There are 9 elements that define models, however not
-#' all combinations are available in sparta. You will get an error if you try and use
+#' @details \code{modeltype} is used to choose the model as well as the associated initial values,
+#' and parameters to monitor. Elements to choose from can be separated into the following components:
+#' 
+#' A. Prior type: this has 3 options, each of which was tested in Outhwaite et al (in review):
+#'   1. sparta - This uses the same model as in Isaac et al (2014).
+#'   2. indran - This is the adaptive stationary model.
+#'   3. ranwalk - This is the random walk model.
+#' 
+#' B. Hyperprior type: This has 3 options, each of these are discussed in Outhwaite et al (in review):
+#'   1. halfuniform - the original formulation in Isaac et al (2014).
+#'   2. halfcauchy - preferred form, tested in Outhwaite et al (2018).
+#'   3. inversegamma - alternative form presented in the literature.
+#' 
+#' C. List length specification:  This has 3 options:
+#'   1. catlistlength - list length as a categorical variable.
+#'   2. contlistlength - list length as a continuous variable.
+#'   3. nolistlength - no list length variable.
+#' 
+#' D. Julian date: this is an additional option for including Julian date within the detection model:
+#'   1. jul_date.
+#' 
+#' Not all combinations are available in sparta. You will get an error if you try and use
 #' a combination that is not supported. There is usually a good reason why that
-#' combination is not a good idea. Here are the model elements available.
+#' combination is not a good idea. Here are the model elements available:
+#' 
 #' \itemize{
 #'  \item{\code{"sparta"}}{ - This uses the same model as in Isaac et al (2014)}
 #'  \item{\code{"indran"}}{ - Here the prior for the year effect of the state model is modelled as a random effect.  This allows the model to adapt to interannual variability.}
-#'  \item{\code{"inversegamma"}}{ - Includes inverse-gamma hyperpriors for random effects within the model}
-#'  \item{\code{"intercept"}}{ - Includes an intercept term in the state and observation model.  By including intercept terms, the occupancy and detection probabilities in each year are centred on an overall mean level.}
-#'  \item{\code{"centering"}}{ - Includes hierarchical centering of the model parameters.   Centring does not change the model explicitly but writes it in a way that allows parameter estimates to be updated simultaneously.}
 #'  \item{\code{"ranwalk"}}{ - Here the prior for the year effect of the state model is modelled as a random walk.  Each estimate for the year effect is dependent on that of the previous year.}
 #'  \item{\code{"halfcauchy"}}{ - Includes half-Cauchy hyperpriors for all random effects within the model.  The half-Cauchy is a special case of the Student’s t distribution with 1 degree of freedom. }
+#'  \item{\code{"inversegamma"}}{ - Includes inverse-gamma hyperpriors for random effects within the model}
 #'  \item{\code{"catlistlength"}}{ - This specifies that list length should be considered as a catagorical variable. There are 3 classes, lists of length 1, 2-3, and 4 and over. If none of the list length options are specifed 'contlistlength' is used}
 #'  \item{\code{"contlistlength"}}{ - This specifies that list length should be considered as a continious variable. If none of the list length options are specifed 'contlistlength' is used}
 #'  \item{\code{"nolistlength"}}{ - This specifies that no list length should be used. If none of the list length options are specifed 'contlistlength' is used}
-#'  \item{\code{"jul_date"}}{ - This adds Julian date to the model as a polynomial centered on the middle of the year. Note your data must include Julian day (use formatOccData(..., includeJDay = TRUE))}
+#'  \item{\code{"jul_date"}}{ - This adds Julian date to the model as a polynomial centered on the middle of the year.}
+#'  \item{\code{"intercept"}}{ - No longer available. Includes an intercept term in the state and observation model.  By including intercept terms, the occupancy and detection probabilities in each year are centred on an overall mean level.}
+#'  \item{\code{"centering"}}{ - No longer available. Includes hierarchical centering of the model parameters.   Centring does not change the model explicitly but writes it in a way that allows parameter estimates to be updated simultaneously.}
+#' }
+#' These options are provided as a vector of characters, e.g. \code{modeltype = c('indran', 'halfcauchy', 'catlistlength')}
+#' 
+#' @return A list including the model, JAGS model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
+#' Key aspects of the model output include:
+#' \itemize{
+#'  \item{\code{"out$BUGSoutput$summary"}}{ - A summary table of the monitored parameter. The posterior distribution for each parameter is summaried with the mean, standard deviation, various credible intervals, a formal convergence metric (Rhat), and a measure of effective sample size (n.eff).}
+#'  \item{\code{"out$BUGSoutput$sims.list"}}{ - A list of the posterior distribution for each monitored parameter. Use sims.array and sims.matrix if a different format of the posteriors is desired.}
+#'  \item{\code{"out$SPP_NAME"}}{ - The name of the study species.}
+#'  \item{\code{"out$min_year"}}{ - First year of data included in the occupancy model run.}
+#'  \item{\code{"out$max_year"}}{ - Final year of data included in the occupancy model run.}
+#'  \item{\code{"out$nsite"}}{ - The number of unique sites included int he occupancy model run.}
+#'  \item{\code{"out$nvisits"}}{ - The number of unique visits included int he occupancy model run.}
+#'  \item{\code{"out$species_sites"}}{ - The number of unique sites the species of interest was recorded in.}
+#'  \item{\code{"out$species_observations"}}{ - The number of unique records for the species of interest.}
+#'  \item{\code{"out$regions"}}{ - The names of the regions included in the model run.}
 #' }
 #' These options are provided as a vector of characters, e.g. \code{modeltype = c('indran', 'centering', 'halfcauchy', 'catlistlength')}
 #'
@@ -83,7 +121,10 @@
 #' @keywords trends, species, distribution, occupancy, bayesian, modeling
 #' @references Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
 #'             Statistics for citizen science: extracting signals of change from noisy ecological data.
-#'             Methods in Ecology and Evolution, 5 (10), 1052-1060.
+#'             \emph{Methods in Ecology and Evolution}, 5: 1052-1060.
+#' @references Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac, N.J.B. (2018).
+#'             Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. 
+#'             \emph{Ecological Indicators}, 93: 333-343.
 #' @examples
 #' \dontrun{
 #' 
@@ -106,10 +147,10 @@
 #' site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 #' 
 #' # the date of visit is selected at random from those created earlier
-#' time_period <- sample(rDates, size = n, TRUE)
+#' survey <- sample(rDates, size = n, TRUE)
 #'
 #' # Format the data
-#' visitData <- formatOccData(taxa = taxa, site = site, time_period = time_period)
+#' visitData <- formatOccData(taxa = taxa, site = site, survey = survey)
 #'
 #' # run the model with these data for one species (very small number of iterations)
 #' results <- occDetFunc(taxa_name = taxa[1],
@@ -126,8 +167,8 @@
 
 occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 2,
                         burnin = 1500, thinning = 3, n_chains = 3, write_results = TRUE,
-                        output_dir = getwd(),  modeltype = 'sparta', seed = NULL,
-                        model.function = NULL, regional_codes = NULL,
+                        output_dir = getwd(),  modeltype = 'sparta', max_year = NULL, 
+                        seed = NULL, model.function = NULL, regional_codes = NULL,
                         region_aggs = NULL, additional.parameters = NULL,
                         additional.BUGS.elements = NULL, additional.init.values = NULL,
                         return_data = FALSE){
@@ -216,13 +257,15 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                  ']')) 
     }
   }
+
+  # look for missing years before time frame can be extended using max_year parameter
+  years <- (max(occDetdata$TP) - min(occDetdata$TP))+1
+  if(length(unique(occDetdata$TP)) != years) stop('It looks like you have years with no data. This will crash BUGS')
   
-  # Record the max and min year
-  min_year <- min(occDetdata$year)
-  max_year <- max(occDetdata$year)
+  # Record the max and min values of TP
+  min_year <- min(occDetdata$TP)
   
   # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
-  occDetdata$year <- occDetdata$year - min(occDetdata$year) + 1
   site_match <- data.frame(original_site = occDetdata$site, new_site_name = as.numeric(as.factor(occDetdata$site)))
   site_match <- unique(site_match)
   occDetdata$site <- as.numeric(as.factor(occDetdata$site))
@@ -230,21 +273,62 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   # Convert the regional table to these numeric versions of site names
   if(!is.null(regional_codes)){
     regional_codes$numeric_site_name <- site_match$new_site_name[match(x = as.character(regional_codes[,1]),
-                                                             table = as.character(site_match$original_site))]
+                                                                       table = as.character(site_match$original_site))]
   }
   
   # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
-  zst <- acast(occDetdata, site ~ factor(year), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
-  nyear <- max_year - min_year + 1
+  zst <- acast(occDetdata, site ~ factor(TP), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
   
-  # look for missing years
-  if(length(unique(occDetdata$year)) != nyear) stop('It looks like you have years with no data. This will crash BUGS')
+  # if the max_year is not null, edit the zst table to add the additional years required
+  if(!is.null(max_year)){
+    
+    # check that max_year is a numeric value
+    if(!is.numeric(max_year)) stop('max_year should be a numeric value')
+    
+    # check that max_year is greater than the final year of the dataset
+    if(max_year <= max(occDetdata$TP)) stop('max_year should be greater than the final year of available data')
+
+    nTP <- max_year - min_year + 1
+    
+    # if nyear is greater than the number of years due to different specification of max_year, 
+    # add on additional columns to zst so that inital values can be create for these years.
+    
+    if(nTP > ncol(zst)){
+      # work out how many columns need to be added
+      to_add <- nTP - ncol(zst)
+      zst <- cbind(zst, matrix(0, ncol = to_add, nrow = nrow(zst)))
+      # add column names
+      colnames(zst) <- 1:nTP 
+    }
+    
+    # if a value has not been selected for max_year then continue as before
+  }else{
+    # record the max year
+    max_year <- max(occDetdata$TP)
+    nTP <- max_year - min_year + 1
+  }
   
+  # look for time periods with no data
+  if(length(unique(occDetdata$TP)) != nTP) stop('It looks like you have time periods with no data. This will crash BUGS')
+
+   # TP and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
+  occDetdata$TP <- occDetdata$TP - min(occDetdata$TP) + 1
+
   # Parameter you wish to monitor, shown in the output
-  parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a", "mu.lp")
+  parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a")
   
-  # If not sparta add monitoring for eta.psi0
-  if(!'sparta' %in% tolower(modeltype)) parameters <- c(parameters, "eta.p0", "eta.psi0")
+
+  # If ranwalk + halfcauchy monitor mu.lp 
+  if(all(c('ranwalk', 'halfcauchy') %in% modeltype)){
+    if(!'centering' %in% tolower(modeltype) & !'intercept' %in% tolower(modeltype)){
+      parameters <- c(parameters, "mu.lp")
+    }
+  }
+  
+  # If sparta monitor mu.lp 
+  if('sparta' %in% tolower(modeltype)) {
+    parameters <- c(parameters, "mu.lp")
+  }
   
   # Add user specified paramters if given
   if(!is.null(additional.parameters)) parameters <- c(parameters, additional.parameters)
@@ -263,7 +347,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                     paste0("psi.fs.r_", regions),
                     paste0("a_", regions))
     # ignore some parameters not used in regions model
-    parameters <- parameters[!parameters %in% c('eta.psi0', 'a', 'eta.p0')]
+    parameters <- parameters[!parameters %in% c('a')]
   }
   
   # add parameters for regional aggregates
@@ -273,7 +357,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # only include sites which have more than nyr of records
   # and are in the regional data if used
-  yps <- rowSums(acast(occDetdata, site ~ year, length, value.var = 'L') > 0)
+  yps <- rowSums(acast(occDetdata, site ~ TP, length, value.var = 'L') > 0)
   sites_to_include <- names(yps[yps >= nyr])
   
   # If we are using regional data makes sure all 'good' sites
@@ -296,8 +380,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # HERE IS THE BUGS DATA
   bugs_data <- with(merge(occDetdata[i,], site_to_row_lookup), # adds rownum to occDetdata (used below)
-                    list(y = as.numeric(focal), Year = year, Site = rownum, 
-                         nyear = nyear, nsite = nrow(zst), nvisit = nrow(occDetdata[i,])))
+                    list(y = as.numeric(focal), Year = TP, Site = rownum, 
+                         nyear = nTP, nsite = nrow(zst), nvisit = nrow(occDetdata[i,])))
   
   # added extra elements to bugs data if needed
   occDetData_temp <- merge(occDetdata[i,], site_to_row_lookup)
@@ -367,11 +451,11 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     } 
   }
   
-  initiate <- function(z, nyear, bugs_data) {
+  initiate <- function(z, nTP, bugs_data) {
     init <- list (z = z,
                   alpha.p = rep(runif(1, -2, 2),
-                                nyear),
-                  a = rep(runif(1, -2, 2), nyear),
+                                nTP),
+                  a = rep(runif(1, -2, 2), nTP),
                   eta = rep(runif(1, -2, 2), bugs_data$nsite))
 
     # add extra init values if needed
@@ -397,7 +481,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # set the initial values... 
   init.vals <- replicate(n_chains, initiate(z = zst,
-                                            nyear = nyear,
+                                            nTP = nTP,
                                             bugs_data = bugs_data),
                          simplify = F)
   
@@ -419,11 +503,13 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     model.file <- model.function
   }
   
+  modelcode <- paste(readLines(model.file), collapse = '\n')
+  
   ### REVIEW CODE
   cat('#### PLEASE REVIEW THE BELOW ####\n\n')
   cat('Your model settings:', paste(modeltype, collapse = ', '))
   cat('\n\nModel File:\n\n')
-  cat(paste(readLines(model.file), collapse = '\n'))
+  cat(modelcode)
   cat('\n\nbugs_data:\n\n')
   cat(str(bugs_data))
   cat('\n\ninit.vals:\n\n')
@@ -458,6 +544,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     if(!is.null(regional_codes)) out$regions <- head(tail(colnames(regional_codes), -1), -2)
     if(!is.null(region_aggs)) out$region_aggs <- region_aggs
     if(return_data) out$bugs_data <- bugs_data
+    attr(out, 'modelcode') <- modelcode
     class(out) <- 'occDet'
     if(write_results) save(out, file = file.path(output_dir, paste(taxa_name, ".rdata", sep = "")))  
     return(out)

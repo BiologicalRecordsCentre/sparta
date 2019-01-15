@@ -27,12 +27,6 @@ getObsModel <- function(modeltype, verbose = FALSE){
                          "dtype2.p ~ dnorm(0, 0.01)\ndtype3.p ~ dnorm(0, 0.01)\n") 
            },
            
-           intercept = {
-             basemodel <- paste(
-               basemodel,
-               'eta.p0',
-               sep = ' + ')},
-           
            contlistlength = {
              basemodel <- paste(
                basemodel,
