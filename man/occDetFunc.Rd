@@ -4,12 +4,13 @@
 \alias{occDetFunc}
 \title{Occupancy detection Function}
 \usage{
-occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 2,
-  burnin = 1500, thinning = 3, n_chains = 3, write_results = TRUE,
-  output_dir = getwd(), modeltype = "sparta", seed = NULL,
-  model.function = NULL, regional_codes = NULL, region_aggs = NULL,
-  additional.parameters = NULL, additional.BUGS.elements = NULL,
-  additional.init.values = NULL, return_data = FALSE)
+occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000,
+  nyr = 2, burnin = 1500, thinning = 3, n_chains = 3,
+  write_results = TRUE, output_dir = getwd(), modeltype = "sparta",
+  seed = NULL, model.function = NULL, regional_codes = NULL,
+  region_aggs = NULL, additional.parameters = NULL,
+  additional.BUGS.elements = NULL, additional.init.values = NULL,
+  return_data = FALSE)
 }
 \arguments{
 \item{taxa_name}{A character giving the name of the species to be modelled.}
@@ -69,7 +70,22 @@ be added to the defaults.}
 \item{return_data}{Logical, if \code{TRUE} (default) the bugs data object is returned with the data}
 }
 \value{
-A list including the model, bugs model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
+A list of elements that give results of the model as well as details decribing the model run. These include:
+\itemize{
+ \item{\code{"model"}}{ - }
+ \item{\code{"BUGSoutput"}}{ - }
+ \item{\code{"parameters.to.save"}}{ - }
+ \item{\code{"model.file"}}{ - }
+ \item{\code{"n.iter"}}{ - }
+ \item{\code{"DIC"}}{ - }
+ \item{\code{"SPP_NAME"}}{ - }
+ \item{\code{"min_year"}}{ - }
+ \item{\code{"max_year"}}{ - }
+ \item{\code{"nsites"}}{ - }
+ \item{\code{"nvisits"}}{ - }
+ \item{\code{"species_sites"}}{ - }
+ \item{\code{"species_observations"}}{ - }
+}
 }
 \description{
 Run occupancy detection models using the output from \code{formatOccData}
