@@ -4,6 +4,7 @@
 \alias{occDetFunc}
 \title{Occupancy detection Function}
 \usage{
+
 occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 2,
   burnin = 1500, thinning = 3, n_chains = 3, write_results = TRUE,
   output_dir = getwd(), modeltype = "sparta", max_year = NULL,
@@ -73,6 +74,7 @@ be added to the defaults.}
 \item{return_data}{Logical, if \code{TRUE} (default) the bugs data object is returned with the data}
 }
 \value{
+
 A list including the model, JAGS model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
 Key aspects of the model output include:
 \itemize{

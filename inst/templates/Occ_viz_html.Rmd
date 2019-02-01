@@ -94,7 +94,7 @@ plot(comb.samples)
 
 ### Traceplots - Other parameters {#Traceplots_Other_parameters}
 
-```{r traceplots_OTHER, fig.height=0.2*ceiling((length(colnames(results$BUGSoutput$sims.array[,1,])[!(grepl('^alpha.p\\[', colnames(results$BUGSoutput$sims.array[,1,])) | grepl('^psi.fs\\[', colnames(results$BUGSoutput$sims.array[,1,])))])/3)), echo = FALSE}
+```{r traceplots_OTHER, fig.height=1*ceiling((length(colnames(results$BUGSoutput$sims.array[,1,])[!(grepl('^alpha.p\\[', colnames(results$BUGSoutput$sims.array[,1,])) | grepl('^psi.fs\\[', colnames(results$BUGSoutput$sims.array[,1,])))])/3)), echo = FALSE}
 array_sim <- results$BUGSoutput$sims.array
 comb.samples <- mcmc.list(
   lapply(1:results$BUGSoutput$n.chains,
