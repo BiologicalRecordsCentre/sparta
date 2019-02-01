@@ -64,7 +64,7 @@ test_that("Test errors and warnings", {
   expect_error(temp <- telfer(taxa = df$taxa, site = df$site, time_period = df$time_period, minSite = 100),
                'No taxa satisfy the minSite criteria when comparing time period 1 and 2')
   expect_error(temp <- telfer(taxa = df$taxa, site = df$site, time_period = df$time_period, minSite = TRUE),
-               'minSite must be numeric or interger')
+               'minSite must be numeric or integer')
   expect_warning(temp <- telfer(taxa, site, time_period),
                  '260 out of 1000 observations will be removed as duplicates')
   
