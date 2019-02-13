@@ -9,7 +9,7 @@
 #' @param taxa A character vector of taxon names, as long as the number of observations.
 #' @param site A character vector of site names, as long as the number of observations.
 #' @param survey A  vector as long as the number of observations. 
-#'        This must be a Date if either closure_period is not supplied or if includeJDay = \code{TRUE}
+#'        This must be a Date if includeJDay = \code{TRUE}
 #' @param species_list A character vector of taxa names for which models should be run. This is
 #'        optional and by default models will be run for all taxa
 #' @param write_results logical, should results be saved to \code{output_dir}. This is
