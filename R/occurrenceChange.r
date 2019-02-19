@@ -20,16 +20,15 @@
 #' There are four options to choose from: difference, percentdif, growthrate and
 #' lineargrowth.
 #' 
-#' difference calculates the simple difference between the first and last year.
+#' \code{difference} calculates the simple difference between the first and last year.
 #' 
-#' percentdif calculates the percentage difference between the first and last year.
+#' \code{percentdif} calculates the percentage difference between the first and last year.
 #' 
-#' growthrate calculates the annual growth rate across years.
+#' \code{growthrate} calculates the annual growth rate across years.
 #' 
-#' lineargrowth calculates the linear growth rate from a linear model.
-#'
+#' \code{lineargrowth} calculates the linear growth rate from a linear model.
 #' 
-#' @return A list giving the mean, credible intervals and raw data from the
+#' @return A list giving the mean, median, credible intervals and raw data from the
 #' estimations.
 #' @examples
 #' \dontrun{
@@ -142,7 +141,9 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   if(change == 'difference'){
     first <- years[1]
     last <- years[length(years)]
-    res_tab <- data.frame(occ_it[, grep(first,colnames(occ_it))], occ_it[, grep(last,colnames(occ_it))], row.names = NULL)
+    res_tab <- data.frame(occ_it[, colnames(occ_it) == first],
+                          occ_it[, colnames(occ_it) == last],
+                          row.names = NULL)
     colnames(res_tab) <- as.character(c(min(years), max(years)))
     res_tab$change = res_tab[,2] - res_tab[,1]
   } # end of loop for simple difference
@@ -151,7 +152,9 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   if(change == 'percentdif'){
     first <- years[1]
     last <- years[length(years)]
-    res_tab <- data.frame(occ_it[, grep(first,colnames(occ_it))], occ_it[, grep(last,colnames(occ_it))], row.names = NULL)
+    res_tab <- data.frame(occ_it[, colnames(occ_it) == first],
+                          occ_it[, colnames(occ_it) == last],
+                          row.names = NULL)
     colnames(res_tab) <- as.character(c(min(years), max(years)))
     res_tab$change = ((res_tab[,2] - res_tab[,1])/res_tab[,1])*100
   } # end of loop for percentage difference
@@ -161,13 +164,16 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
     nyr <- length(years)
     first <- years[1]
     last <- years[length(years)]
-    res_tab <- data.frame(occ_it[, grep(first,colnames(occ_it))], occ_it[, grep(last,colnames(occ_it))], row.names = NULL)
+    res_tab <- data.frame(occ_it[, colnames(occ_it) == first],
+                          occ_it[, colnames(occ_it) == last],
+                          row.names = NULL)
     colnames(res_tab) <- as.character(c(min(years), max(years)))
     res_tab$change = (((res_tab[,2]/res_tab[,1])^(1/nyr))-1)*100
   } # end of loop for growth rate
 
   # return the mean, quantiles, and the data
   return(list(mean = mean(res_tab$change),
+              median = median(res_tab$change),
               CIs = quantile(res_tab$change, probs = c(0.025, 0.975)),
               data = res_tab))
 
