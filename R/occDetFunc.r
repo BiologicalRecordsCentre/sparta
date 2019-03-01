@@ -545,6 +545,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     if(!is.null(regional_codes)) out$regions <- head(tail(colnames(regional_codes), -1), -2)
     if(!is.null(region_aggs)) out$region_aggs <- region_aggs
     if(return_data) out$bugs_data <- bugs_data
+    attr(out, 'modeltype') <- modeltype
     attr(out, 'modelcode') <- modelcode
     class(out) <- 'occDet'
     if(write_results) save(out, file = file.path(output_dir, paste(taxa_name, ".rdata", sep = "")))  
