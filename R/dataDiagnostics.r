@@ -21,7 +21,7 @@
 #' 
 #' ### Diagnostics functions ###
 #' # Create data
-#' n <- 2000 #size of dataset
+#' n <- 2000 # size of dataset
 #' nyr <- 20 # number of years in data
 #' nSamples <- 200 # set number of dates
 #' useDates <- TRUE
