@@ -112,7 +112,7 @@ errorChecks <- function(taxa = NULL, site = NULL, survey = NULL, closure_period 
     
     if(class(dist) != 'data.frame') stop('dist must be a data.frame')
     if(ncol(dist) != 3) stop('dist must have three columns') 
-    if(!class(dist[,3]) %in% c('numeric', 'interger')) stop('the value column in dist must be an integer or numeric')
+    if(!class(dist[,3]) %in% c('numeric', 'integer')) stop('the value column in dist must be an integer or numeric')
     
     # Check distance table contains all combinations of sites
     sites <- unique(c(as.character(dist[,1]), as.character(dist[,2])))
@@ -128,15 +128,15 @@ errorChecks <- function(taxa = NULL, site = NULL, survey = NULL, closure_period 
   if(!is.null(sim)){
     
     if(class(sim) != 'data.frame') stop('sim must be a data.frame')
-    if(!all(lapply(sim[,2:ncol(sim)], class) %in% c('numeric', 'interger'))) stop('the values in sim must be integers or numeric')
+    if(!all(lapply(sim[,2:ncol(sim)], class) %in% c('numeric', 'integer'))) stop('the values in sim must be integers or numeric')
         
   }
   
   ### Checks for sim_sub and dist_sub ###
   if(!is.null(sim_sub) & !is.null(dist_sub)){
     
-    if(!class(dist_sub) %in% c('numeric', 'interger')) stop('dist_sub must be integer or numeric')
-    if(!class(sim_sub) %in% c('numeric', 'interger')) stop('sim_sub must be integer or numeric')
+    if(!class(dist_sub) %in% c('numeric', 'integer')) stop('dist_sub must be integer or numeric')
+    if(!class(sim_sub) %in% c('numeric', 'integer')) stop('sim_sub must be integer or numeric')
     if(dist_sub <= sim_sub) stop("'dist_sub' cannot be smaller than or equal to 'sim_sub'")
     
   }
@@ -144,7 +144,7 @@ errorChecks <- function(taxa = NULL, site = NULL, survey = NULL, closure_period 
   ### checks for minSite ###
   if(!is.null(minSite)){
   
-    if(!class(minSite) %in% c('numeric', 'interger')) stop('minSite must be numeric or interger')
+    if(!class(minSite) %in% c('numeric', 'integer')) stop('minSite must be numeric or integer')
   
   }
   
@@ -158,7 +158,7 @@ errorChecks <- function(taxa = NULL, site = NULL, survey = NULL, closure_period 
   ### checks for iterations ###
   if(!is.null(iterations)){
    
-    if(!class(iterations) %in% c('numeric', 'interger')) stop('iterations must be numeric or interger')
+    if(!class(iterations) %in% c('numeric', 'integer')) stop('iterations must be numeric or integer')
         
   }
   
