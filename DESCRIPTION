@@ -33,9 +33,5 @@ Suggests:
     knitr
 VignetteBuilder: knitr
 LazyData: TRUE
-<<<<<<< HEAD
 RoxygenNote: 6.1.0
 Encoding: UTF-8
-=======
-RoxygenNote: 6.1.1
->>>>>>> d9408e9e13afa355f96ea5f372fac0feec2903ba
