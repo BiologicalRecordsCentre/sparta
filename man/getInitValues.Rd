@@ -14,7 +14,8 @@ species is present, alpha.p is the initial values for detectability in each year
 the inital values for the occupancy probability in each year, eta is the initial values
 for the site random effects.}
 
-\item{modeltype}{one of: intercept, centering, contlistlength.}
+\item{modeltype}{Character, one of: intercept, centering, contlistlength. See \code{occDetFunc} for
+more information.}
 
 \item{verbose}{Logical, if true progress is reported to the console}
 }

@@ -8,7 +8,8 @@
 #' nvisit = nrow(occDetdata[i,]))}. Where focal is a binary (0/1) of is the focal species is
 #' present, Year is the time periods or survey periods, Site are the site identifiers, nyear is
 #' the number of years in the data, nsite is hte number of sites and nVisit is the number of visits
-#' @param modeltype one of: intercept, centering, jul_date, catlistlength, contlistlength.
+#' @param modeltype Character, one of: intercept, centering, jul_date, catlistlength, contlistlength.
+#' See \code{occDetFunc} for more information.
 #' @param verbose Logical, if true progress is reported to the console
 #' @param occDetData The 'raw' data used to create the \code{bugs_data}. This should have a 
 #' column 'L' for list length and a column 'JulDate' for Julian date

@@ -9,7 +9,8 @@
 #' species is present, alpha.p is the initial values for detectability in each year, a is 
 #' the inital values for the occupancy probability in each year, eta is the initial values
 #' for the site random effects.
-#' @param modeltype one of: intercept, centering, contlistlength.
+#' @param modeltype Character, one of: intercept, centering, contlistlength. See \code{occDetFunc} for
+#' more information.
 #' @param verbose Logical, if true progress is reported to the console
 #' @return An updated \code{init} (initial values) object
 #' @export

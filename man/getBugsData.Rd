@@ -13,7 +13,8 @@ nvisit = nrow(occDetdata[i,]))}. Where focal is a binary (0/1) of is the focal s
 present, Year is the time periods or survey periods, Site are the site identifiers, nyear is
 the number of years in the data, nsite is hte number of sites and nVisit is the number of visits}
 
-\item{modeltype}{one of: intercept, centering, jul_date, catlistlength, contlistlength.}
+\item{modeltype}{Character, one of: intercept, centering, jul_date, catlistlength, contlistlength.
+See \code{occDetFunc} for more information.}
 
 \item{verbose}{Logical, if true progress is reported to the console}
 
