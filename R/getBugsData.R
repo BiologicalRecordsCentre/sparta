@@ -1,4 +1,19 @@
-# Modify the bugs data object depending on the type of model we are running
+#' Modify the bugs data object depending on the type of model you are running
+#' 
+#' This function is primarily for internal use within \code{occDetFunc}. It is used to 
+#' update the bugs data according to the needs of each model type.
+#' 
+#' @param bugs_data The bugs data object. This is a list specified in \code{occDetFunc} as 
+#' \code{list(y = as.numeric(focal), Year = TP, Site = rownum, nyear = nTP, nsite = nrow(zst),
+#' nvisit = nrow(occDetdata[i,]))}. Where focal is a binary (0/1) of is the focal species is
+#' present, Year is the time periods or survey periods, Site are the site identifiers, nyear is
+#' the number of years in the data, nsite is hte number of sites and nVisit is the number of visits
+#' @param modeltype one of: intercept, centering, jul_date, catlistlength, contlistlength.
+#' @param verbose Logical, if true progress is reported to the console
+#' @param occDetData The 'raw' data used to create the \code{bugs_data}. This should have a 
+#' column 'L' for list length and a column 'JulDate' for Julian date
+#' @return An updated bugs_data object
+#' @export
 
 getBugsData <- function(bugs_data, modeltype, verbose = FALSE,
                         occDetData){
