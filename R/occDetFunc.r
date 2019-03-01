@@ -537,6 +537,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     out$SPP_NAME <- taxa_name
     out$min_year <- min_year
     out$max_year <- max_year
+    out$sites_included <- site_match[site_match$new_site_name %in% as.numeric(sites_to_include), "original_site"]
     out$nsites <- bugs_data$nsite
     out$nvisits <- bugs_data$nvisit
     out$species_sites <- length(unique(bugs_data$Site[bugs_data$y == 1]))
