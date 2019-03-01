@@ -1,3 +1,23 @@
+#' Create a sparta JAGS model file fitting your needs 
+#' 
+#' This function is primarily for internal use within \code{occDetFunc}. It is used to 
+#' write a model file that fits the users needs, the path to this file is returned.
+#' 
+#' @param modeltype Character, see \code{occDetFunc} for more information.
+#' @param regional_codes A data.frame object detailing which site is associated with which region.
+#' each row desginates a site and each column represents a region. The first column represents the 
+#' site name (as in \code{site}). Subsequent columns are named for each regions with 1 representing
+#' the site is in that region and 0 that it is not. NOTE a site should only be in one region
+#' @param region_aggs A named list giving aggregations of regions that you want trend
+#' estimates for. For example \code{region_aggs = list(GB = c('england', 'scotland', 'wales'))}
+#' will produced a trend for GB (Great Britain) as well as its constituent nations. Note that
+#' 'england', scotland' and 'wales' must appear as names of columns in \code{regional_codes}. 
+#' More than one aggregate can be given, eg \code{region_aggs = list(GB = c('england', 'scotland',
+#' 'wales'), UK = c('england', 'scotland', 'wales', 'northern_ireland'))}.
+#' @param verbose Logical, if true progress is reported to the console
+#' @return The path to the model file.
+#' @export
+
 getModelFile <- function(modeltype, regional_codes = NULL, region_aggs = NULL, verbose = FALSE){
   
   # first get all the available model files

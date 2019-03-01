@@ -1,3 +1,14 @@
+#' Create the observation model component of a sparta JAGS model 
+#' 
+#' This function is primarily for internal use within \code{getModelFile}. It is used to 
+#' write an observation model that fits the users needs. The model is returned as a character.
+#' 
+#' @param modeltype Character, one of: jul_date, catlistlength, contlistlength.
+#' See \code{occDetFunc} for more information.
+#' @param verbose Logical, if true progress is reported to the console
+#' @return A character, of JAGS model code, that describes the observation model.
+#' @export
+
 getObsModel <- function(modeltype, verbose = FALSE){
   
   basemodel <- "logit(p[j]) <-  alpha.p[Year[j]]"
