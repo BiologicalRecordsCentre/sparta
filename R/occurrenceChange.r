@@ -105,8 +105,8 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
   years <- firstYear:lastYear
   
   ## edit values that are 0 or 1 to prevent estimates of inf later on
-  occ_it[occ_it == 0] <- 0.0001
-  occ_it[occ_it == 1] <- 0.9999
+  #occ_it[occ_it == 0] <- 0.0001
+  #occ_it[occ_it == 1] <- 0.9999
   
   
   ### loops depend on which change metric has been specified
@@ -155,6 +155,10 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
     res_tab <- data.frame(occ_it[, colnames(occ_it) == first],
                           occ_it[, colnames(occ_it) == last],
                           row.names = NULL)
+
+    ## edit 0 in the first year with some small value to prevent Infinite trends
+    res_tab[,1][res_tab[,1] == 0] <- 0.0000001
+    
     colnames(res_tab) <- as.character(c(min(years), max(years)))
     res_tab$change = ((res_tab[,2] - res_tab[,1])/res_tab[,1])*100
   } # end of loop for percentage difference
@@ -167,6 +171,10 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
     res_tab <- data.frame(occ_it[, colnames(occ_it) == first],
                           occ_it[, colnames(occ_it) == last],
                           row.names = NULL)
+
+    ## edit 0 in the first year with some small value to prevent Infinite trends
+    res_tab[,1][res_tab[,1] == 0] <- 0.0000001
+    
     colnames(res_tab) <- as.character(c(min(years), max(years)))
     res_tab$change = (((res_tab[,2]/res_tab[,1])^(1/nyr))-1)*100
   } # end of loop for growth rate
