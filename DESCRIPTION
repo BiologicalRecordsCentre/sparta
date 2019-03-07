@@ -3,6 +3,7 @@ Type: Package
 Title: Trend Analysis for Unstructured Data
 Version: 0.1.49
 Date: 2019-03-07
+
 Authors@R: c(person("Tom", "August", role = c("aut", "cre"), email = "tomaug@ceh.ac.uk"),
              person("Gary", "Powney", role = c("aut")),
              person("Charlie", "Outhwaite", role = c("aut")),
@@ -35,3 +36,4 @@ Suggests:
 VignetteBuilder: knitr
 LazyData: TRUE
 RoxygenNote: 6.1.1
+Encoding: UTF-8
