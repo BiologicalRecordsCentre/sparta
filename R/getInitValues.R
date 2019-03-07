@@ -1,4 +1,19 @@
-# Modify the init object depending on the type of model we are running
+#' Modify the init object depending on the type of model we are running
+#' 
+#' This function is primarily for internal use within \code{occDetFunc}. It is used to 
+#' update the initial values object according to the needs of each model type.
+#' 
+#' @param init An initial values object. As a minimum this is a list defined in \code{occDetFunc}
+#' as \code{list(z = z, alpha.p = rep(runif(1, -2, 2), nTP), a = rep(runif(1, -2, 2), nTP),
+#' eta = rep(runif(1, -2, 2), bugs_data$nsite))}. Where z is 1's/0's for whether the focal
+#' species is present, alpha.p is the initial values for detectability in each year, a is 
+#' the inital values for the occupancy probability in each year, eta is the initial values
+#' for the site random effects.
+#' @param modeltype Character, one of: intercept, centering, contlistlength. See \code{occDetFunc} for
+#' more information.
+#' @param verbose Logical, if true progress is reported to the console
+#' @return An updated \code{init} (initial values) object
+#' @export
 
 getInitValues <- function(init, modeltype, verbose = FALSE){
   

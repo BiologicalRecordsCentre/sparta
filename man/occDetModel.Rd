@@ -18,7 +18,7 @@ occDetModel(taxa, site, survey, species_list = unique(taxa),
 \item{site}{A character vector of site names, as long as the number of observations.}
 
 \item{survey}{A  vector as long as the number of observations. 
-This must be a Date if either closure_period is not supplied or if includeJDay = \code{TRUE}}
+This must be a Date if includeJDay = \code{TRUE}}
 
 \item{species_list}{A character vector of taxa names for which models should be run. This is
 optional and by default models will be run for all taxa}

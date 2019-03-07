@@ -89,7 +89,21 @@
 #' @return A list including the model, JAGS model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
 #' Key aspects of the model output include:
 #' \itemize{
+#'  \item{\code{"out$model"}}{ - The model used as provided to JAGS. Also contained is a list of fully observed variables. These are those listed in the BUGS data.}
+#'  \item{\code{"out$BUGSoutput$n.chains"}}{ - The number of Markov chains ran in the MCMC simulations.}
+#'  \item{\code{"out$BUGSoutput$n.iter"}}{ - The total number of iterations per chain.}
+#'  \item{\code{"out$BUGSoutput$n.burnin"}}{ - The number of interations discarded from the start as a burn-in period.}
+#'  \item{\code{"out$BUGSoutput$n.thin"}}{ - The thinning rate used. For example a thinning rate of 3 retains only every third iteration. This is used to reduce autocorrelation.}
+#'  \item{\code{"out$BUGSoutput$n.keep"}}{ - The number of iterations kept per chain. This is the total number of iterations minus the burn-in then divided by the thinning rate.}
+#'  \item{\code{"out$BUGSoutput$n.sims"}}{ - The total number of iterations kept.}
 #'  \item{\code{"out$BUGSoutput$summary"}}{ - A summary table of the monitored parameter. The posterior distribution for each parameter is summaried with the mean, standard deviation, various credible intervals, a formal convergence metric (Rhat), and a measure of effective sample size (n.eff).}
+#'  \item{\code{"out$BUGSoutput$mean"}}{ - the mean values for all monitored parameters}
+#'  \item{\code{"out$BUGSoutput$sd"}}{ - the standard deviation values for all monitored parameters}
+#'  \item{\code{"out$BUGSoutput$median"}}{ - the median values for all monitored parameters}
+#'  \item{\code{"out$parameters.to.save"}}{ - The names of all monitored parameters.}
+#'  \item{\code{"out$BUGSoutput$model.file"}}{ - The user provided or temporary generated model file detailing the occupancy model.}
+#'  \item{\code{"out$n.iter"}}{ - The total number of interations per chain.}
+#'  \item{\code{"out$DIC"}}{ - Whether the Deviance Information Criterion (DIC) is calculated.}
 #'  \item{\code{"out$BUGSoutput$sims.list"}}{ - A list of the posterior distribution for each monitored parameter. Use sims.array and sims.matrix if a different format of the posteriors is desired.}
 #'  \item{\code{"out$SPP_NAME"}}{ - The name of the study species.}
 #'  \item{\code{"out$min_year"}}{ - First year of data included in the occupancy model run.}
@@ -100,24 +114,7 @@
 #'  \item{\code{"out$species_observations"}}{ - The number of unique records for the species of interest.}
 #'  \item{\code{"out$regions"}}{ - The names of the regions included in the model run.}
 #' }
-#' These options are provided as a vector of characters, e.g. \code{modeltype = c('indran', 'centering', 'halfcauchy', 'catlistlength')}
 #'
-#' @return A list of elements that give results of the model as well as details decribing the model run. These include:
-#' \itemize{
-#'  \item{\code{"model"}}{ - }
-#'  \item{\code{"BUGSoutput"}}{ - }
-#'  \item{\code{"parameters.to.save"}}{ - }
-#'  \item{\code{"model.file"}}{ - }
-#'  \item{\code{"n.iter"}}{ - }
-#'  \item{\code{"DIC"}}{ - }
-#'  \item{\code{"SPP_NAME"}}{ - }
-#'  \item{\code{"min_year"}}{ - }
-#'  \item{\code{"max_year"}}{ - }
-#'  \item{\code{"nsites"}}{ - }
-#'  \item{\code{"nvisits"}}{ - }
-#'  \item{\code{"species_sites"}}{ - }
-#'  \item{\code{"species_observations"}}{ - }
-#' }
 #' @keywords trends, species, distribution, occupancy, bayesian, modeling
 #' @references Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
 #'             Statistics for citizen science: extracting signals of change from noisy ecological data.
@@ -545,6 +542,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     out$SPP_NAME <- taxa_name
     out$min_year <- min_year
     out$max_year <- max_year
+    out$sites_included <- site_match[site_match$new_site_name %in% as.numeric(sites_to_include), "original_site"]
     out$nsites <- bugs_data$nsite
     out$nvisits <- bugs_data$nvisit
     out$species_sites <- length(unique(bugs_data$Site[bugs_data$y == 1]))
@@ -552,6 +550,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     if(!is.null(regional_codes)) out$regions <- head(tail(colnames(regional_codes), -1), -2)
     if(!is.null(region_aggs)) out$region_aggs <- region_aggs
     if(return_data) out$bugs_data <- bugs_data
+    attr(out, 'modeltype') <- modeltype
     attr(out, 'modelcode') <- modelcode
     class(out) <- 'occDet'
     if(write_results) save(out, file = file.path(output_dir, paste(taxa_name, ".rdata", sep = "")))  
