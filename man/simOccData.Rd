@@ -9,7 +9,7 @@ simOccData(nsites = 20, nvisits = 100, nTP = 10, psi = 0.5,
   dtype2.p = 3, dtype3.p = 10)
 }
 \value{
-A list, the first two elements of which (spp_vis occDetData) mimic the output of occDetFunc.
+A list, the first two elements of which ('spp_vis' & 'occDetData') mimic the output of occDetFunc.
 The third element ('Z') is the presence-absence state variable and the fourth ('p') is the true probability of detection.
 }
 \description{

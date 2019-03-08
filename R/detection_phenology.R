@@ -55,18 +55,19 @@ detection_phenology <- function(model, spname=NULL, bins=12){
     pDet1 + jd * data$beta1[,1] +  jd^2 * data$beta2[,1]
   }))
   
-  names(pDet) <- c("it", "jd","lgt_pDet")
+  names(pDet) <- c("it", "bin","lgt_pDet")
   pDet$pDet <- inv.logit(pDet$lgt_pDet)
   
   # now summarize these posterior distributions
   pDet_summary <-ddply(
-    pDet, .(jd), summarise, 
+    pDet, .(bin), summarise, 
     mean_pDet = mean(pDet),
     lower95CI = quantile(pDet, 0.025),
     upper95CI = quantile(pDet, 0.975))
   
   # now convert the jds back to their equivalent Julian Dates
-  pDet_summary$JulianDay <- jul_dates[pDet_summary$jd] 
+  pDet_summary$cJulDate <- cjd[pDet_summary$bin] 
+  pDet_summary$JulianDay <- jul_dates[pDet_summary$bin] 
 
   # now plot the detection over time
   gp <- ggplot(data=pDet_summary, x=JulianDay, y=mean_pDet) +

@@ -4,7 +4,7 @@
 #' The user defines the parameters for the data generation
 #' At present it works with just one species and generates the list length probabalistically
 #'
-#' @return A list, the first two elements of which (spp_vis occDetData) mimic the output of occDetFunc.
+#' @return A list, the first two elements of which ('spp_vis' & 'occDetData') mimic the output of occDetFunc.
 #' The third element ('Z') is the presence-absence state variable and the fourth ('p') is the true probability of detection.
 #' 
 #' @examples

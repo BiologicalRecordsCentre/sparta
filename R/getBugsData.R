@@ -55,7 +55,7 @@ getBugsData <- function(bugs_data, modeltype, verbose = FALSE,
         
         jul_date = {
           if(verbose) cat('Adding bugs_data elements for Julian Date\n')
-          JulDate <- occDetData$Jul_date - 182
+          JulDate <- occDetData$Jul_date #- 182 # centering has already been done in formatOccData!
           bugs_data <- c(bugs_data,
                          JulDate = list(as.numeric(JulDate)))
           return(bugs_data)
