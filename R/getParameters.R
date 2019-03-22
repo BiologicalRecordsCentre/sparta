@@ -12,7 +12,7 @@ getParameters <- function(parameters, modeltype, verbose = FALSE){
          
          jul_date = {
            if(verbose) cat('Adding parameters to monitor for Julian Date\n')
-           parameters <- c(parameters, "beta1", "beta2")
+           parameters <- c(parameters, "beta1", "beta2", "beta3")
            return(parameters)
          },
          
