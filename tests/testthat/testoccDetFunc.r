@@ -317,6 +317,7 @@ test_that("Test occDetFunc with julian date", {
                      "nsites", "nvisits", "species_sites", "species_observations"))
   expect_true('beta1' %in% row.names(results$BUGSoutput$summary))
   expect_true('beta2' %in% row.names(results$BUGSoutput$summary))
+  expect_true('beta3' %in% row.names(results$BUGSoutput$summary))
   
   results <- occDetFunc(taxa_name = 'a',
                         n_iterations = 50,
@@ -334,6 +335,7 @@ test_that("Test occDetFunc with julian date", {
                      "nsites", "nvisits", "species_sites", "species_observations"))
   expect_true('beta1' %in% row.names(results$BUGSoutput$summary))
   expect_true('beta2' %in% row.names(results$BUGSoutput$summary))
+  expect_true('beta3' %in% row.names(results$BUGSoutput$summary))
   
   sink()
   
