@@ -52,8 +52,9 @@ test_that("Test errors", {
   } else if(.Platform$OS.type == "unix"){
     download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_linux.exe',
                   destfile = frespath,
-                  method = "curl",
+                  method = "libcurl",
                   quiet = TRUE)
+    system(command = paste('chmod', '+x', normalizePath(frespath)))
   } else{
     stop(paste('frescalo is not supported on', .Platform$OS.type))
   }
