@@ -23,7 +23,11 @@ site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 survey <- sample(rDates, size = n, TRUE)
 
 # set the closure period to be in 2 year bins
-closure_period <- ceiling((as.numeric(format(rDates,'%Y')) - 2009)/2)
+closure_period <- ceiling((as.numeric(format(survey,'%Y')) - 2009)/2)
+
+# create survey variable that is not a date and a closure period to match
+survey_numbered <- as.integer(as.factor(survey))
+
 
 test_that("Test formatOccData", {
 
@@ -87,6 +91,14 @@ test_that("Test formatOccData errors", {
   expect_error(visitData <- formatOccData(taxa = taxa, site = site, survey = survey, closure_period=head(closure_period)),
                'The following arguements are not of equal length: taxa, site, survey, closure_period')
   
+})
+
+test_that("Test formatOccData date requirement errors", {
+  
+  expect_error(visitData <- formatOccData(taxa = taxa, site = site, survey = survey_numbered),
+               'survey must be a date if closure_period not supplied')
+  expect_error(visitData <- formatOccData(taxa =taxa, site = site, survey = survey_numbered, includeJDay = TRUE, closure_period = closure_period),
+               'survey must be a date if Julian Date is to be included')
 })
 
 
