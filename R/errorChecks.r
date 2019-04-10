@@ -1,6 +1,6 @@
 #' @importFrom dplyr distinct
 
-errorChecks <- function(taxa = NULL, site = NULL, survey = NULL, closure_period = NULL, time_period = NULL, 
+errorChecks <- function(taxa = NULL, site = NULL, survey = NULL, replicate = NULL, closure_period = NULL, time_period = NULL, 
                         startDate = NULL, endDate = NULL, Date = NULL, 
                         time_periodsDF = NULL, dist = NULL, sim = NULL,
                         dist_sub = NULL, sim_sub = NULL, minSite = NULL, useIterations = NULL,
@@ -17,6 +17,7 @@ errorChecks <- function(taxa = NULL, site = NULL, survey = NULL, closure_period 
                           site=site,
                           survey=survey,
                           closure_period=closure_period,
+                          replicate=replicate,
                           time_period=time_period,
                           startDate=startDate,
                           endDate=endDate)
@@ -51,21 +52,30 @@ errorChecks <- function(taxa = NULL, site = NULL, survey = NULL, closure_period 
     
   }
   
+  ###### Make sure there are no NAs
+  
   ### Checks for taxa ###
   if(!is.null(taxa)){    
-    # Make sure there are no NAs
     if(!all(!is.na(taxa))) stop('taxa must not contain NAs')    
   }
   
   ### Checks for site ###
   if(!is.null(site)){    
-    # Make sure there are no NAs
     if(!all(!is.na(site))) stop('site must not contain NAs')    
+  }
+  
+  ### Checks for closure period ###
+  if(!is.null(closure_period)){    
+    if(!all(!is.na(closure_period))) stop('closure_period must not contain NAs')    
+  }
+  
+  ### Checks for replicate ###
+  if(!is.null(replicate)){    
+    if(!all(!is.na(replicate))) stop('replicate must not contain NAs')    
   }
   
   ### Checks for time_period ###
   if(!is.null(time_period)){    
-    # Make sure there are no NAs
     if(!all(!is.na(time_period))) stop('time_period must not contain NAs')    
   }
   
