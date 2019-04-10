@@ -439,6 +439,51 @@ test_that("Test occDetFunc using regions and region aggregates", {
                         regional_codes = regions,
                         region_aggs = list(agg1 = c('region1', 'region2'))),
                  'The following regions have no data and')
+  
+  # test with regional_codes not as a dataframe
+  expect_error(results <- occDetFunc(taxa_name = 'a',
+                                       n_iterations = 50,
+                                       burnin = 15, 
+                                       occDetdata = visitData$occDetdata,
+                                       spp_vis = visitData$spp_vis,
+                                       write_results = FALSE,
+                                       seed = 111,
+                                       modeltype = c("ranwalk", "halfcauchy"),
+                                       regional_codes = as.matrix(regions),
+                                       region_aggs = list(agg1 = c('region1', 'region2'))),
+                 'regional_codes should be a data.frame')
+  
+  # test with NAs in regional_codes
+  regionsNA <- regions
+  regionsNA[1,3] <- NA
+  
+  expect_warning(results <- occDetFunc(taxa_name = 'a',
+                                     n_iterations = 50,
+                                     burnin = 15, 
+                                     occDetdata = visitData$occDetdata,
+                                     spp_vis = visitData$spp_vis,
+                                     write_results = FALSE,
+                                     seed = 111,
+                                     modeltype = c("ranwalk", "halfcauchy"),
+                                     regional_codes = regionsNA,
+                                     region_aggs = list(agg1 = c('region1', 'region2'))),
+               "NAs are present in regional_codes, these will be replaced with 0's")
+  
+  # test with sites in multiple regions
+  regionsmulti <- regions
+  regionsmulti[1,3] <- 1
+  
+  expect_error(results <- occDetFunc(taxa_name = 'a',
+                                       n_iterations = 50,
+                                       burnin = 15, 
+                                       occDetdata = visitData$occDetdata,
+                                       spp_vis = visitData$spp_vis,
+                                       write_results = FALSE,
+                                       seed = 111,
+                                       modeltype = c("ranwalk", "halfcauchy"),
+                                       regional_codes = regionsmulti,
+                                       region_aggs = list(agg1 = c('region1', 'region2'))),
+                  '1 sites are assigned to more than one region in regional_codes')
 
   sink()
   
