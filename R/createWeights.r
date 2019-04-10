@@ -20,6 +20,7 @@
 #'        this is set to 100 and is the default here.
 #' @param normalise Logical. If \code{TRUE} each attribute is divided by its maximum value to 
 #'        produce values between 0 and 1. Default is \code{FALSE}
+#' @param verbose Logical, should progress be printed to console. Defaults to TRUE
 #' @return A dataframe is returned in a format that can be used directly in frescalo() or 
 #'         sparta(). The dataframe has three columns giving the target cell, the neighbourhood
 #'         cell, and the weight.
@@ -71,7 +72,8 @@ createWeights<-function(distances,
                         attributes,
                         dist_sub=200,
                         sim_sub=100,
-                        normalise=FALSE){
+                        normalise=FALSE,
+                        verbose=TRUE){
   
   # Error checks
   errorChecks(dist = distances, sim = attributes, dist_sub = dist_sub, sim_sub = sim_sub)
@@ -107,7 +109,7 @@ createWeights<-function(distances,
   }
   
   #convert attribute table into a long distance table
-  cat('Creating similarity distance table...')
+  if(verbose) cat('Creating similarity distance table...')
   row.names(attributes) <- attributes[,1]
   sim_distance <- dist(attributes[,2:length(names(attributes))], diag = TRUE, upper = TRUE) 
   sim_distance <- melt(as.matrix(sim_distance))
@@ -115,18 +117,12 @@ createWeights<-function(distances,
   sim_distance[,1] <- as.character(sim_distance[,1])
   sim_distance[,2] <- as.character(sim_distance[,2])
   colnames(sim_distance) <- c('site1', 'site2', 'similarity')
-  cat('Complete\n')
+  if(verbose) cat('Complete\n')
   
-  # Set up progress tracking
-  if(length(unique(distances[,1]) >=10)){
-    breaks_length <- 11
-  } else {
-    breaks_length <- length(unique(distances[,1]))
-  }
-  breaks <- round(seq(0,length(unique(distances[,1])), length.out = breaks_length))[-1]
-  breakpoints <- unique(distances[,1])[breaks]
-  progressDF <- data.frame(progress = paste(seq(from = 10, to = 100, length.out = length(breakpoints))), ID = breakpoints)
-  cat('Creating weights file...\n0%\n')
+  if(verbose) cat('Creating weights file...\n0%\n')
+  
+  total <- length(unique(distances[,1]))
+  pb <- txtProgressBar(min = 0, max = total, style = 3)
   
   # Taking each cell in turn calculate the weights
   weights_list <- lapply(unique(distances[,1]), function(i){
@@ -153,10 +149,7 @@ createWeights<-function(distances,
     # Calculate weights
     ranks$weight <- ranks$distsim*ranks$florsim
     
-    # report on progress
-    if(i %in% progressDF$ID){
-      cat(paste(progressDF$progress[progressDF$ID == i],'%\n',sep=''))
-    }
+    if(verbose) setTxtProgressBar(pb, grep(paste0('^', i, '$'), unique(distances[,1])))
     
     # Merge back with all data
     return(data.frame(target = ranks$site1,
@@ -166,8 +159,9 @@ createWeights<-function(distances,
     })
 
   weights_master <- do.call(rbind, weights_list)
+  close(pb)
   
-  cat('Complete\n')
+  if(verbose) cat('Complete\n')
   
   return(weights_master) 
   
