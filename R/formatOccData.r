@@ -8,6 +8,7 @@
 #' @param site A character vector of site names, as long as the number of observations.
 #' @param survey A vector as long as the number of observations. 
 #'        This must be a Date if either closure_period is not supplied or if includeJDay = \code{TRUE}
+#' @param replicate An optional vector to identify replicate samples (visits) per survey. Need not be globally unique (e.g can be 1, 2, .. n within surveys) 
 #' @param closure_period An optional vector of integers specifying the closure period. 
 #'        If \code{FALSE} then closure_period will be extracted as the year from the survey.
 #' @param includeJDay Logical. If \code{TRUE} a Julian day column is returned in the
@@ -85,17 +86,23 @@
 #'                                 site = site,
 #'                                 survey = survey,
 #'                                 closure_period = closure_period)
-#' }
+#'  
+#' # format the unicorns data
+#' formatted_data <- formatOccData(taxa = unicorns$CONCEPT,
+#'                                survey = unicorns$Date,
+#'                                site = unicorns$kmsq)
+#'}
+#' 
 #' @export
 #' @importFrom dplyr distinct
 #' @importFrom dplyr summarise
 #' @importFrom dplyr group_by
 #' @importFrom reshape2 dcast
 
-formatOccData <- function(taxa, site, survey, closure_period = NULL, includeJDay = FALSE){
+formatOccData <- function(taxa, site, survey, replicate = NULL, closure_period = NULL, includeJDay = FALSE){
 
   # Do error checks
-  errorChecks(taxa = taxa, site = site, survey = survey, closure_period = closure_period)
+  errorChecks(taxa = taxa, site = site, survey = survey, replicate = replicate, closure_period = closure_period)
 
   # Additional error check whether survey is a date
   if(!'POSIXct' %in% class(survey) & !'Date' %in% class(survey)){
@@ -109,8 +116,10 @@ formatOccData <- function(taxa, site, survey, closure_period = NULL, includeJDay
    }
   } # otherwise survey can be anything (including a character vector)
   
+  if(is.null(replicate)) replicate <- rep(1, length(survey)) # all 
+  
   # Create dataframe from vectors
-  taxa_data <- data.frame(taxa, site, survey)
+  taxa_data <- data.frame(taxa, site, survey, replicate)
   
   # now add the time period (TP). It's defined by closure_period if supplied
   # TP was formerly referred to as year
@@ -124,6 +133,7 @@ formatOccData <- function(taxa, site, survey, closure_period = NULL, includeJDay
     #check that surveys are nested within closure_periods
     temp <- taxa_data %>% 
             group_by(survey) %>% 
+            group_by(replicate) %>% 
             summarise(ns = length(unique(TP)))
     if(any(temp$ns) > 1) {
       # return a warning but assume they know what they're doing
@@ -139,7 +149,7 @@ formatOccData <- function(taxa, site, survey, closure_period = NULL, includeJDay
   taxa_data <- distinct(taxa_data)
   
   # add list length column
-  taxa_data$visit <- paste(taxa_data$site, taxa_data$survey, sep="") # create a factor which combines date and site
+  taxa_data$visit <- paste(taxa_data$site, taxa_data$survey, taxa_data$replicate, sep="") # create a factor which combines site, survey & replicate
   visit_Ls <- as.data.frame(table(taxa_data$visit))
   names(visit_Ls) <- c("visit", "L")
   taxa_data <- merge(taxa_data, visit_Ls)

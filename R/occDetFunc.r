@@ -168,7 +168,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                         seed = NULL, model.function = NULL, regional_codes = NULL,
                         region_aggs = NULL, additional.parameters = NULL,
                         additional.BUGS.elements = NULL, additional.init.values = NULL,
-                        return_data = FALSE){
+                        return_data = TRUE){
   
   J_success <- requireNamespace("R2jags", quietly = TRUE)
   
@@ -264,7 +264,10 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   if(length(unique(occDetdata$TP)) != years) {
     # find out which years have no data
     missing_yrs <-  with(occDetdata, setdiff(min(TP):max(TP), unique(TP)))
-    error_msg <- paste0('There are no visits in years ', missing_yrs,'. This will crash BUGS')
+    if(length(missing_yrs) ==1)
+      error_msg <- paste0('There are no visits in year ', missing_yrs,'. This will crash BUGS')
+    else 
+      error_msg <- paste0('There are ', length(missing_yrs),' years with no visits, including ', missing_yrs[1],'. This will crash BUGS')
     stop(error_msg)
   }
   # Record the max and min values of TP

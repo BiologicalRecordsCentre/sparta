@@ -10,7 +10,7 @@ occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 2,
   seed = NULL, model.function = NULL, regional_codes = NULL,
   region_aggs = NULL, additional.parameters = NULL,
   additional.BUGS.elements = NULL, additional.init.values = NULL,
-  return_data = FALSE)
+  return_data = TRUE)
 }
 \arguments{
 \item{taxa_name}{A character giving the name of the species to be modelled.}
