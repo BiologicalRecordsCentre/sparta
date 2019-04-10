@@ -41,8 +41,8 @@ frespath <- file.path(tempdir(), 'fres.exe')
 
 test_that("Test errors", {
   
-  if (!capabilities('libcurl') | .Platform$OS.type != "windows") skip('skipping as libcurl not supported')
-  skip('Carbon black blocks Frescalo')
+  if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
+  if (.Platform$OS.type == "windows") skip('Carbon black blocks Frescalo')
   
   if(.Platform$OS.type == "windows"){
     download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_windows.exe',
@@ -54,6 +54,7 @@ test_that("Test errors", {
                   destfile = frespath,
                   method = "libcurl",
                   quiet = TRUE)
+    system(command = paste('chmod', '+x', normalizePath(frespath)))
   } else{
     stop(paste('frescalo is not supported on', .Platform$OS.type))
   }
@@ -100,10 +101,10 @@ test_that("Test errors", {
 
 
 test_that("Runs without error", {
-  
-  if (!capabilities('libcurl') | .Platform$OS.type != "windows") skip('skipping as libcurl not supported')
 
-  skip('Carbon black blocks Frescalo')
+  if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
+
+  if (.Platform$OS.type == "windows") skip('Carbon black blocks Frescalo')
   
   # This first run is done using years
   temp <- tempfile(pattern = 'dir')

@@ -6,12 +6,11 @@
 \usage{
 plot_GIS(gis_data = NULL, main = "", xlab = "", ylab = "",
   xlim = NULL, ylim = NULL, show.axis = TRUE, show.grid = TRUE,
-  grid.div = 1, round.grid = FALSE, grid.col = "grey",
-  fill.col = NA, line.col = NULL, bg.col = "white", box.col = NA,
-  new.window = TRUE, no.margin = FALSE, set.margin = TRUE,
-  max.dimen = 13, cex.main = 1.2, cex.lab = 1, cex.axis = 0.8,
-  blank.plot = FALSE, plot.shape = TRUE, additions = FALSE,
-  return.dimen = TRUE)
+  grid.div = 1, round.grid = FALSE, grid.col = "grey", fill.col = NA,
+  line.col = NULL, bg.col = "white", box.col = NA, new.window = TRUE,
+  no.margin = FALSE, set.margin = TRUE, max.dimen = 13, cex.main = 1.2,
+  cex.lab = 1, cex.axis = 0.8, blank.plot = FALSE, plot.shape = TRUE,
+  additions = FALSE, return.dimen = TRUE)
 }
 \arguments{
 \item{gis_data}{GIS object, or list of objects, to be plotted.}

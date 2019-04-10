@@ -168,7 +168,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                         seed = NULL, model.function = NULL, regional_codes = NULL,
                         region_aggs = NULL, additional.parameters = NULL,
                         additional.BUGS.elements = NULL, additional.init.values = NULL,
-                        return_data = FALSE){
+                        return_data = TRUE){
   
   J_success <- requireNamespace("R2jags", quietly = TRUE)
   
@@ -205,7 +205,11 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   if(!taxa_name %in% colnames(spp_vis)) stop('taxa_name is not the name of a taxa in spp_vis')
     
   # Add the focal column (was the species recorded on the visit?). Use the spp_vis dataframe to extract this info
+  nrow1 <- nrow(occDetdata)
   occDetdata <- merge(occDetdata, spp_vis[,c("visit", taxa_name)])
+  
+  if(nrow1 != nrow(occDetdata)) stop('some visits have been lost')
+  
   names(occDetdata)[names(occDetdata) == taxa_name] <- "focal"
   
   # If we are using regional codes do some checks
@@ -257,8 +261,15 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
 
   # look for missing years before time frame can be extended using max_year parameter
   years <- (max(occDetdata$TP) - min(occDetdata$TP))+1
-  if(length(unique(occDetdata$TP)) != years) stop('It looks like you have years with no data. This will crash BUGS')
-  
+  if(length(unique(occDetdata$TP)) != years) {
+    # find out which years have no data
+    missing_yrs <-  with(occDetdata, setdiff(min(TP):max(TP), unique(TP)))
+    if(length(missing_yrs) ==1)
+      error_msg <- paste0('There are no visits in year ', missing_yrs,'. This will crash BUGS')
+    else 
+      error_msg <- paste0('There are ', length(missing_yrs),' years with no visits, including ', missing_yrs[1],'. This will crash BUGS')
+    stop(error_msg)
+  }
   # Record the max and min values of TP
   min_year <- min(occDetdata$TP)
   
