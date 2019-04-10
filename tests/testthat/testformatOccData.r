@@ -23,7 +23,11 @@ site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 survey <- sample(rDates, size = n, TRUE)
 
 # set the closure period to be in 2 year bins
-closure_period <- ceiling((as.numeric(format(rDates,'%Y')) - 2009)/2)
+closure_period <- ceiling((as.numeric(format(survey,'%Y')) - 2009)/2)
+
+# create survey variable that is not a date and a closure period to match
+survey_numbered <- as.integer(as.factor(survey))
+
 
 test_that("Test formatOccData", {
 
@@ -89,5 +93,34 @@ test_that("Test formatOccData errors", {
   
 })
 
+test_that("Test formatOccData date requirement errors", {
+  
+  expect_warning(visitData <- formatOccData(taxa = taxa, site = site, survey = survey, closure_period = closure_period),
+                 '854 out of 15000 observations will be removed as duplicates')
+  expect_error(visitData <- formatOccData(taxa = taxa, site = site, survey = survey_numbered),
+               'survey must be a date if closure_period not supplied')
+  expect_error(visitData <- formatOccData(taxa =taxa, site = site, survey = survey_numbered, includeJDay = TRUE, closure_period = closure_period),
+               'survey must be a date if Julian Date is to be included')
+})
 
-
+test_that("Test formatOccData specified closure period", {
+  
+  expect_warning(visitData <- formatOccData(taxa = taxa, site = site, survey = survey, closure_period = closure_period),
+                 '854 out of 15000 observations will be removed as duplicates')
+  
+  head_occDetdata_cp <- structure(list(visit = c("A102010-02-17", "A102010-04-14", "A102010-04-22", 
+                                             "A102010-08-29", "A102010-11-04", "A102011-02-09"), 
+                                   site = structure(c(2L, 2L, 2L, 2L, 2L, 2L), 
+                                                    .Label = c("A1", "A10", "A11", "A12", "A13", "A14", "A15", "A16", "A17", "A18", "A19", "A2", "A20", "A21",
+                                                               "A22", "A23", "A24", "A25", "A26", "A27", "A28", "A29", "A3",
+                                                               "A30", "A31", "A32", "A33", "A34", "A35", "A36", "A37", "A38", 
+                                                               "A39", "A4", "A40", "A41", "A42", "A43", "A44", "A45", "A46", 
+                                                               "A47", "A48", "A49", "A5", "A50", "A6", "A7", "A8", "A9"), class = "factor"), 
+                                   L = c(5L, 2L, 1L, 5L, 5L, 1L), 
+                                   TP = c(1L, 1L, 1L, 1L, 1L, 1L)), 
+                              .Names = c("visit", "site", "L", "TP"), 
+                              row.names = c(1L, 6L, 8L, 9L, 14L, 19L), class = "data.frame")
+  
+  expect_identical(head(visitData$occDetdata), head_occDetdata_cp)
+  
+})
