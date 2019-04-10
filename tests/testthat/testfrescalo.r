@@ -41,7 +41,7 @@ frespath <- file.path(tempdir(), 'fres.exe')
 
 test_that("Test errors", {
   
-  if (!capabilities('libcurl') | .Platform$OS.type != "windows") skip('skipping as libcurl not supported')
+  if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
   if (.Platform$OS.type == "windows") skip('Carbon black blocks Frescalo')
   
   if(.Platform$OS.type == "windows"){
