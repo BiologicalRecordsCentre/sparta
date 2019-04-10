@@ -21,7 +21,7 @@ This must be a Date if either closure_period is not supplied or if includeJDay =
 If \code{FALSE} then closure_period will be extracted as the year from the survey.}
 
 \item{includeJDay}{Logical. If \code{TRUE} a Julian day column is returned in the
-occDetData object, centered on 1 July.}
+occDetData object.}
 }
 \value{
 A list of length 2 the first element 'spp_vis' is a data.frame with visit
