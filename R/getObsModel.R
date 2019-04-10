@@ -23,10 +23,10 @@ getObsModel <- function(modeltype, verbose = FALSE){
            jul_date = {
              basemodel <- paste(
                basemodel,
-               'beta1*JulDate[j] + beta2*pow(JulDate[j], 2)',
+               'beta3*f_JD[JulDate[j]]',
                sep = ' + ')
              addVar <- c(addVar,
-                        "beta1 ~ dnorm(0, 0.0001)\nbeta2 ~ dnorm(0, 0.0001)\n")
+                         "beta1 ~ dunif(1, 366)\nbeta2 ~ dt(0, 1, 1)T(0,)\nbeta3 ~ dnorm(0, 0.0001)\nfor (d in 1:366){\nf_JD[d] <- 1/((2*3.14159265359)^0.5 * beta2) * exp(-((d - beta1)^2 / (2* beta2^2)))\n}\n")
            },
            
            catlistlength = {

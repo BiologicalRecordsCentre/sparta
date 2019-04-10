@@ -12,7 +12,7 @@
 #' @param closure_period An optional vector of integers specifying the closure period. 
 #'        If \code{FALSE} then closure_period will be extracted as the year from the survey.
 #' @param includeJDay Logical. If \code{TRUE} a Julian day column is returned in the
-#'        occDetData object, centered on 1 July.
+#'        occDetData object.
 #' 
 #' @return A list of length 2 the first element 'spp_vis' is a data.frame with visit
 #'  (unique combination of site and time period) in the first column and taxa for all
@@ -167,8 +167,6 @@ formatOccData <- function(taxa, site, survey, replicate = NULL, closure_period =
             format(as.POSIXlt(taxa_data[,"survey"],
                         format = "%Y-%m-%d"), "%j")
       )
-    #center on the 1st of July by subtracting 182
-    taxa_data$Jul_date <- taxa_data$Jul_date - 182
     occDetdata <- unique(taxa_data[,c("visit", "site", "L", "TP", "Jul_date")])
   } else {
     # create occDetdata which is the main file sent to bugs (1 row per visist) - this will have "focal" added to it within the species loop

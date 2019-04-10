@@ -42,6 +42,15 @@ getInitValues <- function(init, modeltype, verbose = FALSE){
            return(init)
          },
          
+         jul_date = {
+           if(verbose) cat('Adding init values for Julian Date\n')
+           init$beta1 = runif(1, 0, 366)
+           init$beta2 = runif(1, 0, 90)
+           init$beta3 = rnorm(1, 0, 0.0001)
+           if(verbose) cat(init)
+           return(init)
+         },
+         
          {
            if(verbose) cat(modeltype, 'uses the basic init object, nothing extra added\n')
            return(init)
