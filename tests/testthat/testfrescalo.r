@@ -155,4 +155,57 @@ test_that("Runs without error", {
                 "freq" %in% names(fres_try) &
                 "log" %in% names(fres_try) &
                 "lm_stats" %in% names(fres_try))
+  
+  # test a very low value of phi
+  temp <- tempfile(pattern = 'dir')
+  dir.create(temp)
+  sink(file.path(temp, 'null'))
+  fres_try <- try(frescalo(Data = df1,
+                           phi = 0.01,
+                           Fres_weights = weights,
+                           frespath = frespath,
+                           time_periods = data.frame(start=c(1980,1990),end=c(1989,1999)),
+                           site_col = 'site',
+                           sp_col = 'taxa',
+                           year = 'year',
+                           sinkdir = temp),
+                  silent=TRUE
+  )
+  sink()
+  unlink(temp, recursive = TRUE)
+  
+  expect_equal(class(fres_try), "frescalo")
+  expect_true("paths" %in% names(fres_try) &
+                "trend" %in% names(fres_try) &
+                "stat" %in% names(fres_try) &
+                "freq" %in% names(fres_try) &
+                "log" %in% names(fres_try) &
+                "lm_stats" %in% names(fres_try))
+  
+  # test plotting
+  temp <- tempfile(pattern = 'dir')
+  dir.create(temp)
+  sink(file.path(temp, 'null'))
+  fres_try <- try(frescalo(Data = df1,
+                           phi = 0.01,
+                           Fres_weights = weights,
+                           frespath = frespath,
+                           time_periods = data.frame(start=c(1980,1990),end=c(1989,1999)),
+                           site_col = 'site',
+                           sp_col = 'taxa',
+                           year = 'year',
+                           plot_fres = TRUE,
+                           sinkdir = temp),
+                  silent=TRUE
+  )
+  sink()
+  unlink(temp, recursive = TRUE)
+  
+  expect_equal(class(fres_try), "frescalo")
+  expect_true("paths" %in% names(fres_try) &
+                "trend" %in% names(fres_try) &
+                "stat" %in% names(fres_try) &
+                "freq" %in% names(fres_try) &
+                "log" %in% names(fres_try) &
+                "lm_stats" %in% names(fres_try))
 })
