@@ -112,8 +112,8 @@ test_that("Test formatOccData specified closure period", {
   expect_warning(visitData <- formatOccData(taxa = taxa, site = site, survey = survey, closure_period = closure_period),
                  '854 out of 15000 observations will be removed as duplicates')
   
-  head_occDetdata_cp <- structure(list(visit = c("A102010-02-17", "A102010-04-14", "A102010-04-22", 
-                                             "A102010-08-29", "A102010-11-04", "A102011-02-09"), 
+  head_occDetdata_cp <- structure(list(visit = c("A102010-02-171", "A102010-04-141", "A102010-04-221", 
+                                             "A102010-08-291", "A102010-11-041", "A102011-02-091"), 
                                    site = structure(c(2L, 2L, 2L, 2L, 2L, 2L), 
                                                     .Label = c("A1", "A10", "A11", "A12", "A13", "A14", "A15", "A16", "A17", "A18", "A19", "A2", "A20", "A21",
                                                                "A22", "A23", "A24", "A25", "A26", "A27", "A28", "A29", "A3",
