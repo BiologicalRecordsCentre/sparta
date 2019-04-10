@@ -4,8 +4,7 @@
 \alias{dataDiagnostics}
 \title{Data Diagnostics}
 \usage{
-dataDiagnostics(taxa, site, time_period, plot = TRUE,
-  progress_bar = TRUE)
+dataDiagnostics(taxa, site, time_period, plot = TRUE, progress_bar = TRUE)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}
