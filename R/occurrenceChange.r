@@ -118,7 +118,7 @@ occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate
       data_table <- data.frame(occ = series[as.character(years)], year = (years - min(years) + 1))
       
       # run model
-      model <- glm(occ ~ year, data = data_table, family = 'binomial')
+      model <- glm(occ ~ year, data = data_table, family = 'quasibinomial')
       
       # create predicted values
       predicted <- plogis(predict(model))
