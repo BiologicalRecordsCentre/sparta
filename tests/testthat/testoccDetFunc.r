@@ -442,9 +442,10 @@ test_that("Test occDetFunc using regions and region aggregates", {
   expect_true("psi.fs.r_region3[1]" %in% RNs)
   expect_true("psi.fs.r_agg1[1]" %in% RNs)
   
-  regions$region4 <- 0
-  
   # test with a region with no data
+  regionsempty<-regions
+  regionsempty$region4 <- 0
+  
   expect_warning(results <- occDetFunc(taxa_name = 'a',
                         n_iterations = 50,
                         burnin = 15, 
@@ -453,7 +454,7 @@ test_that("Test occDetFunc using regions and region aggregates", {
                         write_results = FALSE,
                         seed = 111,
                         modeltype = c("ranwalk", "halfcauchy"),
-                        regional_codes = regions,
+                        regional_codes = regionsempty,
                         region_aggs = list(agg1 = c('region1', 'region2'))),
                  'The following regions have no data and')
   
@@ -501,7 +502,64 @@ test_that("Test occDetFunc using regions and region aggregates", {
                                        regional_codes = regionsmulti,
                                        region_aggs = list(agg1 = c('region1', 'region2'))),
                   '1 sites are assigned to more than one region in regional_codes')
-
+  
+  # test with sites in no regions
+  regionsmulti <- regions
+  regionsmulti[1,2] <- 0
+  
+  expect_error(results <- occDetFunc(taxa_name = 'a',
+                                     n_iterations = 50,
+                                     burnin = 15, 
+                                     occDetdata = visitData$occDetdata,
+                                     spp_vis = visitData$spp_vis,
+                                     write_results = FALSE,
+                                     seed = 111,
+                                     modeltype = c("ranwalk", "halfcauchy"),
+                                     regional_codes = regionsmulti,
+                                     region_aggs = list(agg1 = c('region1', 'region2'))),
+               'sites are not assigned to a region in regional_codes')
+  
+  # test for sites in occurence data but not regions
+  regionsmissing <- regions[2:50,]
+  
+  expect_warning(results <- occDetFunc(taxa_name = 'a',
+                                     n_iterations = 50,
+                                     burnin = 15, 
+                                     occDetdata = visitData$occDetdata,
+                                     spp_vis = visitData$spp_vis,
+                                     write_results = FALSE,
+                                     seed = 111,
+                                     modeltype = c("ranwalk", "halfcauchy"),
+                                     regional_codes = regionsmissing,
+                                     region_aggs = list(agg1 = c('region1', 'region2'))),
+               '1 sites are in occurrence data but not in regional data and will be removed')
+  
+  # test for regional aggregate containing unknown region
+  expect_error(results <- occDetFunc(taxa_name = 'a',
+                                       n_iterations = 50,
+                                       burnin = 15, 
+                                       occDetdata = visitData$occDetdata,
+                                       spp_vis = visitData$spp_vis,
+                                       write_results = FALSE,
+                                       seed = 111,
+                                       modeltype = c("ranwalk", "halfcauchy"),
+                                       regional_codes = regions,
+                                       region_aggs = list(agg1 = c('region1', 'region2','region4'))),
+               'Aggregate members [region4] not in regional_codes column names [region1, region2, region3]',fixed=TRUE)
+  
+  # test for regional aggregate without regional_codes
+  expect_error(results <- occDetFunc(taxa_name = 'a',
+                                     n_iterations = 50,
+                                     burnin = 15, 
+                                     occDetdata = visitData$occDetdata,
+                                     spp_vis = visitData$spp_vis,
+                                     write_results = FALSE,
+                                     seed = 111,
+                                     modeltype = c("ranwalk", "halfcauchy"),
+                                     regional_codes = NULL,
+                                     region_aggs = list(agg1 = c('region1', 'region2'))),
+               'Cannot use regional aggregates if regional_codes is not supplied')
+  
   sink()
   
 }) 
