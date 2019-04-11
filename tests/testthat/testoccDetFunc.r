@@ -484,6 +484,22 @@ test_that("Test occDetFunc using regions and region aggregates", {
                                        regional_codes = regionsmulti,
                                        region_aggs = list(agg1 = c('region1', 'region2'))),
                   '1 sites are assigned to more than one region in regional_codes')
+  
+  # test with sites in no regions
+  regionsmulti <- regions
+  regionsmulti[1,2] <- 0
+  
+  expect_error(results <- occDetFunc(taxa_name = 'a',
+                                     n_iterations = 50,
+                                     burnin = 15, 
+                                     occDetdata = visitData$occDetdata,
+                                     spp_vis = visitData$spp_vis,
+                                     write_results = FALSE,
+                                     seed = 111,
+                                     modeltype = c("ranwalk", "halfcauchy"),
+                                     regional_codes = regionsmulti,
+                                     region_aggs = list(agg1 = c('region1', 'region2'))),
+               'sites are not assigned to a region in regional_codes')
 
   sink()
   
