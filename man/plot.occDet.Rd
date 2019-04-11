@@ -4,8 +4,7 @@
 \alias{plot.occDet}
 \title{Plot occDet Objects}
 \usage{
-\method{plot}{occDet}(x, y = NULL, main = x$SPP_NAME, reg_agg = "",
-  ...)
+\method{plot}{occDet}(x, y = NULL, main = x$SPP_NAME, reg_agg = "", ...)
 }
 \arguments{
 \item{x}{An object of class occDet}

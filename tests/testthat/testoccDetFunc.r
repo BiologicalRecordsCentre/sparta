@@ -33,13 +33,20 @@ suppressWarnings({visitData <- formatOccData(taxa = taxa, site = site,
                                              survey = survey)})
 
 ## additional data for testing missing years
-# remove one year 
+# remove one years 
 time_period_missing <- sub("2018-", "2019-", survey)
 time_period_missing <- as.Date(time_period_missing)
+
+# remove a second year
+time_period_missing2 <- sub("2017-", "2019-", time_period_missing)
+time_period_missing2 <- as.Date(time_period_missing2)
 
 # format data
 suppressWarnings({visitData_missing <- formatOccData(taxa = taxa, site = site,
                                                      survey = time_period_missing)})
+suppressWarnings({visitData_missing2 <- formatOccData(taxa = taxa, site = site,
+                                                     survey = time_period_missing2)})
+
 
 
 test_that("Test occDetFunc errors", {
@@ -69,8 +76,18 @@ test_that("Test occDetFunc errors", {
                                     spp_vis = visitData_missing$spp_vis,
                                     write_results = FALSE,
                                     seed = 111),
-              'It looks like you have years with no data. This will crash BUGS')
+              'There are no visits in year 2018. This will crash BUGS')
+
+ expect_error(results <- occDetFunc(taxa_name = 'a',
+                                    n_iterations = 50,
+                                    burnin = 15, 
+                                    occDetdata = visitData_missing2$occDetdata,
+                                    spp_vis = visitData_missing2$spp_vis,
+                                    write_results = FALSE,
+                                    seed = 111),
+              'There are 2 years with no visits, including 2017. This will crash BUGS')
  
+  
  expect_error(results <- occDetFunc(taxa_name = 'a',
                                     n_iterations = 50,
                                     burnin = 15, 
@@ -112,7 +129,7 @@ test_that("Test occDetFunc with defaults", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
   
 })
 
@@ -135,7 +152,7 @@ test_that("Test occDetFunc with model types", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
 
   results <- occDetFunc(taxa_name = 'a',
                         n_iterations = 50,
@@ -150,7 +167,7 @@ test_that("Test occDetFunc with model types", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
   
   results <- occDetFunc(taxa_name = 'a',
                         n_iterations = 50,
@@ -164,7 +181,7 @@ test_that("Test occDetFunc with model types", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
   
   results <- occDetFunc(taxa_name = 'a',
                         n_iterations = 50,
@@ -179,7 +196,7 @@ test_that("Test occDetFunc with model types", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
   
   
   results <- occDetFunc(taxa_name = 'a',
@@ -195,7 +212,7 @@ test_that("Test occDetFunc with model types", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
   
   results <- occDetFunc(taxa_name = 'a',
                         n_iterations = 50,
@@ -210,7 +227,7 @@ test_that("Test occDetFunc with model types", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
   
   results <- occDetFunc(taxa_name = 'a',
                         n_iterations = 50,
@@ -225,7 +242,7 @@ test_that("Test occDetFunc with model types", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
   
   results <- occDetFunc(taxa_name = 'a',
                         n_iterations = 50,
@@ -239,7 +256,7 @@ test_that("Test occDetFunc with model types", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
   
   results <- occDetFunc(taxa_name = 'a',
                         n_iterations = 50,
@@ -254,7 +271,7 @@ test_that("Test occDetFunc with model types", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
   
   
   results <- occDetFunc(taxa_name = 'a',
@@ -270,7 +287,7 @@ test_that("Test occDetFunc with model types", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
   
   results <- occDetFunc(taxa_name = 'a',
                         n_iterations = 50,
@@ -285,7 +302,7 @@ test_that("Test occDetFunc with model types", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
   
   sink()
   
@@ -314,7 +331,7 @@ test_that("Test occDetFunc with julian date", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
   expect_true('beta1' %in% row.names(results$BUGSoutput$summary))
   expect_true('beta2' %in% row.names(results$BUGSoutput$summary))
   expect_true('beta3' %in% row.names(results$BUGSoutput$summary))
@@ -332,7 +349,7 @@ test_that("Test occDetFunc with julian date", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
   expect_true('beta1' %in% row.names(results$BUGSoutput$summary))
   expect_true('beta2' %in% row.names(results$BUGSoutput$summary))
   expect_true('beta3' %in% row.names(results$BUGSoutput$summary))
@@ -364,7 +381,7 @@ test_that("Test occDetFunc with catagorical list length", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
   expect_true('dtype2.p' %in% row.names(results$BUGSoutput$summary))
   expect_true('dtype3.p' %in% row.names(results$BUGSoutput$summary))
   
@@ -381,7 +398,7 @@ test_that("Test occDetFunc with catagorical list length", {
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_sites", "species_observations", "bugs_data"))
   expect_true('dtype2.p' %in% row.names(results$BUGSoutput$summary))
   expect_true('dtype3.p' %in% row.names(results$BUGSoutput$summary))
   
@@ -412,7 +429,7 @@ test_that("Test occDetFunc using regions and region aggregates", {
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
                      "nsites", "nvisits", "species_sites", "species_observations",
-                     "regions", "region_aggs"))
+                     "regions", "region_aggs", "bugs_data"))
   expect_identical(results$regions,
                    c("region1", "region2", "region3"))
   expect_identical(names(results$region_aggs), "agg1")

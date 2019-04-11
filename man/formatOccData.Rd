@@ -4,7 +4,7 @@
 \alias{formatOccData}
 \title{Format data for Occupancy detection models}
 \usage{
-formatOccData(taxa, site, survey, closure_period = NULL,
+formatOccData(taxa, site, survey, replicate = NULL, closure_period = NULL,
   includeJDay = FALSE)
 }
 \arguments{
@@ -14,6 +14,8 @@ formatOccData(taxa, site, survey, closure_period = NULL,
 
 \item{survey}{A vector as long as the number of observations. 
 This must be a Date if either closure_period is not supplied or if includeJDay = \code{TRUE}}
+
+\item{replicate}{An optional vector to identify replicate samples (visits) per survey. Need not be globally unique (e.g can be 1, 2, .. n within surveys)}
 
 \item{closure_period}{An optional vector of integers specifying the closure period. 
 If \code{FALSE} then closure_period will be extracted as the year from the survey.}
@@ -91,7 +93,13 @@ formatted_data <- formatOccData(taxa = taxa,
                                 site = site,
                                 survey = survey,
                                 closure_period = closure_period)
+ 
+# format the unicorns data
+formatted_data <- formatOccData(taxa = unicorns$CONCEPT,
+                               survey = unicorns$Date,
+                               site = unicorns$kmsq)
 }
+
 }
 \references{
 Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).

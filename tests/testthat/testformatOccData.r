@@ -29,13 +29,15 @@ closure_period <- ceiling((as.numeric(format(survey,'%Y')) - 2009)/2)
 survey_numbered <- as.integer(as.factor(survey))
 
 
+replicate <- rep(1, n)
+
 test_that("Test formatOccData", {
 
   expect_warning(visitData <- formatOccData(taxa = taxa, site = site, survey = survey),
                  '854 out of 15000 observations will be removed as duplicates')
   
-  head_spp_vis <- structure(list(visit = c("A102010-02-17", "A102010-04-14", "A102010-04-22", 
-                            "A102010-08-29", "A102010-11-04", "A102011-02-09"), a = c(TRUE, 
+  head_spp_vis <- structure(list(visit = c("A102010-02-171", "A102010-04-141", "A102010-04-221", 
+                            "A102010-08-291", "A102010-11-041", "A102011-02-091"), a = c(TRUE, 
                             FALSE, FALSE, FALSE, FALSE, FALSE), b = c(FALSE, FALSE, FALSE, 
                             FALSE, FALSE, FALSE), c = c(FALSE, FALSE, FALSE, FALSE, TRUE, 
                             FALSE), d = c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE), e = c(FALSE, 
@@ -61,8 +63,8 @@ test_that("Test formatOccData", {
                             6L), class = "data.frame")
   
 
- head_occDetdata <- structure(list(visit = c("A102010-02-17", "A102010-04-14", "A102010-04-22", 
-                                             "A102010-08-29", "A102010-11-04", "A102011-02-09"), 
+ head_occDetdata <- structure(list(visit = c("A102010-02-171", "A102010-04-141", "A102010-04-221", 
+                                             "A102010-08-291", "A102010-11-041", "A102011-02-091"), 
                                    site = structure(c(2L, 2L, 2L, 2L, 2L, 2L), 
                                   .Label = c("A1", "A10", "A11", "A12", "A13", "A14", "A15", "A16", "A17", "A18", "A19", "A2", "A20", "A21",
                                            "A22", "A23", "A24", "A25", "A26", "A27", "A28", "A29", "A3",
@@ -82,14 +84,16 @@ test_that("Test formatOccData", {
 
 test_that("Test formatOccData errors", {
   
-  expect_error(visitData <- formatOccData(taxa = head(taxa), site = site, survey = survey),
-               'The following arguements are not of equal length: taxa, site, survey')
-  expect_error(visitData <- formatOccData(taxa = taxa, site = head(site), survey = survey, closure_period = closure_period),
-               'The following arguements are not of equal length: taxa, site, survey, closure_period')
-  expect_error(visitData <- formatOccData(taxa = taxa, site = site, survey = head(survey), closure_period = closure_period),
-               'The following arguements are not of equal length: taxa, site, survey, closure_period')
-  expect_error(visitData <- formatOccData(taxa = taxa, site = site, survey = survey, closure_period=head(closure_period)),
-               'The following arguements are not of equal length: taxa, site, survey, closure_period')
+  expect_error(visitData <- formatOccData(taxa = head(taxa), site = site, survey = survey, closure_period = closure_period, replicate = replicate),
+               'The following arguements are not of equal length: taxa, site, survey, closure_period, replicate')
+  expect_error(visitData <- formatOccData(taxa = taxa, site = head(site), survey = survey, closure_period = closure_period, replicate = replicate),
+               'The following arguements are not of equal length: taxa, site, survey, closure_period, replicate')
+  expect_error(visitData <- formatOccData(taxa = taxa, site = site, survey = head(survey), closure_period = closure_period, replicate = replicate),
+               'The following arguements are not of equal length: taxa, site, survey, closure_period, replicate')
+  expect_error(visitData <- formatOccData(taxa = taxa, site = site, survey = survey, closure_period=head(closure_period), replicate = replicate),
+               'The following arguements are not of equal length: taxa, site, survey, closure_period, replicate')
+  expect_error(visitData <- formatOccData(taxa = taxa, site = site, survey = survey, closure_period=closure_period, replicate = head(replicate)),
+               'The following arguements are not of equal length: taxa, site, survey, closure_period, replicate')
   
 })
 
@@ -108,8 +112,8 @@ test_that("Test formatOccData specified closure period", {
   expect_warning(visitData <- formatOccData(taxa = taxa, site = site, survey = survey, closure_period = closure_period),
                  '854 out of 15000 observations will be removed as duplicates')
   
-  head_occDetdata_cp <- structure(list(visit = c("A102010-02-17", "A102010-04-14", "A102010-04-22", 
-                                             "A102010-08-29", "A102010-11-04", "A102011-02-09"), 
+  head_occDetdata_cp <- structure(list(visit = c("A102010-02-171", "A102010-04-141", "A102010-04-221", 
+                                             "A102010-08-291", "A102010-11-041", "A102011-02-091"), 
                                    site = structure(c(2L, 2L, 2L, 2L, 2L, 2L), 
                                                     .Label = c("A1", "A10", "A11", "A12", "A13", "A14", "A15", "A16", "A17", "A18", "A19", "A2", "A20", "A21",
                                                                "A22", "A23", "A24", "A25", "A26", "A27", "A28", "A29", "A3",
