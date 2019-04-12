@@ -17,7 +17,7 @@
 #'                    'halfcauchy') # prior on the precisions
 #'
 #' # simulate some data
-#'mydata <- simOccData(nvisit=200, nsite=10, nTP=5, psi=0.5, beta1=0.1, beta2=-2e-3)
+#'mydata <- simOccData(nvisit=200, nsite=10, nTP=5, psi=0.5, beta1=182, beta2=20, beta3=100)
 #'with(mydata, plot(occDetdata$Jul_date, p))
 #'
 #'# run the occupancy model model
@@ -44,7 +44,9 @@ simOccData <- function(
                 trend = -0.01, # this proportion of sites changes state each TP           
                 mu.lp = -1,
                 tau.lp = 10,
-                beta1=0.1, beta2=-2e-3,
+                beta1 = 182,
+                beta2 = 20,
+                beta3 = 100,
                 dtype2.p = 3,
                 dtype3.p = 10
               ){
@@ -75,12 +77,11 @@ simOccData <- function(
                         site = sample.int(n=nsites, size=nvisits, repl=TRUE),
                         L = sample(c(1,2,4), size=nvisits, repl=TRUE),
                         TP = sample.int(n=nTP, size=nvisits, repl=TRUE),
-                        Jul_date = sample.int(n=365, size=nvisits, repl=TRUE) - 182
+                        Jul_date = sample.int(n=365, size=nvisits, repl=TRUE)
                         )
   # probability of detection
   p <- inv.logit( alpha.p[occDetdata$TP] + 
-                  beta1 * (occDetdata$Jul_date) +
-                  beta2 * (occDetdata$Jul_date)^2 +
+                  beta3 * (1/((2*pi)^0.5 * beta2) * exp(-((occDetdata$Jul_date - beta1)^2 / (2* beta2^2)))) +
                   dtype2.p * (occDetdata$L %in% 2:3) + 
                   dtype3.p * (occDetdata$L == 4)
   )
