@@ -4,8 +4,8 @@
 \alias{htmlSummary}
 \title{Create HTML Report}
 \usage{
-htmlSummary(occDet, open = TRUE, output_dir = getwd(), output_file = NULL,
-  ...)
+htmlSummary(occDet, open = TRUE, output_dir = getwd(),
+  output_file = NULL, ...)
 }
 \arguments{
 \item{occDet}{An object of class occDet}

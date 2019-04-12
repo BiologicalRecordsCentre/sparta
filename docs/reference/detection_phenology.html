@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title><span class="pkg">sparta</span> Trend Analysis for Unstructured Data — sparta • sparta</title>
+<title>Diagnostics for the detectability with respect to Julian Date — detection_phenology • sparta</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,13 +30,9 @@
 
 
 
-<meta property="og:title" content="<span class="pkg">sparta</span> Trend Analysis for Unstructured Data — sparta" />
+<meta property="og:title" content="Diagnostics for the detectability with respect to Julian Date — detection_phenology" />
 
-<meta property="og:description" content="The Sparta package includes methods used to analyse trends in
-unstructured occurrence datasets. Methods included in the package
-include Frescalo, Telfer's change index, Reporting rate models
-and Bayesian Occupancy models. These methods are reviewed in 
-Issac et al (2014), available at http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract" />
+<meta property="og:description" content="Creates a plot of detectability over the season and calculates some simple statistics" />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -112,28 +108,64 @@ Issac et al (2014), available at http://onlinelibrary.wiley.com/doi/10.1111/2041
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1><span class="pkg">sparta</span> Trend Analysis for Unstructured Data</h1>
+    <h1>Diagnostics for the detectability with respect to Julian Date</h1>
     
-    <div class="hidden name"><code>sparta.Rd</code></div>
+    <div class="hidden name"><code>detection_phenology.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>The Sparta package includes methods used to analyse trends in
-unstructured occurrence datasets. Methods included in the package
-include Frescalo, Telfer's change index, Reporting rate models
-and Bayesian Occupancy models. These methods are reviewed in 
-Issac et al (2014), available at <a href='http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract'>http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract</a></p>
+    <p>Creates a plot of detectability over the season and calculates some simple statistics</p>
     
     </div>
 
-        
+    <pre class="usage"><span class='fu'>detection_phenology</span>(<span class='no'>model</span>, <span class='kw'>spname</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>bins</span> <span class='kw'>=</span> <span class='fl'>12</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>model</th>
+      <td><p>a fitted sparta model of class <code>OccDet</code>.</p></td>
+    </tr>
+    <tr>
+      <th>spname</th>
+      <td><p>optional name of the species (used for plotting)</p></td>
+    </tr>
+    <tr>
+      <th>bins</th>
+      <td><p>number of points to estimate across the year. Defaults to 12</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>Some numbers.</p>
+    
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>Takes a object of <code>OccDet</code> fitted with the <code>jul_date</code> option</p>
+<p>Calculate the phenology of detection and produces a plot of detectability over time for the reference data type.</p>
+    
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
+
+    <p>van Strien, A.J., Termaat, T., Groenendijk, D., Mensing, V. &amp; Kéry, M. (2010) 
+            Site-occupancy models may offer new opportunities for dragonfly monitoring based on daily species lists. 
+            <em>Basic and Applied Ecology</em>, 11, 495–503.</p>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-                </ul>
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+
+      <li><a href="#details">Details</a></li>
+
+      <li><a href="#references">References</a></li>
+          </ul>
 
   </div>
 </div>
