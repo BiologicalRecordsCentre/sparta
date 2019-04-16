@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title><span class="pkg">sparta</span> Trend Analysis for Unstructured Data — sparta • sparta</title>
+<title>Modify the init object depending on the type of model we are running — getInitValues • sparta</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,13 +30,10 @@
 
 
 
-<meta property="og:title" content="<span class="pkg">sparta</span> Trend Analysis for Unstructured Data — sparta" />
+<meta property="og:title" content="Modify the init object depending on the type of model we are running — getInitValues" />
 
-<meta property="og:description" content="The Sparta package includes methods used to analyse trends in
-unstructured occurrence datasets. Methods included in the package
-include Frescalo, Telfer's change index, Reporting rate models
-and Bayesian Occupancy models. These methods are reviewed in 
-Issac et al (2014), available at http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract" />
+<meta property="og:description" content="This function is primarily for internal use within occDetFunc. It is used to 
+update the initial values object according to the needs of each model type." />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -112,28 +109,56 @@ Issac et al (2014), available at http://onlinelibrary.wiley.com/doi/10.1111/2041
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1><span class="pkg">sparta</span> Trend Analysis for Unstructured Data</h1>
+    <h1>Modify the init object depending on the type of model we are running</h1>
     
-    <div class="hidden name"><code>sparta.Rd</code></div>
+    <div class="hidden name"><code>getInitValues.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>The Sparta package includes methods used to analyse trends in
-unstructured occurrence datasets. Methods included in the package
-include Frescalo, Telfer's change index, Reporting rate models
-and Bayesian Occupancy models. These methods are reviewed in 
-Issac et al (2014), available at <a href='http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract'>http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract</a></p>
+    <p>This function is primarily for internal use within <code>occDetFunc</code>. It is used to 
+update the initial values object according to the needs of each model type.</p>
     
     </div>
 
-        
+    <pre class="usage"><span class='fu'>getInitValues</span>(<span class='no'>init</span>, <span class='no'>modeltype</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>init</th>
+      <td><p>An initial values object. As a minimum this is a list defined in <code>occDetFunc</code>
+as <code><a href='https://www.rdocumentation.org/packages/base/topics/list'>list(z = z, alpha.p = rep(runif(1, -2, 2), nTP), a = rep(runif(1, -2, 2), nTP),
+eta = rep(runif(1, -2, 2), bugs_data$nsite))</a></code>. Where z is 1's/0's for whether the focal
+species is present, alpha.p is the initial values for detectability in each year, a is 
+the inital values for the occupancy probability in each year, eta is the initial values
+for the site random effects.</p></td>
+    </tr>
+    <tr>
+      <th>modeltype</th>
+      <td><p>Character, one of: intercept, centering, contlistlength. See <code>occDetFunc</code> for
+more information.</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>Logical, if true progress is reported to the console</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>An updated <code>init</code> (initial values) object</p>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-                </ul>
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+          </ul>
 
   </div>
 </div>

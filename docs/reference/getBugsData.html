@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title><span class="pkg">sparta</span> Trend Analysis for Unstructured Data — sparta • sparta</title>
+<title>Modify the bugs data object depending on the type of model you are running — getBugsData • sparta</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,13 +30,10 @@
 
 
 
-<meta property="og:title" content="<span class="pkg">sparta</span> Trend Analysis for Unstructured Data — sparta" />
+<meta property="og:title" content="Modify the bugs data object depending on the type of model you are running — getBugsData" />
 
-<meta property="og:description" content="The Sparta package includes methods used to analyse trends in
-unstructured occurrence datasets. Methods included in the package
-include Frescalo, Telfer's change index, Reporting rate models
-and Bayesian Occupancy models. These methods are reviewed in 
-Issac et al (2014), available at http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract" />
+<meta property="og:description" content="This function is primarily for internal use within occDetFunc. It is used to 
+update the bugs data according to the needs of each model type." />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -112,28 +109,60 @@ Issac et al (2014), available at http://onlinelibrary.wiley.com/doi/10.1111/2041
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1><span class="pkg">sparta</span> Trend Analysis for Unstructured Data</h1>
+    <h1>Modify the bugs data object depending on the type of model you are running</h1>
     
-    <div class="hidden name"><code>sparta.Rd</code></div>
+    <div class="hidden name"><code>getBugsData.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>The Sparta package includes methods used to analyse trends in
-unstructured occurrence datasets. Methods included in the package
-include Frescalo, Telfer's change index, Reporting rate models
-and Bayesian Occupancy models. These methods are reviewed in 
-Issac et al (2014), available at <a href='http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract'>http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract</a></p>
+    <p>This function is primarily for internal use within <code>occDetFunc</code>. It is used to 
+update the bugs data according to the needs of each model type.</p>
     
     </div>
 
-        
+    <pre class="usage"><span class='fu'>getBugsData</span>(<span class='no'>bugs_data</span>, <span class='no'>modeltype</span>, <span class='kw'>verbose</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='no'>occDetData</span>)</pre>
+    
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>bugs_data</th>
+      <td><p>The bugs data object. This is a list specified in <code>occDetFunc</code> as 
+<code><a href='https://www.rdocumentation.org/packages/base/topics/list'>list(y = as.numeric(focal), Year = TP, Site = rownum, nyear = nTP, nsite = nrow(zst),
+nvisit = nrow(occDetdata[i,]))</a></code>. Where focal is a binary (0/1) of is the focal species is
+present, Year is the time periods or survey periods, Site are the site identifiers, nyear is
+the number of years in the data, nsite is hte number of sites and nVisit is the number of visits</p></td>
+    </tr>
+    <tr>
+      <th>modeltype</th>
+      <td><p>Character, one of: intercept, centering, jul_date, catlistlength, contlistlength.
+See <code>occDetFunc</code> for more information.</p></td>
+    </tr>
+    <tr>
+      <th>verbose</th>
+      <td><p>Logical, if true progress is reported to the console</p></td>
+    </tr>
+    <tr>
+      <th>occDetData</th>
+      <td><p>The 'raw' data used to create the <code>bugs_data</code>. This should have a 
+column 'L' for list length and a column 'JulDate' for Julian date</p></td>
+    </tr>
+    </table>
+    
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>An updated bugs_data object</p>
+    
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
-                </ul>
+      <li><a href="#arguments">Arguments</a></li>
+      
+      <li><a href="#value">Value</a></li>
+          </ul>
 
   </div>
 </div>

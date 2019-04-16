@@ -1,13 +1,15 @@
 Package: sparta
 Type: Package
 Title: Trend Analysis for Unstructured Data
-Version: 0.1.49
-Date: 2019-03-07
+Version: 0.2.00
+Date: 2019-04-12
 Authors@R: c(person("Tom", "August", role = c("aut", "cre"), email = "tomaug@ceh.ac.uk"),
              person("Gary", "Powney", role = c("aut")),
              person("Charlie", "Outhwaite", role = c("aut")),
              person("Colin", "Harrower", role = c("aut")),
              person("Mark", "Hill", role = c("aut")),
+             person("Jack", "Hatfield", role = c("aut")),
+             person("Francesca", "Mancini", role = c("aut")),
              person("Nick", "Isaac", role = c("aut")))
 Maintainer: Tom August <tomaug@ceh.ac.uk>
 Description: Methods used to analyse trends in unstructured
