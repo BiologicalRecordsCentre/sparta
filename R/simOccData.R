@@ -48,7 +48,8 @@ simOccData <- function(
                 beta2 = 20,
                 beta3 = 100,
                 dtype2.p = 3,
-                dtype3.p = 10
+                dtype3.p = 10,
+                JD_range = NULL
               ){
 
   #-------------------------- State variable
@@ -73,12 +74,23 @@ simOccData <- function(
   
   # visits are randomly allocated to sites and TPs
   # there is a nonzero probability that some TPs will have no visits, which could be a problem
-  occDetdata <- data.frame(visit = 1:nvisits,
+  if(is.null(JD_range)){occDetdata <- data.frame(visit = 1:nvisits,
                         site = sample.int(n=nsites, size=nvisits, repl=TRUE),
                         L = sample(c(1,2,4), size=nvisits, repl=TRUE),
                         TP = sample.int(n=nTP, size=nvisits, repl=TRUE),
                         Jul_date = sample.int(n=365, size=nvisits, repl=TRUE)
                         )
+  }else{
+    if(any( !(JD_range %in% c(1:366)))){
+      stop('Invalid Julian date range')}
+    potential_JD <- seq(JD_range[1],JD_range[2],by=1)
+    occDetdata <- data.frame(visit = 1:nvisits,
+                  site = sample.int(n=nsites, size=nvisits, repl=TRUE),
+                  L = sample(c(1,2,4), size=nvisits, repl=TRUE),
+                  TP = sample.int(n=nTP, size=nvisits, repl=TRUE),
+                  Jul_date = sample(x=potential_JD, size=nvisits, repl=TRUE)
+    ) 
+  }
   # probability of detection
   p <- inv.logit( alpha.p[occDetdata$TP] + 
                   beta3 * (1/((2*pi)^0.5 * beta2) * exp(-((occDetdata$Jul_date - beta1)^2 / (2* beta2^2)))) +
