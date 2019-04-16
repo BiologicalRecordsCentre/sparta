@@ -4,6 +4,20 @@
 #' The user defines the parameters for the data generation
 #' At present it works with just one species and generates the list length probabalistically
 #'
+#'@param nsites numeric, the number of sites from which the simulated data is sampled.
+#'@param nvisits numeric, the number of visits from which the simulated data is sampled.
+#'@param nTP numeric, the number of time periods from which the simulated data is sampled.
+#'@param psi probability of a site being occupied in time period 1.
+#'@param trend the proportion of sites that change state each time period.
+#'@param mu.lp the mean value for the normal distribution for the year effect (alpha.p) on the observation model.
+#'@param tau.lp the precision value for the normal distribution for the year effect (alpha.p) on the observation model. 
+#'@param beta1 the mean value for the normal distribution for the effect of Julian day on observation model.This must be a valid Julian date
+#'@param beta2 the standard deviation for the normal distribution for the effect of Julian day on observation model.
+#'@param beta3 parameter on the logit scale governing the magnitude of the Julian date effect on the observation model.
+#'@param dtype2.p parameter (logit scale) for list length 2-3 on the observation model.
+#'@param dtype3.p parameter (logit scale) for list length 4 on the observation model.
+#'@param JD_range range of Julian dates upon which visits can take place. If this is null Julian date ranges between 1 and 365.
+#'
 #' @return A list, the first two elements of which ('spp_vis' & 'occDetData') mimic the output of occDetFunc.
 #' The third element ('Z') is the presence-absence state variable and the fourth ('p') is the true probability of detection.
 #' 
