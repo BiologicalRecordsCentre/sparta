@@ -61,7 +61,8 @@ errorChecks <- function(taxa = NULL, site = NULL, survey = NULL, replicate = NUL
   
   ### Checks for site ###
   if(!is.null(site)){    
-    if(!all(!is.na(site))) stop('site must not contain NAs')    
+    if(!all(!is.na(site))) stop('site must not contain NAs')
+    if(!all(site != '')) stop("site must not contain empty values (i.e. '')")
   }
   
   ### Checks for closure period ###
