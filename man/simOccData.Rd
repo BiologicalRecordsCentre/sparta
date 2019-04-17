@@ -35,6 +35,7 @@ simOccData(nsites = 20, nvisits = 100, nTP = 10, psi = 0.5,
 \item{dtype3.p}{parameter (logit scale) for list length 4 on the observation model.}
 
 \item{JD_range}{range of Julian dates upon which visits can take place. If this is null Julian date ranges between 1 and 365.}
+
 }
 \value{
 A list, the first two elements of which ('spp_vis' & 'occDetData') mimic the output of occDetFunc.
