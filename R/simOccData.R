@@ -9,6 +9,10 @@
 #'@param nTP numeric, the number of time periods from which the simulated data is sampled.
 #'@param psi probability of a site being occupied in time period 1.
 #'@param trend the proportion of sites that change state each time period.
+#'       For decreasing trends the probability of persistence from one time period to the next is 1 + the trend value.
+#'       Probability of colonisation is 0.
+#'       For increasing trends the probability of an unoccupied site being colonised from one time period to the next is the trend value.
+#'       Probability of persistence is 1.
 #'@param mu.lp the mean value for the normal distribution for the year effect (alpha.p) on the observation model.
 #'@param tau.lp the precision value for the normal distribution for the year effect (alpha.p) on the observation model. 
 #'@param beta1 the mean value for the normal distribution for the effect of Julian day on observation model.This must be a valid Julian date
@@ -73,9 +77,13 @@ simOccData <- function(
   Z[,1] <- rbinom(n=nsites, size=1, prob=psi)
   
   for(t in 2:nTP){
-    transition <- rbinom(n=nsites, size=1, prob=abs(trend))
-    if(trend > 0) Zt <- apply(cbind(Z[,(t-1)], transition), 1, max)
-    else if(trend < 0) Zt <- apply(cbind(Z[,(t-1)], transition), 1, min)
+    if(trend > 0) {
+      transition <- rbinom(n=nsites, size=1, prob= trend) # prob defined here as colonization
+      Zt <- apply(cbind(Z[,(t-1)], transition), 1, max)
+    } else if(trend < 0) {
+      transition <- rbinom(n=nsites, size=1, prob= 1+trend) # prob defined here as persistence
+      Zt <- apply(cbind(Z[,(t-1)], transition), 1, min)
+    }
     Z[,t] <- Zt
   }
   
@@ -97,7 +105,7 @@ simOccData <- function(
   }else{
     if(any( !(JD_range %in% c(1:366)))){
       stop('Invalid Julian date range')}
-    potential_JD <- seq(JD_range[1],JD_range[2],by=1)
+    potential_JD <- seq(as.integer(JD_range[1]),as.integer(JD_range[2]),by=1L)
     occDetdata <- data.frame(visit = 1:nvisits,
                   site = sample.int(n=nsites, size=nvisits, repl=TRUE),
                   L = sample(c(1,2,4), size=nvisits, repl=TRUE),
