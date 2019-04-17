@@ -164,4 +164,8 @@ test_that("Test errors", {
   expect_error(errorChecks(frespath = "file.exe"),
                'file.exe does not exist')
   
+  expect_error(errorChecks(site = c('a', 'b', '')),
+               "site must not contain empty values (i.e. '')",
+               fixed = TRUE)
+  
 })
