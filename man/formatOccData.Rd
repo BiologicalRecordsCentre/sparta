@@ -4,8 +4,8 @@
 \alias{formatOccData}
 \title{Format data for Occupancy detection models}
 \usage{
-formatOccData(taxa, site, survey, replicate = NULL,
-  closure_period = NULL, includeJDay = FALSE)
+formatOccData(taxa, site, survey, replicate = NULL, closure_period = NULL,
+  includeJDay = FALSE)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}
