@@ -5,8 +5,8 @@
 \title{Simulate for Occupancy detection models}
 \usage{
 simOccData(nsites = 20, nvisits = 100, nTP = 10, psi = 0.5,
-  trend = -0.01, mu.lp = -1, tau.lp = 10, beta1 = 0.1,
-  beta2 = -0.002, dtype2.p = 3, dtype3.p = 10)
+  trend = -0.01, mu.lp = -1, tau.lp = 10, beta1 = 0.1, beta2 = -0.002,
+  dtype2.p = 3, dtype3.p = 10)
 }
 \value{
 A list, the first two elements of which ('spp_vis' & 'occDetData') mimic the output of occDetFunc.

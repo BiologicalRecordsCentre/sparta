@@ -33,8 +33,13 @@ errorChecks <- function(taxa = NULL, site = NULL, survey = NULL, replicate = NUL
   }
   
   if(!is.null(taxa) & !is.null(site) & !is.null(survey)){
-    
-    df <- data.frame(taxa, site, survey)
+
+    if(!is.null(replicate)){
+      df <- data.frame(taxa, site, survey, replicate)
+    } else {
+      df <- data.frame(taxa, site, survey)
+    }
+
     NR1 <- nrow(df)
     NR2 <- nrow(distinct(df))
     
