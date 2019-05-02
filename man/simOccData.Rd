@@ -18,7 +18,11 @@ simOccData(nsites = 20, nvisits = 100, nTP = 10, psi = 0.5,
 
 \item{psi}{probability of a site being occupied in time period 1.}
 
-\item{trend}{the proportion of sites that change state each time period.}
+\item{trend}{the proportion of sites that change state each time period.
+For decreasing trends the probability of persistence from one time period to the next is 1 + the trend value.
+Probability of colonisation is 0.
+For increasing trends the probability of an unoccupied site being colonised from one time period to the next is the trend value.
+Probability of persistence is 1.}
 
 \item{mu.lp}{the mean value for the normal distribution for the year effect (alpha.p) on the observation model.}
 
@@ -35,7 +39,6 @@ simOccData(nsites = 20, nvisits = 100, nTP = 10, psi = 0.5,
 \item{dtype3.p}{parameter (logit scale) for list length 4 on the observation model.}
 
 \item{JD_range}{range of Julian dates upon which visits can take place. If this is null Julian date ranges between 1 and 365.}
-
 }
 \value{
 A list, the first two elements of which ('spp_vis' & 'occDetData') mimic the output of occDetFunc.
