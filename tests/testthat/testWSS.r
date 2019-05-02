@@ -38,6 +38,6 @@ test_that("Test WSS2", {
                c("species_name", "intercept.estimate", "year.estimate", "intercept.stderror", 
                   "year.stderror", "intercept.zvalue", "year.zvalue", "intercept.pvalue", 
                   "year.pvalue", "observations"))
-  expect_equal(nrow(results), 24)
+  expect_equal(nrow(results), 25)
 
 })
