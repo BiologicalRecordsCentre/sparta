@@ -25,19 +25,20 @@ time_period <- sample(rDates, size = n, TRUE)
 df <- unique(data.frame(taxa, site, time_period))
 
 test_that("Test WSS2", {
- 
+  
   set.seed(seed = 125)
   results <- WSS(df$taxa,
-                  df$site,
-                  df$time_period,
-                  minL = 4,
-                  minTP = 3) 
+                 df$site,
+                 df$time_period,
+                 minL = 4,
+                 minTP = 3) 
   
   expect_is(results, 'data.frame')
   expect_equal(colnames(results), 
                c("species_name", "intercept.estimate", "year.estimate", "intercept.stderror", 
-                  "year.stderror", "intercept.zvalue", "year.zvalue", "intercept.pvalue", 
-                  "year.pvalue", "observations"))
-  expect_equal(nrow(results), 25)
 
+                 "year.stderror", "intercept.zvalue", "year.zvalue", "intercept.pvalue", 
+                 "year.pvalue", "observations"))
+  expect_equal(nrow(results), 24)
+  
 })
