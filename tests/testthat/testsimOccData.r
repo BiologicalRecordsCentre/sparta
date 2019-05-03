@@ -10,17 +10,17 @@ test_that("Test simOccData", {
   results <- simOccData(nvisit=200, nsite=10, nTP=5, psi=0.5, beta1=182, beta2=20,
                         beta3=100, JD_range = c(100,300))
   
-  head_spp_vis<-structure(list(visit = c(1L, 2L, 3L, 4L, 5L, 6L), mysp = c(0L, 1L, 1L, 1L, 0L, 0L)),
+  head_spp_vis<-structure(list(visit = c(1L, 2L, 3L, 4L, 5L, 6L), mysp = c(1L, 1L, 1L, 1L, 0L, 0L)),
                                .Names = c("visit", "mysp"), row.names = c(NA, 6L), class = "data.frame")
   
-  head_occDetdata<-structure(list(visit = c(1L, 2L, 3L, 4L, 5L, 6L), site = c(6L, 9L, 10L, 7L, 2L, 2L), 
-                                  L = c(1, 4, 4, 4, 1, 1), TP = c(3L, 5L, 4L, 3L, 2L, 4L),
-                                  Jul_date = c(244L, 299L, 174L, 125L, 133L, 135L)),
+  head_occDetdata<-structure(list(visit = c(1L, 2L, 3L, 4L, 5L, 6L), site = c(1L, 10L, 7L, 4L, 1L, 7L), 
+                                  L = c(4, 1, 4, 2, 1, 2), TP = c(2L, 2L, 5L, 2L, 5L, 1L),
+                                  Jul_date = c(171L, 283L, 299L, 133L, 280L, 298L)),
                              .Names = c("visit", "site", "L", "TP", "Jul_date"), row.names = c(NA, 6L), class = "data.frame")
   
-  head_Z <-matrix(c(1L, 0L, 0L, 0L, 1L, 1L, 1L, 0L, 0L, 0L, 1L, 1L, 1L, 0L, 0L, 0L, 1L, 1L, 1L, 0L, 0L, 0L, 1L, 1L, 1L, 0L, 0L, 0L, 1L, 1L), ncol = 5, nrow = 6)
+  head_Z <-matrix(c(1L, 0L, 0L, 0L, 1L, 1L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L), ncol = 5, nrow = 6)
   
-  head_p <-c(0.3087322, 0.9998911, 0.9999852, 0.9999002, 0.1850282, 0.3561440)
+  head_p <-c(0.9999603, 0.1705370, 0.9998911, 0.8201487, 0.2942406, 0.8923152)
   
   expect_identical(names(results), c('spp_vis','occDetdata','Z','p'))
   expect_identical(head(results$spp_vis), head_spp_vis)
@@ -33,17 +33,17 @@ test_that("Test simOccData", {
   resultsB<-simOccData(nvisit=200, nsite=10, nTP=5, psi=0.5, beta1=182, beta2=20,
                        beta3=100,trend = +0.2)
   
-  head_spp_visB<-structure(list(visit = c(1L, 2L, 3L, 4L, 5L, 6L), mysp = c(0L, 1L, 1L, 1L, 0L, 0L)),
+  head_spp_visB<-structure(list(visit = c(1L, 2L, 3L, 4L, 5L, 6L), mysp = c(0L, 0L, 0L, 0L, 0L, 0L)),
                           .Names = c("visit", "mysp"), row.names = c(NA, 6L), class = "data.frame")
   
-  head_occDetdataB<-structure(list(visit = c(1L, 2L, 3L, 4L, 5L, 6L), site = c(6L, 9L, 10L, 7L, 2L, 2L), 
-                                  L = c(1, 4, 4, 4, 1, 1), TP = c(3L, 5L, 4L, 3L, 2L, 4L),
-                                  Jul_date = c(262L, 363L, 136L, 47L, 62L, 65L)),
+  head_occDetdataB<-structure(list(visit = c(1L, 2L, 3L, 4L, 5L, 6L), site = c(5L, 2L, 1L, 1L, 4L, 3L), 
+                                  L = c(1, 2, 1, 2, 4, 2), TP = c(3L, 5L, 3L, 2L, 1L, 4L),
+                                  Jul_date = c(302L, 83L, 242L, 283L, 190L, 29L)),
                              .Names = c("visit", "site", "L", "TP", "Jul_date"), row.names = c(NA, 6L), class = "data.frame")
   
-  head_ZB <-matrix(c(1L, 0L, 0L, 0L, 1L, 1L, 1L, 0L, 0L, 0L, 1L, 1L, 1L, 0L, 0L, 0L, 1L, 1L, 1L, 0L, 1L, 0L, 1L, 1L, 1L, 0L, 1L, 0L, 1L, 1L), ncol = 5, nrow = 6)
+  head_ZB <-matrix(c(0L, 1L, 0L, 0L, 0L, 1L, 0L, 1L, 1L, 0L, 0L, 1L, 0L, 1L, 1L, 0L, 0L, 1L, 0L, 1L, 1L, 0L, 0L, 1L, 0L, 1L, 1L, 0L, 0L, 1L), ncol = 5, nrow = 6)
   
-  head_pB <-c(0.3053991, 0.9998911, 0.9999192, 0.9998967, 0.1705362, 0.3277827)
+  head_pB <-c(0.3000636, 0.8308382, 0.3047382, 0.8959869, 0.9999850, 0.8515318)
   
   expect_identical(head(resultsB$spp_vis), head_spp_visB)
   expect_identical(head(resultsB$occDetdata), head_occDetdataB)
