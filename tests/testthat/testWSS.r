@@ -36,6 +36,7 @@ test_that("Test WSS2", {
   expect_is(results, 'data.frame')
   expect_equal(colnames(results), 
                c("species_name", "intercept.estimate", "year.estimate", "intercept.stderror", 
+
                  "year.stderror", "intercept.zvalue", "year.zvalue", "intercept.pvalue", 
                  "year.pvalue", "observations"))
   expect_equal(nrow(results), 24)
