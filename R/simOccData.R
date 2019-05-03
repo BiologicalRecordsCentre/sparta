@@ -97,20 +97,20 @@ simOccData <- function(
   # visits are randomly allocated to sites and TPs
   # there is a nonzero probability that some TPs will have no visits, which could be a problem
   if(is.null(JD_range)){occDetdata <- data.frame(visit = 1:nvisits,
-                        site = sample.int(n=nsites, size=nvisits, repl=TRUE),
-                        L = sample(c(1,2,4), size=nvisits, repl=TRUE),
-                        TP = sample.int(n=nTP, size=nvisits, repl=TRUE),
-                        Jul_date = sample.int(n=365, size=nvisits, repl=TRUE)
+                        site = sample.int(n=nsites, size=nvisits, replace = TRUE),
+                        L = sample(c(1,2,4), size=nvisits, replace=TRUE),
+                        TP = sample.int(n=nTP, size=nvisits, replace=TRUE),
+                        Jul_date = sample.int(n=365, size=nvisits, replace=TRUE)
                         )
   }else{
     if(any( !(JD_range %in% c(1:366)))){
       stop('Invalid Julian date range')}
     potential_JD <- seq(as.integer(JD_range[1]),as.integer(JD_range[2]),by=1L)
     occDetdata <- data.frame(visit = 1:nvisits,
-                  site = sample.int(n=nsites, size=nvisits, repl=TRUE),
-                  L = sample(c(1,2,4), size=nvisits, repl=TRUE),
-                  TP = sample.int(n=nTP, size=nvisits, repl=TRUE),
-                  Jul_date = sample(x=potential_JD, size=nvisits, repl=TRUE)
+                  site = sample.int(n=nsites, size=nvisits, replace=TRUE),
+                  L = sample(c(1,2,4), size=nvisits, replace=TRUE),
+                  TP = sample.int(n=nTP, size=nvisits, replace=TRUE),
+                  Jul_date = sample(x=potential_JD, size=nvisits, replace=TRUE)
     ) 
   }
   # probability of detection
