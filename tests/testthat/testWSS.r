@@ -39,6 +39,6 @@ test_that("Test WSS2", {
 
                  "year.stderror", "intercept.zvalue", "year.zvalue", "intercept.pvalue", 
                  "year.pvalue", "observations"))
-  expect_equal(nrow(results), 24)
+  expect_equal(nrow(results), 25)
   
 })
