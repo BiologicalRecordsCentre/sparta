@@ -60,7 +60,7 @@ test_that("Sub-selection works - siteSelectionMinTP", {
   
   dfSEL  <- siteSelectionMinTP(df$taxa, df$site, df$time_period, minTP = 14)
   
-  expect_lt(nrow(dfSEL), nrow(df))
+  expect_equal(nrow(dfSEL), nrow(df))
   
   expect_true(min(table(unique(cbind(dfSEL$site, as.numeric(format(dfSEL$time_period, '%Y'))))[,1])) >= 14)
   
@@ -111,7 +111,7 @@ test_that("Sub-selection works - siteSelection", {
   # Check list length and min years are no smaller than those specified
   temp <- paste(dfSEL2$site, dfSEL2$time_period)
   expect_true(min(table(temp)) >= 4)
-  expect_true(min(table(unique(cbind(dfSEL2$site, as.numeric(format(dfSEL2$time_period, '%Y'))))[,1])) >= 3)
+  expect_true(max(table(unique(cbind(dfSEL2$site, as.numeric(format(dfSEL2$time_period, '%Y'))))[,1])) >= 5)
   
   expect_true(!identical(x = dfSEL, y = dfSEL2))
 
