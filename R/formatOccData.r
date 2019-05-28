@@ -131,10 +131,9 @@ formatOccData <- function(taxa, site, survey, replicate = NULL, closure_period =
     taxa_data$TP <- lookup$TP[match(closure_period, lookup$cp)]
 
     #check that surveys are nested within closure_periods
-    temp <- taxa_data %>% 
-            group_by(survey) %>% 
-            group_by(replicate) %>% 
-            summarise(ns = length(unique(TP)))
+    temp <- group_by(.data = taxa_data, survey, replicate)  
+            
+    temp <- summarise(temp, ns = length(unique(TP)))
     if(any(temp$ns) > 1) {
       # return a warning but assume they know what they're doing
       warning(paste(as.numeric(table(temp$ns >1)[2]), 'survey identities appear in multiple closure periods'))
