@@ -8,3 +8,4 @@ logo.png
 frescalo.exe
 ^docs$
 misc/
+^appveyor\.yml$
