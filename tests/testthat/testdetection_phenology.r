@@ -43,6 +43,12 @@ test_that("Test detection_phenology", {
                         seed = 111,
                         modeltype = c('ranwalk','halfcauchy','jul_date'))
   
+  # quick check this output is as expected
+  expect_identical(head(modelresults$BUGSoutput$sims.list$alpha.p[,1]),
+                   c(-3.0072164156934, -2.17484348943153, -2.04228261009605, -2.53916362332146, 
+                     -3.18523796966506, -3.02335381838008),
+                   tolerance = 1e-7)
+  
   # create some model results without Julian date
   modelresults2 <- occDetFunc(taxa_name = 'a',
                              n_iterations = 50,
