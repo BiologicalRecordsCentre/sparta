@@ -41,25 +41,25 @@ test_that("Test errors and warnings", {
                                list_length = TRUE,
                                family = 'Binomial'),
                  "When list_length is TRUE family will default to Bernoulli")
-  expect_error(RR_out <- reportingRateModel(df$taxa,
+  expect_error(suppressWarnings(RR_out <- reportingRateModel(df$taxa,
                                               df$site,
                                               df$time_period,
-                                              list_length = 1),
+                                              list_length = 1)),
                  "list_length must be logical")
-  expect_error(RR_out <- reportingRateModel(df$taxa,
+  expect_error(suppressWarnings(RR_out <- reportingRateModel(df$taxa,
                                               df$site,
                                               df$time_period,
-                                              overdispersion = 1),
+                                              overdispersion = 1)),
                  "overdispersion must be logical")
-  expect_error(RR_out <- reportingRateModel(df$taxa,
+  expect_error(suppressWarnings(RR_out <- reportingRateModel(df$taxa,
                                               df$site,
                                               df$time_period,
-                                              verbose = 1),
+                                              verbose = 1)),
                  "verbose must be logical")
-  expect_error(RR_out <- reportingRateModel(df$taxa,
+  expect_error(suppressWarnings(RR_out <- reportingRateModel(df$taxa,
                                               df$site,
                                               df$time_period,
-                                              site_effect = 1),
+                                              site_effect = 1)),
                  "site_effect must be logical")
   expect_warning(RR_out <- reportingRateModel(df$taxa,
                                             df$site,

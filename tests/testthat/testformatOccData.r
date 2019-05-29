@@ -101,9 +101,9 @@ test_that("Test formatOccData date requirement errors", {
   
   expect_warning(visitData <- formatOccData(taxa = taxa, site = site, survey = survey, closure_period = closure_period),
                  '871 out of 15000 observations will be removed as duplicates')
-  expect_error(visitData <- formatOccData(taxa = taxa, site = site, survey = survey_numbered),
+  expect_error(suppressWarnings(visitData <- formatOccData(taxa = taxa, site = site, survey = survey_numbered)),
                'survey must be a date if closure_period not supplied')
-  expect_error(visitData <- formatOccData(taxa =taxa, site = site, survey = survey_numbered, includeJDay = TRUE, closure_period = closure_period),
+  expect_error(suppressWarnings(visitData <- formatOccData(taxa =taxa, site = site, survey = survey_numbered, includeJDay = TRUE, closure_period = closure_period)),
                'survey must be a date if Julian Date is to be included')
 })
 

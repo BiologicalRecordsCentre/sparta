@@ -26,11 +26,11 @@ df <- data.frame(taxa, site, time_period)
 
 test_that("Test dataDiagnostics", {
   
- results <- dataDiagnostics(taxa = df$taxa,
+ suppressWarnings(results <- dataDiagnostics(taxa = df$taxa,
                             progress_bar = FALSE,
                             site = df$site,
                             time_period = df$time_period,
-                            plot = FALSE)
+                            plot = FALSE))
  
  recperyear <- structure(c(771L, 775L, 882L, 303L, 443L, 1051L, 582L, 862L, 
              591L, 324L, 768L, 751L, 728L, 924L, 739L, 900L, 738L, 939L, 1185L, 
