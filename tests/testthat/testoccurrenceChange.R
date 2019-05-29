@@ -30,7 +30,7 @@ regions <- data.frame(site = unique(site),
                       region3 = c(rep(0, 20), rep(0, 15), rep(1, 15)))
 
 # run the model with these data for one species
-temp <- capture.output(results <- occDetModel(taxa = taxa,
+suppressWarnings(temp <- capture.output(results <- occDetModel(taxa = taxa,
                        site = site,
                        survey = survey,
                        species_list = c('a'),
@@ -38,7 +38,7 @@ temp <- capture.output(results <- occDetModel(taxa = taxa,
                        n_iterations = 200,
                        burnin = 10,
                        thinning = 2,
-                       regional_codes = regions))
+                       regional_codes = regions)))
 
 
 test_that("Test errors and warnings", {

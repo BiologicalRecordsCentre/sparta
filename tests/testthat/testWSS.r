@@ -27,11 +27,11 @@ df <- unique(data.frame(taxa, site, time_period))
 test_that("Test WSS2", {
   
   set.seed(seed = 125)
-  results <- WSS(df$taxa,
+  suppressWarnings(results <- WSS(df$taxa,
                  df$site,
                  df$time_period,
                  minL = 4,
-                 minTP = 3) 
+                 minTP = 3))
   
   expect_is(results, 'data.frame')
   expect_equal(colnames(results), 
