@@ -4,7 +4,7 @@ test_that("Test detection_phenology", {
   
   sink(file=ifelse(Sys.info()["sysname"] == "Windows",
                    "NUL",
-                    "/dev/null"))
+                   "/dev/null"))
   # Create data
   n <- 15000 #size of dataset
   nyr <- 20 # number of years in data
@@ -14,7 +14,8 @@ test_that("Test detection_phenology", {
   
   # Create somes dates
   first <- as.Date(strptime("2010/01/01", "%Y/%m/%d")) 
-  last <- as.Date(strptime(paste(2010+(nyr-1),"/12/31", sep=''), "%Y/%m/%d")) 
+  last <- as.Date(strptime(paste(2010+(nyr-1),"/12/31", sep=''),
+                           "%Y/%m/%d")) 
   dt <- last-first 
   rDates <- first + (runif(nSamples)*dt)
   
@@ -28,8 +29,10 @@ test_that("Test detection_phenology", {
   survey <- sample(rDates, size = n, TRUE)
   
   # format data
-  suppressWarnings({visitData <- formatOccData(taxa = taxa, site = site,
-                                               survey = survey, includeJDay = TRUE)})
+  suppressWarnings({visitData <- formatOccData(taxa = taxa,
+                                               site = site,
+                                               survey = survey,
+                                               includeJDay = TRUE)})
   # create some model results
   modelresults <- occDetFunc(taxa_name = 'a',
                         n_iterations = 50,
@@ -37,7 +40,8 @@ test_that("Test detection_phenology", {
                         occDetdata = visitData$occDetdata,
                         spp_vis = visitData$spp_vis,
                         write_results = FALSE,
-                        seed = 111, modeltype = c('ranwalk','halfcauchy','jul_date'))
+                        seed = 111,
+                        modeltype = c('ranwalk','halfcauchy','jul_date'))
   
   # create some model results without Julian date
   modelresults2 <- occDetFunc(taxa_name = 'a',
@@ -46,10 +50,14 @@ test_that("Test detection_phenology", {
                              occDetdata = visitData$occDetdata,
                              spp_vis = visitData$spp_vis,
                              write_results = FALSE,
-                             seed = 111, modeltype = c('ranwalk','halfcauchy'))
+                             seed = 111,
+                             modeltype = c('ranwalk','halfcauchy'))
   
   # run the function
-  results <- detection_phenology(modelresults, spname='a', bins=12, density_function = TRUE)
+  results <- detection_phenology(modelresults,
+                                 spname ='a',
+                                 bins = 12,
+                                 density_function = TRUE)
   
   # create expected data
   head_data_bin <- c(1L, 2L, 3L, 4L, 5L, 6L)
