@@ -125,6 +125,8 @@
 #' @examples
 #' \dontrun{
 #' 
+#' set.seed(123)
+#' 
 #' # Create data
 #' n <- 15000 #size of dataset
 #' nyr <- 20 # number of years in data
@@ -542,6 +544,44 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     warning('JAGS returned an error when modelling', taxa_name, 'error:', error_status[1])
     return(NULL)
   } else {
+    
+    # Add metadata
+    
+    if(is.null(attributes(occDetdata))){
+      metadata <- list()
+    } else if('metadata' %in% names(attributes(occDetdata))){
+      metadata <- attr(occDetdata, 'metadata')
+    } else {
+      metadata <- list()
+    }
+    
+    MD <- list(method = 'sparta::occDetFunc',
+               call =   call <- match.call(),
+               date = Sys.Date(),
+               user = Sys.info()['user'],
+               summary = list(species = taxa_name,
+                              n_sites = bugs_data$nsite,
+                              n_years = bugs_data$nyear,
+                              n_obs = sum(bugs_data$y),
+                              min_year = min_year,
+                              max_year = max_year),
+               output_path = ifelse(test = write_results,
+                                    file.path(getwd(), output_dir, paste(taxa_name, ".rdata", sep = "")),
+                                    NA),
+               session.info = sessionInfo())
+    
+    # If the data coming in is the result of analysis we want to
+    # append this data
+    name <- 'analysis'
+    i = 1
+    while(name %in% names(metadata)){
+      name <- paste0(name, i)
+      i = i + 1 
+    }
+    
+    metadata[name] <- list(MD)
+    attr(out, 'metadata') <- metadata
+    
     out$SPP_NAME <- taxa_name
     out$min_year <- min_year
     out$max_year <- max_year
