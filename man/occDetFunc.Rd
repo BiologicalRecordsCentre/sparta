@@ -153,6 +153,8 @@ These options are provided as a vector of characters, e.g. \code{modeltype = c('
 \examples{
 \dontrun{
 
+set.seed(123)
+
 # Create data
 n <- 15000 #size of dataset
 nyr <- 20 # number of years in data
