@@ -27,16 +27,20 @@ environment:
   - R_VERSION: devel
     NOT_CRAN: true
     R_CHECK_ARGS: "--no-manual"
+    USE_RTOOLS: true
     
   - R_VERSION: devel
     NOT_CRAN: true
     R_CHECK_ARGS: "--no-manual"
+    USE_RTOOLS: true
     
   - R_VERSION: stable
     NOT_CRAN: false
+    USE_RTOOLS: true
     
   - R_VERSION: stable
     NOT_CRAN: false
+    USE_RTOOLS: true
     
 build_script:
   - travis-tool.sh install_deps
