@@ -22,8 +22,11 @@ function(
 		cat("\nSAVING DATA TO FRESCALO WORKING DIRECTORY\n",rep("*",20),"\n\n", sep="")
 	
   # Ensure data is unique
+    before <- nrow(fres_data)
 		fres_data<-unique(fres_data)
-    
+    after <- nrow(fres_data)
+    if(before < after) warning(paste(before-after, 'rows of data are removed as they are duplicates within a time period'))
+		
   # Check that frescalo_path exists
 		org_wd<-getwd()
     
