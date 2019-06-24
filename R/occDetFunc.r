@@ -108,11 +108,13 @@
 #'  \item{\code{"out$SPP_NAME"}}{ - The name of the study species.}
 #'  \item{\code{"out$min_year"}}{ - First year of data included in the occupancy model run.}
 #'  \item{\code{"out$max_year"}}{ - Final year of data included in the occupancy model run.}
-#'  \item{\code{"out$nsite"}}{ - The number of unique sites included int he occupancy model run.}
+#'  \item{\code{"out$nsite"}}{ - The number of unique sites included in the occupancy model run.}
 #'  \item{\code{"out$nvisits"}}{ - The number of unique visits included int he occupancy model run.}
 #'  \item{\code{"out$species_sites"}}{ - The number of unique sites the species of interest was recorded in.}
 #'  \item{\code{"out$species_observations"}}{ - The number of unique records for the species of interest.}
 #'  \item{\code{"out$regions"}}{ - The names of the regions included in the model run.}
+#'  \item{\code{"out$region_aggs"}}{ - The names of the region aggregates included in the model run.}
+#'  \item{\code{"out$nsites_region"}}{ - Named vector containing the number of sites in each region included in the occupancy model run.}
 #' }
 #'
 #' @keywords trends, species, distribution, occupancy, bayesian, modeling
@@ -393,6 +395,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                     list(y = as.numeric(focal), Year = TP, Site = rownum, 
                          nyear = nTP, nsite = nrow(zst), nvisit = nrow(occDetdata[i,])))
   
+  # check there are still detections for the focal species after the nyr filter
+  if(sum(bugs_data$y) < 1){stop(paste(taxa_name, "has no observations after site filtering. To continue to model this species please decrease the nyr parameter"))}
+  
   # added extra elements to bugs data if needed
   occDetData_temp <- merge(occDetdata[i,], site_to_row_lookup)
 
@@ -592,6 +597,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     out$species_observations <- sum(bugs_data$y)
     if(!is.null(regional_codes)) out$regions <- head(tail(colnames(regional_codes), -1), -2)
     if(!is.null(region_aggs)) out$region_aggs <- region_aggs
+    if(!is.null(regional_codes)) out$nsites_region <- colSums(regional_codes[,2:(ncol(regional_codes)-2)])
     if(return_data) out$bugs_data <- bugs_data
     attr(out, 'modeltype') <- modeltype
     attr(out, 'modelcode') <- modelcode
