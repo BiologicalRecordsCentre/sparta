@@ -395,6 +395,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                     list(y = as.numeric(focal), Year = TP, Site = rownum, 
                          nyear = nTP, nsite = nrow(zst), nvisit = nrow(occDetdata[i,])))
   
+  # check there are still detections for the focal species after the nyr filter
+  if(sum(bugs_data$y) < 1){stop(paste(taxa_name, "has no observations after site filtering. To continue to model this species please decrease the nyr parameter"))}
+  
   # added extra elements to bugs data if needed
   occDetData_temp <- merge(occDetdata[i,], site_to_row_lookup)
 

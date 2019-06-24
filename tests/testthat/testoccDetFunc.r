@@ -47,7 +47,13 @@ suppressWarnings({visitData_missing <- formatOccData(taxa = taxa, site = site,
 suppressWarnings({visitData_missing2 <- formatOccData(taxa = taxa, site = site,
                                                      survey = time_period_missing2)})
 
+# additional data for testing species lost after nyr filter
+taxa_filterError <- c(taxa,"aa")
+site_filterError <- c(site,"B1")
+survey_filterError <- c(survey,sample(rDates, size = 1, TRUE)) 
 
+suppressWarnings({visitData_filterError <- formatOccData(taxa = taxa_filterError, site = site_filterError,
+                                                      survey = survey_filterError)})
 
 test_that("Test occDetFunc errors", {
   
@@ -567,3 +573,22 @@ test_that("Test occDetFunc using regions and region aggregates", {
   sink()
   
 }) 
+
+test_that("Test occDetFunc with empty species post nyr filter", {
+  
+  sink(file=ifelse(Sys.info()["sysname"] == "Windows",
+                   "NUL",
+                   "/dev/null"))
+  
+  expect_error(results <- occDetFunc(taxa_name = 'aa',
+                                     n_iterations = 50,
+                                     burnin = 15, 
+                                     occDetdata = visitData_filterError$occDetdata,
+                                     spp_vis = visitData_filterError$spp_vis,
+                                     write_results = FALSE,
+                                     seed = 111,
+                                     modeltype = c("ranwalk", "halfcauchy")),'aa has no observations after site filtering. To continue to model this species please decrease the nyr parameter')
+ 
+  sink()
+  
+})
