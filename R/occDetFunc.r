@@ -468,7 +468,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # make a copy of the bugs_data to calculate metadata from
   bugs_data_copy <- data.frame(y = bugs_data$y, year = bugs_data$Year, site = bugs_data$Site)
-  bugs_data_metadata <- list()
+  BD_MD <- list()
   
   if(!is.null(regional_codes)){region_codes_copy <- data.frame(site = 1:bugs_data$nsite)
   
@@ -481,22 +481,34 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
       bugs_data_copy <- merge(bugs_data_copy, region_codes_copy, all.x = TRUE)
   
-  # add regional codes to this copy and get n_obs, max and min years for each region
-    for(region_name in colnames(regional_codes)[2:(ncol(regional_codes)-2)]){
-    
-     regions_nobs[paste0('n_obs_','r_', region_name)] <- sum(bugs_data_copy$y * bugs_data_copy[,paste0('r_', region_name)])
-     regions_sites[paste0('n_sites_','r_', region_name)] <- sum(bugs_data_copy[,paste0('r_', region_name)])
-     
-     current_r <- bugs_data_copy$y * bugs_data_copy[,paste0('r_', region_name)] * bugs_data_copy$year
-     regions_years[paste0('min_year_data','r_', region_name)] <- (min_year-1) + min(current_r[current_r > 0])
-     regions_years[paste0('max_year_data','r_', region_name)] <- (min_year-1) + max(current_r)
-    }
+    # add regional codes to this copy and get n_obs, max and min years and year gaps for each region
+      for(region_name in colnames(regional_codes)[2:(ncol(regional_codes)-2)]){
+        
+        regions_nobs[paste0('n_obs_','r_', region_name)] <- sum(bugs_data_copy$y * bugs_data_copy[,paste0('r_', region_name)])
+        regions_sites[paste0('n_sites_','r_', region_name)] <- sum(bugs_data_copy[,paste0('r_', region_name)])
+        
+        current_r <- bugs_data_copy$y * bugs_data_copy[,paste0('r_', region_name)] * bugs_data_copy$year
+        current_r <- subset(current_r,current_r !=0)
+        current_rmin <- (min_year-1) + min(current_r)
+        current_rmax <- (min_year-1) + max(current_r)
+        regions_years[paste0('min_year_data','r_', region_name)] <- current_rmin
+        regions_years[paste0('max_year_data','r_', region_name)] <- current_rmax
+        current_datagaps <- dataGaps(current_r, min_year, max_year, current_rmin, current_rmax)
+        regions_years[paste0('gap_start','r_', region_name)] <- current_datagaps$gap_start
+        regions_years[paste0('gap_end','r_', region_name)] <- current_datagaps$gap_end
+        regions_years[paste0('gap_middle','r_', region_name)] <- current_datagaps$gap_middle
+      }
+      
   }
   
   # add max and min data years for the whole dataset
   all_years_data <- bugs_data_copy$y * bugs_data_copy$year
-  bugs_data_metadata$min_year_data <- (min_year-1) + min(all_years_data[all_years_data > 0])
-  bugs_data_metadata$max_year_data <- (min_year-1) + max(all_years_data)
+  all_years_data <- subset(all_years_data, all_years_data !=0)
+  BD_MD$min_year_data <- (min_year-1) + min(all_years_data)
+  BD_MD$max_year_data <- (min_year-1) + max(all_years_data)
+  
+  # use these to find year gap data
+  BD_MD$yeargaps<-dataGaps(all_years_data, min_year, max_year, BD_MD$min_year_data, BD_MD$max_year_data)
   
   
   initiate <- function(z, nTP, bugs_data) {
@@ -603,8 +615,11 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                               n_obs = sum(bugs_data$y),
                               min_year_model = min_year,
                               max_year_model = max_year,
-                              min_year_data = bugs_data_metadata$min_year_data,
-                              max_year_data = bugs_data_metadata$max_year_data),
+                              min_year_data = BD_MD$min_year_data,
+                              max_year_data = BD_MD$max_year_data),
+                              gap_start = BD_MD$yeargaps$gap_start,
+                              gap_end = BD_MD$yeargaps$gap_end,
+                              gap_middle = BD_MD$yeargaps$gap_middle,
                               region_nobs = ifelse(test = !is.null(regional_codes),
                               regions_nobs, NA),
                               region_years = ifelse(test = !is.null(regional_codes),
