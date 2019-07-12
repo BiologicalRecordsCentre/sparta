@@ -429,19 +429,15 @@ test_that("Test occDetFunc using regions and region aggregates", {
                         regional_codes = regions,
                         region_aggs = list(agg1 = c('region1', 'region2')))
   
-  regioncounts <- c(20,15,15)
-  names(regioncounts) <- c("region1","region2","region3")
-  
   expect_identical(results$SPP_NAME, 'a')
   expect_identical(results$n.iter, 50)
   expect_identical(names(results),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
                      "nsites", "nvisits", "species_sites", "species_observations",
-                     "regions", "region_aggs", "nsites_region", "bugs_data"))
+                     "regions", "region_aggs", "bugs_data"))
   expect_identical(results$regions,
                    c("region1", "region2", "region3"))
-  expect_identical(results$nsites_region, regioncounts)
   expect_identical(names(results$region_aggs), "agg1")
   RNs <- row.names(results$BUGSoutput$summary)
   expect_true("a_region1[1]" %in% RNs)

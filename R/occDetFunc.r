@@ -107,7 +107,7 @@
 #'  \item{\code{"out$BUGSoutput$sims.list"}}{ - A list of the posterior distribution for each monitored parameter. Use sims.array and sims.matrix if a different format of the posteriors is desired.}
 #'  \item{\code{"out$SPP_NAME"}}{ - The name of the study species.}
 #'  \item{\code{"out$min_year"}}{ - First year of data included in the occupancy model run.}
-#'  \item{\code{"out$max_year"}}{ - Final year of data included in the occupancy model run.}
+#'  \item{\code{"out$max_year"}}{ - Final year of data included in the occupancy model run or final year specified by the user.}
 #'  \item{\code{"out$nsite"}}{ - The number of unique sites included in the occupancy model run.}
 #'  \item{\code{"out$nvisits"}}{ - The number of unique visits included int he occupancy model run.}
 #'  \item{\code{"out$species_sites"}}{ - The number of unique sites the species of interest was recorded in.}
@@ -466,6 +466,39 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     } 
   }
   
+  # make a copy of the bugs_data to calculate metadata from
+  bugs_data_copy <- data.frame(y = bugs_data$y, year = bugs_data$Year, site = bugs_data$Site)
+  bugs_data_metadata <- list()
+  
+  if(!is.null(regional_codes)){region_codes_copy <- data.frame(site = 1:bugs_data$nsite)
+  
+    regions_years <- list()
+    regions_nobs <- list()
+    regions_sites <-list()
+    
+    for(region_name in colnames(regional_codes)[2:(ncol(regional_codes)-2)]){
+      region_codes_copy[,paste0('r_', region_name)] <- bugs_data[paste0('r_', region_name)]}
+  
+      bugs_data_copy <- merge(bugs_data_copy, region_codes_copy, all.x = TRUE)
+  
+  # add regional codes to this copy and get n_obs, max and min years for each region
+    for(region_name in colnames(regional_codes)[2:(ncol(regional_codes)-2)]){
+    
+     regions_nobs[paste0('n_obs_','r_', region_name)] <- sum(bugs_data_copy$y * bugs_data_copy[,paste0('r_', region_name)])
+     regions_sites[paste0('n_sites_','r_', region_name)] <- sum(bugs_data_copy[,paste0('r_', region_name)])
+     
+     current_r <- bugs_data_copy$y * bugs_data_copy[,paste0('r_', region_name)] * bugs_data_copy$year
+     regions_years[paste0('min_year_data','r_', region_name)] <- (min_year-1) + min(current_r[current_r > 0])
+     regions_years[paste0('max_year_data','r_', region_name)] <- (min_year-1) + max(current_r)
+    }
+  }
+  
+  # add max and min data years for the whole dataset
+  all_years_data <- bugs_data_copy$y * bugs_data_copy$year
+  bugs_data_metadata$min_year_data <- (min_year-1) + min(all_years_data[all_years_data > 0])
+  bugs_data_metadata$max_year_data <- (min_year-1) + max(all_years_data)
+  
+  
   initiate <- function(z, nTP, bugs_data) {
     init <- list (z = z,
                   alpha.p = rep(runif(1, -2, 2),
@@ -568,9 +601,17 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                               n_sites = bugs_data$nsite,
                               n_years = bugs_data$nyear,
                               n_obs = sum(bugs_data$y),
-                              min_year = min_year,
-                              max_year = max_year),
-               output_path = ifelse(test = write_results,
+                              min_year_model = min_year,
+                              max_year_model = max_year,
+                              min_year_data = bugs_data_metadata$min_year_data,
+                              max_year_data = bugs_data_metadata$max_year_data),
+                              region_nobs = ifelse(test = !is.null(regional_codes),
+                              regions_nobs, NA),
+                              region_years = ifelse(test = !is.null(regional_codes),
+                                    regions_years, NA),
+                              region_nsite = ifelse(test = !is.null(regional_codes),
+                                     regions_sites, NA),
+                              output_path = ifelse(test = write_results,
                                     file.path(getwd(), output_dir, paste(taxa_name, ".rdata", sep = "")),
                                     NA),
                session.info = sessionInfo())
@@ -597,7 +638,6 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     out$species_observations <- sum(bugs_data$y)
     if(!is.null(regional_codes)) out$regions <- head(tail(colnames(regional_codes), -1), -2)
     if(!is.null(region_aggs)) out$region_aggs <- region_aggs
-    if(!is.null(regional_codes)) out$nsites_region <- colSums(regional_codes[,2:(ncol(regional_codes)-2)])
     if(return_data) out$bugs_data <- bugs_data
     attr(out, 'modeltype') <- modeltype
     attr(out, 'modelcode') <- modelcode
