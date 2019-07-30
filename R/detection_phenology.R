@@ -12,7 +12,9 @@
 #' 
 #' Calculate the phenology of detection and produces a plot of detectability over time for the reference data type.
 #'
-#' @return Some numbers.
+#' @return This function returns plot showing the detection probability on the y axis and Julian day on the x.
+#'         The data within the output list shows the Julian day for each point estimated (equal to the number of bins)
+#'         and the mean detection probability with 95% credible intervals.
 #' 
 #' @references van Strien, A.J., Termaat, T., Groenendijk, D., Mensing, V. & Kéry, M. (2010) 
 #'             Site-occupancy models may offer new opportunities for dragonfly monitoring based on daily species lists. 
