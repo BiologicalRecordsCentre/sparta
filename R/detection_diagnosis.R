@@ -8,17 +8,17 @@
 #' @param density_function whether the model used a density function to fit Julian date. This form was implemented from version 0.1.48 onwards. For models ran using earlier versions of the package this should be set to FALSE
 #' 
 #' @details 
-#' Takes a object of \code{OccDet} fitted with the \code{jul_date} option
+#' Takes a object of \code{OccDet}
 #' 
 #' Calculates the detection probability and produces a plot of detectability over time for the reference data type.
 #'
 #' @return This function returns plot showing the detection probability on the y axis and year on the x.
-#'         The data plotted are the mean detection probability with 95% credible intervals.
 #' 
 #' @export
 
 
 detection_diagnosis <- function(model, spname=NULL, min.yr = NULL){
+
   # calculates and plots the detection probability for an occupancy model output
   require(sparta)
   require(reshape2)
