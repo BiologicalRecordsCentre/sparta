@@ -29,7 +29,7 @@ test_that("Test occDetModel", {
   sink(file=ifelse(Sys.info()["sysname"] == "Windows",
                    "NUL",
                    "/dev/null"))
-  results <- occDetModel(taxa = df$taxa,
+  suppressWarnings(results <- occDetModel(taxa = df$taxa,
                          write_results = FALSE,
                          site = df$site,
                          survey = df$survey,
@@ -37,7 +37,7 @@ test_that("Test occDetModel", {
                          n_iterations = 100,
                          burnin = 10,
                          thinning = 2,
-                         seed = 111)
+                         seed = 111))
   sink()
 
   expect_identical(names(results), c('a','m','g'))

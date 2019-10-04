@@ -4,7 +4,8 @@
 \alias{detection_phenology}
 \title{Diagnostics for the detectability with respect to Julian Date}
 \usage{
-detection_phenology(model, spname = NULL, bins = 12)
+detection_phenology(model, spname = NULL, bins = 12,
+  density_function = TRUE)
 }
 \arguments{
 \item{model}{a fitted sparta model of class \code{OccDet}.}
@@ -12,6 +13,8 @@ detection_phenology(model, spname = NULL, bins = 12)
 \item{spname}{optional name of the species (used for plotting)}
 
 \item{bins}{number of points to estimate across the year. Defaults to 12}
+
+\item{density_function}{whether the model used a density function to fit Julian date. This form was implemented from version 0.1.48 onwards. For models ran using earlier versions of the package this should be set to FALSE}
 }
 \value{
 Some numbers.

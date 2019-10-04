@@ -4,13 +4,13 @@
 \alias{occDetFunc}
 \title{Occupancy detection Function}
 \usage{
-occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 2,
-  burnin = 1500, thinning = 3, n_chains = 3, write_results = TRUE,
-  output_dir = getwd(), modeltype = "sparta", max_year = NULL,
-  seed = NULL, model.function = NULL, regional_codes = NULL,
-  region_aggs = NULL, additional.parameters = NULL,
-  additional.BUGS.elements = NULL, additional.init.values = NULL,
-  return_data = TRUE)
+occDetFunc(taxa_name, occDetdata, spp_vis, n_iterations = 5000,
+  nyr = 2, burnin = 1500, thinning = 3, n_chains = 3,
+  write_results = TRUE, output_dir = getwd(), modeltype = "sparta",
+  max_year = NULL, seed = NULL, model.function = NULL,
+  regional_codes = NULL, region_aggs = NULL,
+  additional.parameters = NULL, additional.BUGS.elements = NULL,
+  additional.init.values = NULL, return_data = TRUE)
 }
 \arguments{
 \item{taxa_name}{A character giving the name of the species to be modelled.}
@@ -94,12 +94,14 @@ Key aspects of the model output include:
  \item{\code{"out$BUGSoutput$sims.list"}}{ - A list of the posterior distribution for each monitored parameter. Use sims.array and sims.matrix if a different format of the posteriors is desired.}
  \item{\code{"out$SPP_NAME"}}{ - The name of the study species.}
  \item{\code{"out$min_year"}}{ - First year of data included in the occupancy model run.}
- \item{\code{"out$max_year"}}{ - Final year of data included in the occupancy model run.}
- \item{\code{"out$nsite"}}{ - The number of unique sites included int he occupancy model run.}
+ \item{\code{"out$max_year"}}{ - Final year of data included in the occupancy model run or final year specified by the user.}
+ \item{\code{"out$nsite"}}{ - The number of unique sites included in the occupancy model run.}
  \item{\code{"out$nvisits"}}{ - The number of unique visits included int he occupancy model run.}
  \item{\code{"out$species_sites"}}{ - The number of unique sites the species of interest was recorded in.}
  \item{\code{"out$species_observations"}}{ - The number of unique records for the species of interest.}
  \item{\code{"out$regions"}}{ - The names of the regions included in the model run.}
+ \item{\code{"out$region_aggs"}}{ - The names of the region aggregates included in the model run.}
+ \item{\code{"out$nsites_region"}}{ - Named vector containing the number of sites in each region included in the occupancy model run.}
 }
 }
 \description{
@@ -152,6 +154,8 @@ These options are provided as a vector of characters, e.g. \code{modeltype = c('
 }
 \examples{
 \dontrun{
+
+set.seed(123)
 
 # Create data
 n <- 15000 #size of dataset

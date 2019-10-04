@@ -33,8 +33,13 @@ errorChecks <- function(taxa = NULL, site = NULL, survey = NULL, replicate = NUL
   }
   
   if(!is.null(taxa) & !is.null(site) & !is.null(survey)){
-    
-    df <- data.frame(taxa, site, survey)
+
+    if(!is.null(replicate)){
+      df <- data.frame(taxa, site, survey, replicate)
+    } else {
+      df <- data.frame(taxa, site, survey)
+    }
+
     NR1 <- nrow(df)
     NR2 <- nrow(distinct(df))
     
@@ -61,7 +66,8 @@ errorChecks <- function(taxa = NULL, site = NULL, survey = NULL, replicate = NUL
   
   ### Checks for site ###
   if(!is.null(site)){    
-    if(!all(!is.na(site))) stop('site must not contain NAs')    
+    if(!all(!is.na(site))) stop('site must not contain NAs')
+    if(!all(site != '')) stop("site must not contain empty values (i.e. '')")
   }
   
   ### Checks for closure period ###

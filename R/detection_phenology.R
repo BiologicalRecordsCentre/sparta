@@ -5,13 +5,16 @@
 #' @param model a fitted sparta model of class \code{OccDet}.
 #' @param spname optional name of the species (used for plotting)
 #' @param bins number of points to estimate across the year. Defaults to 12
+#' @param density_function whether the model used a density function to fit Julian date. This form was implemented from version 0.1.48 onwards. For models ran using earlier versions of the package this should be set to FALSE
 #' 
 #' @details 
 #' Takes a object of \code{OccDet} fitted with the \code{jul_date} option
 #' 
 #' Calculate the phenology of detection and produces a plot of detectability over time for the reference data type.
 #'
-#' @return Some numbers.
+#' @return This function returns plot showing the detection probability on the y axis and Julian day on the x.
+#'         The data within the output list shows the Julian day for each point estimated (equal to the number of bins)
+#'         and the mean detection probability with 95% credible intervals.
 #' 
 #' @references van Strien, A.J., Termaat, T., Groenendijk, D., Mensing, V. & Kéry, M. (2010) 
 #'             Site-occupancy models may offer new opportunities for dragonfly monitoring based on daily species lists. 
@@ -26,7 +29,7 @@
 ###########################################
 
 
-detection_phenology <- function(model, spname=NULL, bins=12){
+detection_phenology <- function(model, spname=NULL, bins=12, density_function = TRUE){
 
   require(sparta)
   require(reshape2)
@@ -48,12 +51,23 @@ detection_phenology <- function(model, spname=NULL, bins=12){
   # Julian dates are 1:
   jul_dates <- seq(from=1, to=365, length.out=bins)
   
-  cjd <- jul_dates - 182
-  # we ran the Julian Date option
-  # So let's scale the detection probabilities to end June (day 180)
-  pDet <- melt(sapply(cjd, function(jd){
-    pDet1 + jd * data$beta1[,1] +  jd^2 * data$beta2[,1]
-  }))
+  if(density_function == TRUE){ 
+    if(!"beta3" %in% names(data))
+      stop("beta3 not found. Please check that the density function method was used")
+    # we ran the Julian Date option
+    # So let's calculate the detection probabilities
+    
+    pDet <- melt(sapply(jul_dates, function(jd){
+      pDet1 + data$beta3[,1] * (1/((2*pi)^0.5 * data$beta2[,1]) * exp(-((jd - data$beta1[,1])^2 / (2* data$beta2[,1]^2))))
+    }))
+  }else{
+    cjd <- jul_dates - 182
+    # we ran the Julian Date option
+    # So let's scale the detection probabilities to end June (day 180)
+    pDet <- melt(sapply(cjd, function(jd){
+      pDet1 + jd * data$beta1[,1] +  jd^2 * data$beta2[,1]
+    })) 
+  }
   
   names(pDet) <- c("it", "bin","lgt_pDet")
   pDet$pDet <- inv.logit(pDet$lgt_pDet)
@@ -65,8 +79,8 @@ detection_phenology <- function(model, spname=NULL, bins=12){
     lower95CI = quantile(pDet, 0.025),
     upper95CI = quantile(pDet, 0.975))
   
-  # now convert the jds back to their equivalent Julian Dates
-  pDet_summary$cJulDate <- cjd[pDet_summary$bin] 
+    # now convert the jds back to their equivalent Julian Dates
+  if(density_function == FALSE){pDet_summary$cJulDate <- cjd[pDet_summary$bin]}
   pDet_summary$JulianDay <- jul_dates[pDet_summary$bin] 
 
   # now plot the detection over time

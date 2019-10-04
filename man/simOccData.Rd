@@ -5,8 +5,40 @@
 \title{Simulate for Occupancy detection models}
 \usage{
 simOccData(nsites = 20, nvisits = 100, nTP = 10, psi = 0.5,
-  trend = -0.01, mu.lp = -1, tau.lp = 10, beta1 = 0.1, beta2 = -0.002,
-  dtype2.p = 3, dtype3.p = 10)
+  trend = -0.01, mu.lp = -1, tau.lp = 10, beta1 = 182,
+  beta2 = 20, beta3 = 100, dtype2.p = 3, dtype3.p = 10,
+  JD_range = NULL)
+}
+\arguments{
+\item{nsites}{numeric, the number of sites from which the simulated data is sampled.}
+
+\item{nvisits}{numeric, the number of visits from which the simulated data is sampled.}
+
+\item{nTP}{numeric, the number of time periods from which the simulated data is sampled.}
+
+\item{psi}{probability of a site being occupied in time period 1.}
+
+\item{trend}{the proportion of sites that change state each time period.
+For decreasing trends the probability of persistence from one time period to the next is 1 + the trend value.
+Probability of colonisation is 0.
+For increasing trends the probability of an unoccupied site being colonised from one time period to the next is the trend value.
+Probability of persistence is 1.}
+
+\item{mu.lp}{the mean value for the normal distribution for the year effect (alpha.p) on the observation model.}
+
+\item{tau.lp}{the precision value for the normal distribution for the year effect (alpha.p) on the observation model.}
+
+\item{beta1}{the mean value for the normal distribution for the effect of Julian day on observation model.This must be a valid Julian date}
+
+\item{beta2}{the standard deviation for the normal distribution for the effect of Julian day on observation model.}
+
+\item{beta3}{parameter on the logit scale governing the magnitude of the Julian date effect on the observation model.}
+
+\item{dtype2.p}{parameter (logit scale) for list length 2-3 on the observation model.}
+
+\item{dtype3.p}{parameter (logit scale) for list length 4 on the observation model.}
+
+\item{JD_range}{range of Julian dates upon which visits can take place. If this is null Julian date ranges between 1 and 365.}
 }
 \value{
 A list, the first two elements of which ('spp_vis' & 'occDetData') mimic the output of occDetFunc.
@@ -27,7 +59,7 @@ sparta_options <- c('ranwalk', # prior on occupancy is set by last year's poster
                    'halfcauchy') # prior on the precisions
 
 # simulate some data
-mydata <- simOccData(nvisit=200, nsite=10, nTP=5, psi=0.5, beta1=0.1, beta2=-2e-3)
+mydata <- simOccData(nvisit=200, nsite=10, nTP=5, psi=0.5, beta1=182, beta2=20, beta3=100)
 with(mydata, plot(occDetdata$Jul_date, p))
 
 # run the occupancy model model

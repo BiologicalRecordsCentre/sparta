@@ -41,25 +41,25 @@ test_that("Test errors and warnings", {
                                list_length = TRUE,
                                family = 'Binomial'),
                  "When list_length is TRUE family will default to Bernoulli")
-  expect_error(RR_out <- reportingRateModel(df$taxa,
+  expect_error(suppressWarnings(RR_out <- reportingRateModel(df$taxa,
                                               df$site,
                                               df$time_period,
-                                              list_length = 1),
+                                              list_length = 1)),
                  "list_length must be logical")
-  expect_error(RR_out <- reportingRateModel(df$taxa,
+  expect_error(suppressWarnings(RR_out <- reportingRateModel(df$taxa,
                                               df$site,
                                               df$time_period,
-                                              overdispersion = 1),
+                                              overdispersion = 1)),
                  "overdispersion must be logical")
-  expect_error(RR_out <- reportingRateModel(df$taxa,
+  expect_error(suppressWarnings(RR_out <- reportingRateModel(df$taxa,
                                               df$site,
                                               df$time_period,
-                                              verbose = 1),
+                                              verbose = 1)),
                  "verbose must be logical")
-  expect_error(RR_out <- reportingRateModel(df$taxa,
+  expect_error(suppressWarnings(RR_out <- reportingRateModel(df$taxa,
                                               df$site,
                                               df$time_period,
-                                              site_effect = 1),
+                                              site_effect = 1)),
                  "site_effect must be logical")
   expect_warning(RR_out <- reportingRateModel(df$taxa,
                                             df$site,
@@ -95,7 +95,7 @@ test_that("Test formulaBuilder", {
 test_that("Check outputs are in the correct form", {
   
   expect_warning(RR_out <- reportingRateModel(df$taxa, df$site, df$time_period, species_to_include = c('a','b','c')),
-                 "343 out of 3001 observations will be removed as duplicates")
+                 "353 out of 3001 observations will be removed as duplicates")
   atts <- attributes(RR_out)  
   expect_equal(atts$intercept_year, 2014)
   expect_equal(atts$min_year, -814)
