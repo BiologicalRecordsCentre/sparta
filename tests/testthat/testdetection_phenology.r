@@ -1,6 +1,6 @@
-context("Test detection_phenology")
+context("Test plot_DetectionPhenology")
 
-test_that("Test detection_phenology", {
+test_that("Test plot_DetectionPhenology", {
   
   sink(file=ifelse(Sys.info()["sysname"] == "Windows",
                    "NUL",
@@ -60,7 +60,7 @@ test_that("Test detection_phenology", {
                              modeltype = c('ranwalk','halfcauchy'))
   
   # run the function
-  results <- detection_phenology(modelresults,
+  results <- plot_DetectionPhenology(modelresults,
                                  spname ='a',
                                  bins = 12,
                                  density_function = TRUE)
@@ -81,7 +81,7 @@ test_that("Test detection_phenology", {
   expect_equal(head(results$data$upper95CI), head_data_upper95CI, tolerance = 1e-7)
   expect_equal(head(results$data$JulianDay), head_data_JulianDay, tolerance = 1e-5)
   
-  expect_error(results <- detection_phenology(modelresults2, spname='a', bins=12, density_function = TRUE),
+  expect_error(results <- plot_DetectionPhenology(modelresults2, spname='a', bins=12, density_function = TRUE),
                'no phenological effect was modelled!')
   
   sink()
