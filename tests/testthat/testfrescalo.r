@@ -1,8 +1,7 @@
 context("Test frescalo")
 
 ### Frescalo testing is currently skipped if not on a ###
-### windows machine, or is libcurl is not supported. I###
-### need to expand testing to linux if possible.      ###
+### windows machine, or is libcurl is not supported.  ###
 
 # Create data
 n <- 1500 #size of dataset
@@ -21,7 +20,7 @@ rDates <- first + (runif(nSamples)*dt)
 taxa <- sample(letters, size = n, TRUE)
 
 # three sites are visited randomly
-site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
+site <- sample(paste('a', 11:(nSites + 10), sep=''), size = n, TRUE)
 
 # the date of visit is selected at random from those created earlier
 time_period <- sample(rDates, size = n, TRUE)
@@ -39,24 +38,30 @@ weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 
 frespath <- file.path(tempdir(), 'fres.exe')
 
+toms_PC <- Sys.info()['nodename'] == "WLD-D5P2J42"
+
+if(toms_PC) frespath <- 'C:/Frescalo_3a_windows.exe'
+
 test_that("Test errors", {
   
   if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
-  if (.Platform$OS.type == "windows") skip('Carbon black blocks Frescalo')
+  if (.Platform$OS.type == "windows" & !toms_PC) skip('Carbon black blocks Frescalo')
   
-  if(.Platform$OS.type == "windows"){
-    download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_windows.exe',
-                  destfile = frespath,
-                  method = "libcurl",
-                  mode = 'wb', quiet = TRUE)
-  } else if(.Platform$OS.type == "unix"){
-    download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_linux.exe',
-                  destfile = frespath,
-                  method = "libcurl",
-                  quiet = TRUE)
-    system(command = paste('chmod', '+x', normalizePath(frespath)))
-  } else{
-    stop(paste('frescalo is not supported on', .Platform$OS.type))
+  if(!toms_PC){
+    if(.Platform$OS.type == "windows"){
+      download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_windows.exe',
+                    destfile = frespath,
+                    method = "libcurl",
+                    mode = 'wb', quiet = TRUE)
+    } else if(.Platform$OS.type == "unix"){
+      download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_linux.exe',
+                    destfile = frespath,
+                    method = "libcurl",
+                    quiet = TRUE)
+      system(command = paste('chmod', '+x', normalizePath(frespath)))
+    } else{
+      stop(paste('frescalo is not supported on', .Platform$OS.type))
+    }
   }
   
   temp <- tempfile(pattern = 'dir')
@@ -88,6 +93,7 @@ test_that("Test errors", {
                         sinkdir = temp),
                'In time_periods year ranges should not overlap')
   
+
   expect_error(frescalo(Data = df1,
                         frespath = frespath,
                         time_periods = data.frame(start=c(1980,1990),end=c(1989,1999)),
@@ -96,7 +102,7 @@ test_that("Test errors", {
                         year = 'year',
                         sinkdir = temp),
                'the sites in your data do not match those in your weights file')
-  
+
 })
 
 
@@ -104,7 +110,7 @@ test_that("Runs without error", {
 
   if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
 
-  if (.Platform$OS.type == "windows") skip('Carbon black blocks Frescalo')
+  if (.Platform$OS.type == "windows" & !toms_PC) skip('Carbon black blocks Frescalo')
   
   # This first run is done using years
   temp <- tempfile(pattern = 'dir')
@@ -155,8 +161,6 @@ test_that("Runs without error", {
                 "freq" %in% names(fres_try) &
                 "log" %in% names(fres_try) &
                 "lm_stats" %in% names(fres_try))
-<<<<<<< HEAD
-=======
   
   # test a very low value of phi
   temp <- tempfile(pattern = 'dir')
@@ -317,5 +321,4 @@ test_that("Runs high value of phi", {
                 "log" %in% names(fres_try) &
                 "lm_stats" %in% names(fres_try))
   
->>>>>>> 4f927cda65af1877d3289dc2624aaba6edd7a667
 })

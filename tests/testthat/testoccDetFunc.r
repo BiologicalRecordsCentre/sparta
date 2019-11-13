@@ -463,8 +463,6 @@ test_that("Test occDetFunc using regions and region aggregates", {
                         regional_codes = regionsempty,
                         region_aggs = list(agg1 = c('region1', 'region2'))),
                  'The following regions have no data and')
-<<<<<<< HEAD
-=======
   
   # test with regional_codes not as a dataframe
   expect_error(results <- occDetFunc(taxa_name = 'a',
@@ -571,7 +569,6 @@ test_that("Test occDetFunc using regions and region aggregates", {
   sink()
   
 }) 
->>>>>>> 4f927cda65af1877d3289dc2624aaba6edd7a667
 
 test_that("Test occDetFunc with empty species post nyr filter", {
   

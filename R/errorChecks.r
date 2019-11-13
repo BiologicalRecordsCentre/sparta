@@ -239,14 +239,14 @@ errorChecks <- function(taxa = NULL, site = NULL, survey = NULL, replicate = NUL
   
   ### check BUGS parameters ###
   if(!is.null(c(n_iterations, burnin, thinning, n_chains))){
-    
-    if(burnin > n_iterations) stop('Burn in (burnin) must not be larger that the number of iteration (n_iterations)')
-    if(thinning > n_iterations) stop('thinning must not be larger that the number of iteration (n_iterations)')
-   
     if(!is.numeric(n_iterations)) stop('n_iterations should be numeric')
     if(!is.numeric(burnin)) stop('burnin should be numeric')
     if(!is.numeric(thinning)) stop('thinning should be numeric')
     if(!is.numeric(n_chains)) stop('n_chains should be numeric')
+    
+    
+    if(burnin > n_iterations) stop('Burn in (burnin) must not be larger that the number of iteration (n_iterations)')
+    if(thinning > n_iterations) stop('thinning must not be larger that the number of iteration (n_iterations)')
     
   }
   

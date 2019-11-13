@@ -112,20 +112,6 @@ test_that("Test formatOccData specified closure period", {
   expect_warning(visitData <- formatOccData(taxa = taxa, site = site, survey = survey, closure_period = closure_period),
                  '871 out of 15000 observations will be removed as duplicates')
   
-<<<<<<< HEAD
-  head_occDetdata_cp <- structure(list(visit = c("A102010-02-17", "A102010-04-14", "A102010-04-22", 
-                                             "A102010-08-29", "A102010-11-04", "A102011-02-09"), 
-                                   site = structure(c(2L, 2L, 2L, 2L, 2L, 2L), 
-                                                    .Label = c("A1", "A10", "A11", "A12", "A13", "A14", "A15", "A16", "A17", "A18", "A19", "A2", "A20", "A21",
-                                                               "A22", "A23", "A24", "A25", "A26", "A27", "A28", "A29", "A3",
-                                                               "A30", "A31", "A32", "A33", "A34", "A35", "A36", "A37", "A38", 
-                                                               "A39", "A4", "A40", "A41", "A42", "A43", "A44", "A45", "A46", 
-                                                               "A47", "A48", "A49", "A5", "A50", "A6", "A7", "A8", "A9"), class = "factor"), 
-                                   L = c(5L, 2L, 1L, 5L, 5L, 1L), 
-                                   TP = c(1L, 1L, 1L, 1L, 1L, 1L)), 
-                              .Names = c("visit", "site", "L", "TP"), 
-                              row.names = c(1L, 6L, 8L, 9L, 14L, 19L), class = "data.frame")
-=======
   head_occDetdata_cp <- structure(list(visit = c("A102010-04-141", "A102010-04-221", "A102010-08-291", 
                                                  "A102010-11-041", "A102011-02-091", "A102011-03-091"), 
                                        site = structure(c(2L, 2L, 2L, 2L, 2L, 2L), 
@@ -138,7 +124,6 @@ test_that("Test formatOccData specified closure period", {
                                        year = c(1L, 1L, 1L, 1L, 1L, 1L)), 
                                   .Names = c("visit", "site", "L", "TP"), 
                                   row.names = c(1L, 6L, 11L, 13L, 15L, 16L), class = "data.frame")
->>>>>>> 4f927cda65af1877d3289dc2624aaba6edd7a667
   
   expect_identical(head(visitData$occDetdata), head_occDetdata_cp)
   
