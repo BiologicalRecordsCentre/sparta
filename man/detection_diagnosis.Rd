@@ -4,7 +4,7 @@
 \alias{detection_diagnosis}
 \title{Diagnostics for the detection model with respect to Length}
 \usage{
-detection_diagnosis(model, spname = NULL)
+detection_diagnosis(model, spname = NULL, min.yr = NULL)
 }
 \arguments{
 \item{model}{a fitted sparta model of class \code{OccDet}.}
@@ -17,13 +17,12 @@ detection_diagnosis(model, spname = NULL)
 }
 \value{
 This function returns plot showing the detection probability on the y axis and year on the x.
-        The data plotted are the mean detection probability with 95% credible intervals.
 }
 \description{
 Creates a plot of detectability by year for differing list lengths
 }
 \details{
-Takes a object of \code{OccDet} fitted with the \code{jul_date} option
+Takes a object of \code{OccDet}
 
 Calculates the detection probability and produces a plot of detectability over time for the reference data type.
 }
