@@ -34,7 +34,7 @@
 #' visitData <- formatOccData(taxa = taxa, site = site, survey = survey)
 #' 
 #' # Summarise visits
-#' summaryVis(visitData)
+#' visitsSummary(visitData)
 #'
 #' }
 #' @export
@@ -42,7 +42,7 @@
 #' @importFrom plyr count
 
 
-summaryVis <- function(x) {
+visitsSummary <- function(x) {
   
   # test if object is formatOccData object
   if(!(is.list(x))) stop('Not a formatOccData object')
