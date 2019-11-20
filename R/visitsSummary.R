@@ -39,13 +39,10 @@
 #' }
 #' @export
 #' @import dplyr
-#' @importFrom plyr count
 
 
 visitsSummary <- function(x) {
   
-  # test if object is formatOccData object
-  if(!(is.list(x))) stop('Not a formatOccData object')
   # Test that the formatOccData object contains an occDetdata dataframe component
   if(!(is.data.frame(x$occDetdata))) stop('formatOccData object does not contain occDetdata dataframe component')
   
@@ -60,7 +57,7 @@ visitsSummary <- function(x) {
   # Fill df with % of sites that have >1 visit within all TPs
   for (i in TPs){
     output[TPs == i,2] <- 100*((nrow(subset(((data[data$TP == i, ]) %>% 
-                                       count(site)), n>1)))/(length(unique(data$site))))
+                                               dplyr::count(site)), n>1)))/(length(unique(data$site))))
   }
   # Fill df with mean number of revisits per site per TP
   for (i in TPs){
@@ -68,7 +65,8 @@ visitsSummary <- function(x) {
     if (output[TPs == i,2] == 0)  (output[TPs == i,3] <- 0)
     # Otherwise find the mean number of revisits per site per TP
     else output[TPs == i,3] <- mean((subset(((data[data$TP == i, ]) %>%
-                                               count(site)), n>1))$n)
+                                               dplyr::count(site)), n>1))$n)
   }
+  output <- output %>% arrange(TP)
   return(output)
   }
