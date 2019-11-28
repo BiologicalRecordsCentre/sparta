@@ -29,7 +29,7 @@
 ###########################################
 
 
-detection_phenology <- function(model, spname=NULL, bins=12, density_function = TRUE){
+plot_DetectionPhenology <- function(model, spname=NULL, bins=12, density_function = TRUE){
 
   require(sparta)
   require(reshape2)

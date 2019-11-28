@@ -17,7 +17,7 @@
 #' @export
 
 
-detection_diagnosis <- function(model, spname=NULL, min.yr = NULL){
+plot_detection_diagnosis <- function(model, spname=NULL, min.yr = NULL){
 
   # calculates and plots the detection probability for an occupancy model output
   require(sparta)
