@@ -2,7 +2,7 @@ context("Test plot_DetectionPhenology")
 
 test_that("Test plot_DetectionPhenology", {
   
-  sink(file=ifelse(Sys.info()["sysname"] == "Windows",
+  sink(file = ifelse(Sys.info()["sysname"] == "Windows",
                    "NUL",
                    "/dev/null"))
   # Create data
