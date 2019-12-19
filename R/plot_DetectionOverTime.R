@@ -1,7 +1,7 @@
 #' Diagnostics for the detection model with respect to Length 
 #' 
-#' Creates a plot of detectability by year for differing list lengths 
-#'
+#' Creates a plot of detectability by year for differing list lengths from an occupancy model output.
+
 #' @param model a fitted sparta model of class \code{OccDet}.
 #' @param spname optional name of the species (used for plotting)
 #' @param bins number of points to estimate across the year. Defaults to 12
@@ -13,19 +13,16 @@
 #' Calculates the detection probability and produces a plot of detectability over time for the reference data type.
 #'
 #' @return This function returns plot showing the detection probability on the y axis and year on the x.
-#' 
+#'
+#' @importFrom reshape2 melt 
+#' @importFrom plyr ddply
+#' @importFrom ggplot2 ggplot
+#' @importFrom boot inv.logit
 #' @export
 
 
-detection_diagnosis <- function(model, spname=NULL, min.yr = NULL){
+plot_DetectionOverTime <- function(model, spname = NULL, min.yr = NULL){
 
-  # calculates and plots the detection probability for an occupancy model output
-  require(sparta)
-  require(reshape2)
-  require(plyr)
-  require(boot)
-  require(ggplot2)
-  
   sims_list <- model$BUGSoutput$sims.list
   
   # the base: alpha.p is common to all models: 

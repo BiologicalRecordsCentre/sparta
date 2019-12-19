@@ -19,6 +19,11 @@
 #' @references van Strien, A.J., Termaat, T., Groenendijk, D., Mensing, V. & Kéry, M. (2010) 
 #'             Site-occupancy models may offer new opportunities for dragonfly monitoring based on daily species lists. 
 #'             \emph{Basic and Applied Ecology}, 11, 495–503.
+#'
+#' @importFrom reshape2 melt 
+#' @importFrom plyr ddply
+#' @importFrom ggplot2 ggplot
+#' @importFrom boot inv.logit
 #' @export
 
 
@@ -29,13 +34,7 @@
 ###########################################
 
 
-detection_phenology <- function(model, spname=NULL, bins=12, density_function = TRUE){
-
-  require(sparta)
-  require(reshape2)
-  require(plyr)
-  require(boot)
-  require(ggplot2)
+plot_DetectionPhenology <- function(model, spname=NULL, bins=12, density_function = TRUE){
   
   data <- model$BUGSoutput$sims.list
   
