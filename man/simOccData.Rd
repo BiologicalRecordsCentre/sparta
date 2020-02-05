@@ -67,7 +67,7 @@ out <- occDetFunc('mysp', mydata$occDetdata, mydata$spp_vis, n_iter = 1e4,
                  modeltype = sparta_options, return_data=TRUE)
 
 out$BUGSoutput
-detection_phenology(out)
+plot_DetectionPhenology(out)
 
 qplot(data=melt(out$BUGSoutput$sims.array), geom='line',
      x=Var1, col=factor(Var2), y=value) +

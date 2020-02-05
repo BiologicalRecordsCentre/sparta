@@ -10,7 +10,7 @@
 #' @details 
 #' Takes a object of \code{OccDet} fitted with the \code{jul_date} option
 #' 
-#' Calculate the phenology of detection and produces a plot of detectability over time for the reference data type.
+#' Calculates the phenology of detection and produces a plot of detectability over time for the reference data type.
 #'
 #' @return This function returns plot showing the detection probability on the y axis and Julian day on the x.
 #'         The data within the output list shows the Julian day for each point estimated (equal to the number of bins)
@@ -19,6 +19,11 @@
 #' @references van Strien, A.J., Termaat, T., Groenendijk, D., Mensing, V. & Kéry, M. (2010) 
 #'             Site-occupancy models may offer new opportunities for dragonfly monitoring based on daily species lists. 
 #'             \emph{Basic and Applied Ecology}, 11, 495–503.
+#'
+#' @importFrom reshape2 melt 
+#' @importFrom plyr ddply
+#' @importFrom ggplot2 ggplot
+#' @importFrom boot inv.logit
 #' @export
 
 
@@ -29,13 +34,7 @@
 ###########################################
 
 
-detection_phenology <- function(model, spname=NULL, bins=12, density_function = TRUE){
-
-  require(sparta)
-  require(reshape2)
-  require(plyr)
-  require(boot)
-  require(ggplot2)
+plot_DetectionPhenology <- function(model, spname=NULL, bins=12, density_function = TRUE){
   
   data <- model$BUGSoutput$sims.list
   
