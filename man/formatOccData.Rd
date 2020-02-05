@@ -4,8 +4,14 @@
 \alias{formatOccData}
 \title{Format data for Occupancy detection models}
 \usage{
-formatOccData(taxa, site, survey, replicate = NULL,
-  closure_period = NULL, includeJDay = FALSE)
+formatOccData(
+  taxa,
+  site,
+  survey,
+  replicate = NULL,
+  closure_period = NULL,
+  includeJDay = FALSE
+)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}
@@ -47,8 +53,8 @@ nSurveys <- 100 # set number of dates
 nSites <- 50 # set number of sites
 
 # Create somes dates
-first <- as.Date(strptime("2010/01/01", "\%Y/\%m/\%d")) 
-last <- as.Date(strptime(paste(2010+(nyr-1),"/12/31", sep=''), "\%Y/\%m/\%d")) 
+first <- as.Date(strptime("2010/01/01", "%Y/%m/%d")) 
+last <- as.Date(strptime(paste(2010+(nyr-1),"/12/31", sep=''), "%Y/%m/%d")) 
 dt <- last-first 
 rDates <- first + (runif(nSurveys)*dt)
 

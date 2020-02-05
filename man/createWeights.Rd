@@ -4,8 +4,14 @@
 \alias{createWeights}
 \title{Create frescalo weights file}
 \usage{
-createWeights(distances, attributes, dist_sub = 200, sim_sub = 100,
-  normalise = FALSE, verbose = TRUE)
+createWeights(
+  distances,
+  attributes,
+  dist_sub = 200,
+  sim_sub = 100,
+  normalise = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{distances}{a dataframe giving the distance between sites in a long format with three

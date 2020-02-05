@@ -4,13 +4,29 @@
 \alias{occDetModel}
 \title{Occupancy detection models}
 \usage{
-occDetModel(taxa, site, survey, species_list = unique(taxa),
-  write_results = TRUE, output_dir = getwd(), nyr = 2,
-  n_iterations = 5000, burnin = 1500, thinning = 3, n_chains = 3,
-  modeltype = "sparta", regional_codes = NULL, region_aggs = NULL,
-  model.function = NULL, max_year = NULL, seed = NULL,
-  additional.parameters = NULL, additional.BUGS.elements = NULL,
-  additional.init.values = NULL, return_data = FALSE)
+occDetModel(
+  taxa,
+  site,
+  survey,
+  species_list = unique(taxa),
+  write_results = TRUE,
+  output_dir = getwd(),
+  nyr = 2,
+  n_iterations = 5000,
+  burnin = 1500,
+  thinning = 3,
+  n_chains = 3,
+  modeltype = "sparta",
+  regional_codes = NULL,
+  region_aggs = NULL,
+  model.function = NULL,
+  max_year = NULL,
+  seed = NULL,
+  additional.parameters = NULL,
+  additional.BUGS.elements = NULL,
+  additional.init.values = NULL,
+  return_data = FALSE
+)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}
@@ -138,8 +154,8 @@ nSamples <- 100 # set number of dates
 nSites <- 50 # set number of sites
 
 # Create somes dates
-first <- as.Date(strptime("1980/01/01", "\%Y/\%m/\%d")) 
-last <- as.Date(strptime(paste(1980+(nyr-1),"/12/31", sep=''), "\%Y/\%m/\%d")) 
+first <- as.Date(strptime("1980/01/01", "%Y/%m/%d")) 
+last <- as.Date(strptime(paste(1980+(nyr-1),"/12/31", sep=''), "%Y/%m/%d")) 
 dt <- last-first 
 rDates <- first + (runif(nSamples)*dt)
 

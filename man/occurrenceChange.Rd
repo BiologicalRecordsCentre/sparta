@@ -4,8 +4,13 @@
 \alias{occurrenceChange}
 \title{Calculate percentage change between two years using Bayesian output}
 \usage{
-occurrenceChange(firstYear, lastYear, bayesOut, change = "growthrate",
-  region = NULL)
+occurrenceChange(
+  firstYear,
+  lastYear,
+  bayesOut,
+  change = "growthrate",
+  region = NULL
+)
 }
 \arguments{
 \item{firstYear}{numeric, the first year over which the change is to be estimated}
@@ -55,8 +60,8 @@ nSamples <- 100 # set number of dates
 nSites <- 50 # set number of sites
 
 # Create somes dates
-first <- as.Date(strptime("1980/01/01", "\%Y/\%m/\%d")) 
-last <- as.Date(strptime(paste(1980+(nyr-1),"/12/31", sep=''), "\%Y/\%m/\%d")) 
+first <- as.Date(strptime("1980/01/01", "%Y/%m/%d")) 
+last <- as.Date(strptime(paste(1980+(nyr-1),"/12/31", sep=''), "%Y/%m/%d")) 
 dt <- last-first 
 rDates <- first + (runif(nSamples)*dt)
 

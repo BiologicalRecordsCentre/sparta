@@ -4,9 +4,18 @@
 \alias{WSS}
 \title{Well sampled sites model}
 \usage{
-WSS(taxa, site, time_period, minL = 2, minTP = 3,
-  species_to_include = unique(taxa), overdispersion = FALSE,
-  family = "Binomial", verbose = FALSE, print_progress = FALSE)
+WSS(
+  taxa,
+  site,
+  time_period,
+  minL = 2,
+  minTP = 3,
+  species_to_include = unique(taxa),
+  overdispersion = FALSE,
+  family = "Binomial",
+  verbose = FALSE,
+  print_progress = FALSE
+)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}

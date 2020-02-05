@@ -3,7 +3,6 @@
 \docType{package}
 \name{sparta}
 \alias{sparta}
-\alias{sparta-package}
 \title{\pkg{sparta} Trend Analysis for Unstructured Data}
 \description{
 The Sparta package includes methods used to analyse trends in

@@ -4,10 +4,18 @@
 \alias{reportingRateModel}
 \title{Run Reporting Rate Models}
 \usage{
-reportingRateModel(taxa, site, time_period, list_length = FALSE,
-  site_effect = FALSE, species_to_include = unique(taxa),
-  overdispersion = FALSE, verbose = FALSE, family = "Binomial",
-  print_progress = FALSE)
+reportingRateModel(
+  taxa,
+  site,
+  time_period,
+  list_length = FALSE,
+  site_effect = FALSE,
+  species_to_include = unique(taxa),
+  overdispersion = FALSE,
+  verbose = FALSE,
+  family = "Binomial",
+  print_progress = FALSE
+)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}
@@ -74,8 +82,8 @@ nSamples <- 30 # set number of dates
 nSites <- 15 # set number of sites
 
 # Create somes dates
-first <- as.POSIXct(strptime("2010/01/01", "\%Y/\%m/\%d")) 
-last <- as.POSIXct(strptime(paste(2010+(nyr-1),"/12/31", sep=''), "\%Y/\%m/\%d")) 
+first <- as.POSIXct(strptime("2010/01/01", "%Y/%m/%d")) 
+last <- as.POSIXct(strptime(paste(2010+(nyr-1),"/12/31", sep=''), "%Y/%m/%d")) 
 dt <- last-first 
 rDates <- first + (runif(nSamples)*dt)
 
@@ -91,7 +99,7 @@ time_period <- sample(rDates, size = n, TRUE)
 # combine this to a dataframe (adding a final row of 'bad' data)
 df <- data.frame(taxa = c(taxa,'bad'),
                  site = c(site,'A1'),
-                 time_period = c(time_period, as.POSIXct(strptime("1200/01/01", "\%Y/\%m/\%d"))))
+                 time_period = c(time_period, as.POSIXct(strptime("1200/01/01", "%Y/%m/%d"))))
 
 # Run the model
 RR_out <- reportingRateModel(df$taxa, df$site, df$time_period, print_progress = TRUE)

@@ -4,12 +4,28 @@
 \alias{frescalo}
 \title{Frescalo trend analysis}
 \usage{
-frescalo(Data, frespath, time_periods, site_col, sp_col, year_col = NULL,
-  start_col = NULL, end_col = NULL, species_to_include = NULL,
-  sinkdir = NULL, plot_fres = FALSE, Fres_weights = "LCGB",
-  non_benchmark_sp = NULL, fres_site_filter = NULL, phi = 0.74,
-  alpha = 0.27, trend_option = "arithmetic", NYears = 10,
-  ignore.ireland = F, ignore.channelislands = F)
+frescalo(
+  Data,
+  frespath,
+  time_periods,
+  site_col,
+  sp_col,
+  year_col = NULL,
+  start_col = NULL,
+  end_col = NULL,
+  species_to_include = NULL,
+  sinkdir = NULL,
+  plot_fres = FALSE,
+  Fres_weights = "LCGB",
+  non_benchmark_sp = NULL,
+  fres_site_filter = NULL,
+  phi = 0.74,
+  alpha = 0.27,
+  trend_option = "arithmetic",
+  NYears = 10,
+  ignore.ireland = F,
+  ignore.channelislands = F
+)
 }
 \arguments{
 \item{Data}{A dataframe object. This should consist of rows of

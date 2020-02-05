@@ -4,8 +4,14 @@
 \alias{telfer}
 \title{Telfer's change index}
 \usage{
-telfer(taxa, site, time_period, minSite = 5, useIterations = TRUE,
-  iterations = 10)
+telfer(
+  taxa,
+  site,
+  time_period,
+  minSite = 5,
+  useIterations = TRUE,
+  iterations = 10
+)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names}

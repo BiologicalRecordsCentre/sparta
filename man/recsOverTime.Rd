@@ -4,8 +4,14 @@
 \alias{recsOverTime}
 \title{Histogram of records over time}
 \usage{
-recsOverTime(time_period, Log = FALSE, col = "black", xlab = "Year",
-  ylab = ifelse(Log, "log(Frequency)", "Frequency"), ...)
+recsOverTime(
+  time_period,
+  Log = FALSE,
+  col = "black",
+  xlab = "Year",
+  ylab = ifelse(Log, "log(Frequency)", "Frequency"),
+  ...
+)
 }
 \arguments{
 \item{time_period}{A numeric vector of user defined time periods, or a date vector,
@@ -39,8 +45,8 @@ nSamples <- 30 # set number of dates
 nSites <- 15 # set number of sites
 
 # Create somes dates
-first <- as.POSIXct(strptime("2010/01/01", "\%Y/\%m/\%d")) 
-last <- as.POSIXct(strptime(paste(2010+(nyr-1),"/12/31", sep=''), "\%Y/\%m/\%d")) 
+first <- as.POSIXct(strptime("2010/01/01", "%Y/%m/%d")) 
+last <- as.POSIXct(strptime(paste(2010+(nyr-1),"/12/31", sep=''), "%Y/%m/%d")) 
 dt <- last-first 
 rDates <- first + (runif(nSamples)*dt)
 
@@ -56,13 +62,13 @@ time_period <- sample(rDates, size = n, TRUE)
 # combine this to a dataframe (adding a final row of 'bad' data)
 df <- data.frame(taxa = c(taxa,'bad'),
                  site = c(site,'A1'),
-                 time_period = c(time_period, as.POSIXct(strptime("1200/01/01", "\%Y/\%m/\%d"))))
+                 time_period = c(time_period, as.POSIXct(strptime("1200/01/01", "%Y/%m/%d"))))
                  
 # This reveals the 'bad data'                  
 recsOverTime(df$time_period)
 
 # remove and replot
-df <- df[format(df$time_period, '\%Y') > 2000, ]
+df <- df[format(df$time_period, '%Y') > 2000, ]
 recsOverTime(df$time_period)
 
 # plot with style
