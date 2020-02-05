@@ -162,7 +162,6 @@
 #' @export
 #' @importFrom reshape2 acast
 #' @import LearnBayes
-#' @import R2jags
 
 occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr = 2,
                         burnin = 1500, thinning = 3, n_chains = 3, write_results = TRUE,
@@ -172,10 +171,11 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                         additional.BUGS.elements = NULL, additional.init.values = NULL,
                         return_data = TRUE){
   
-  J_success <- requireNamespace("R2jags", quietly = TRUE)
-  
-  # test is R2jags installed if not error
-  if(!J_success) stop('Please install the R2jags R package. This also requires you to in stall JAGS from http://sourceforge.net/projects/mcmc-jags/files/JAGS/')
+  # Check if R2jags is installed
+  if (!requireNamespace("R2jags", quietly = TRUE)) {
+    stop("Package 'R2jags' is needed for the 'occDetModel' function to work. Please insatll this from CRAN. You will also be required to install JAGS, which you can download from https://sourceforge.net/projects/mcmc-jags/files/JAGS/",
+         call. = FALSE)
+  }
   
   # If doing regional we take control of model specification
   if(!is.null(regional_codes)){
