@@ -4,8 +4,12 @@
 \alias{plot_DetectionPhenology}
 \title{Diagnostics for the detectability with respect to Julian Date}
 \usage{
-plot_DetectionPhenology(model, spname = NULL, bins = 12,
-  density_function = TRUE)
+plot_DetectionPhenology(
+  model,
+  spname = NULL,
+  bins = 12,
+  density_function = TRUE
+)
 }
 \arguments{
 \item{model}{a fitted sparta model of class \code{OccDet}.}

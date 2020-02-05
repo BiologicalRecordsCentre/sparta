@@ -73,7 +73,10 @@ frescalo_checks <- function(site_col, sp_col, year_col, start_col, end_col,
   
   # retain only the columns we need (site, concept, timeperiod)
   # at the same time keep only unique rows
+  before <- nrow(Data)
   Data <- na.omit(distinct(Data[c('site','CONCEPT','yearnew')]))
+  after <- nrow(Data)
+  if(before < after) warning(paste(before-after, 'rows of data are removed as they are duplicates within a time period'))
   
   return(Data)
   

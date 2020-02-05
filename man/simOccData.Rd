@@ -4,10 +4,21 @@
 \alias{simOccData}
 \title{Simulate for Occupancy detection models}
 \usage{
-simOccData(nsites = 20, nvisits = 100, nTP = 10, psi = 0.5,
-  trend = -0.01, mu.lp = -1, tau.lp = 10, beta1 = 182,
-  beta2 = 20, beta3 = 100, dtype2.p = 3, dtype3.p = 10,
-  JD_range = NULL)
+simOccData(
+  nsites = 20,
+  nvisits = 100,
+  nTP = 10,
+  psi = 0.5,
+  trend = -0.01,
+  mu.lp = -1,
+  tau.lp = 10,
+  beta1 = 182,
+  beta2 = 20,
+  beta3 = 100,
+  dtype2.p = 3,
+  dtype3.p = 10,
+  JD_range = NULL
+)
 }
 \arguments{
 \item{nsites}{numeric, the number of sites from which the simulated data is sampled.}

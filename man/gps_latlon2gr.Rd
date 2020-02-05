@@ -4,8 +4,12 @@
 \alias{gps_latlon2gr}
 \title{Covert latitude and longitude to other formats}
 \usage{
-gps_latlon2gr(latitude, longitude, out_projection = "OSGB",
-  return_type = "both")
+gps_latlon2gr(
+  latitude,
+  longitude,
+  out_projection = "OSGB",
+  return_type = "both"
+)
 }
 \arguments{
 \item{latitude}{a vector of numerics giving latitudes}

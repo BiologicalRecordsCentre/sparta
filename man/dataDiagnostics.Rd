@@ -4,8 +4,7 @@
 \alias{dataDiagnostics}
 \title{Data Diagnostics}
 \usage{
-dataDiagnostics(taxa, site, time_period, plot = TRUE,
-  progress_bar = TRUE)
+dataDiagnostics(taxa, site, time_period, plot = TRUE, progress_bar = TRUE)
 }
 \arguments{
 \item{taxa}{A character vector of taxon names, as long as the number of observations.}
@@ -41,8 +40,8 @@ nSamples <- 200 # set number of dates
 useDates <- TRUE
 
 # Create somes dates
-first <- as.POSIXct(strptime("2003/01/01", "\%Y/\%m/\%d"))
-last <- as.POSIXct(strptime(paste(2003+(nyr-1),"/12/31", sep=''), "\%Y/\%m/\%d"))
+first <- as.POSIXct(strptime("2003/01/01", "%Y/%m/%d"))
+last <- as.POSIXct(strptime(paste(2003+(nyr-1),"/12/31", sep=''), "%Y/%m/%d"))
 dt <- last-first
 rDates <- first + (runif(nSamples)*dt)
 
@@ -61,6 +60,6 @@ if(useDates){
 # Using a date
 dataDiagnostics(taxa, site, time_period)
 # Using a numeric
-dataDiagnostics(taxa, site, as.numeric(format(time_period, '\%Y')))
+dataDiagnostics(taxa, site, as.numeric(format(time_period, '%Y')))
 }
 }

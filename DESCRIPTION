@@ -26,15 +26,15 @@ Imports:
     reshape2,
     ggplot2,
     gdata,
-    R2jags,
     LearnBayes,
     rmarkdown,
     boot
 Suggests:
     testthat (>= 0.8.0),
     roxygen2,
-    knitr
+    knitr,
+    R2jags
 VignetteBuilder: knitr
 LazyData: TRUE
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.0
 Encoding: UTF-8

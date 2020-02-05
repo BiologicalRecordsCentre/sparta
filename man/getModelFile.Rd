@@ -4,8 +4,12 @@
 \alias{getModelFile}
 \title{Create a sparta JAGS model file fitting your needs}
 \usage{
-getModelFile(modeltype, regional_codes = NULL, region_aggs = NULL,
-  verbose = FALSE)
+getModelFile(
+  modeltype,
+  regional_codes = NULL,
+  region_aggs = NULL,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{modeltype}{Character, see \code{occDetFunc} for more information.}
