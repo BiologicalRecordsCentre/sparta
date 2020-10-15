@@ -45,6 +45,7 @@ if(toms_PC) frespath <- 'C:/Frescalo_3a_windows.exe'
 test_that("Test errors", {
   
   if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
+  if(grep("mac", .Platform$pkgType)) skip('Frescalo exe does not run on Mac OS')
   if (.Platform$OS.type == "windows" & !toms_PC) skip('Carbon black blocks Frescalo')
   
   if(!toms_PC){
@@ -109,7 +110,7 @@ test_that("Test errors", {
 test_that("Runs without error", {
 
   if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
-
+  if(grep("mac", .Platform$pkgType)) skip('Frescalo exe does not run on Mac OS')
   if (.Platform$OS.type == "windows" & !toms_PC) skip('Carbon black blocks Frescalo')
   
   # This first run is done using years
@@ -226,7 +227,7 @@ weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 test_that("Test plotting", {
   
   if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
-  
+  if(grep("mac", .Platform$pkgType)) skip('Frescalo exe does not run on Mac OS')
   if (.Platform$OS.type == "windows" & !toms_PC) skip('Carbon black blocks Frescalo')
   
   # test plotting
@@ -293,7 +294,7 @@ weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 test_that("Runs high value of phi", {
   
   if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
-  
+  if(grep("mac", .Platform$pkgType)) skip('Frescalo exe does not run on Mac OS')
   if (.Platform$OS.type == "windows" & !toms_PC) skip('Carbon black blocks Frescalo')
   
   # test a very low value of phi
