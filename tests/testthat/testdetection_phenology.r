@@ -1,10 +1,5 @@
 context("Test plot_DetectionPhenology")
 
-test_that("Test plot_DetectionPhenology", {
-  
-  sink(file = ifelse(Sys.info()["sysname"] == "Windows",
-                   "NUL",
-                   "/dev/null"))
   # Create data
   n <- 15000 #size of dataset
   nyr <- 20 # number of years in data
@@ -27,6 +22,13 @@ test_that("Test plot_DetectionPhenology", {
   
   # the date of visit is selected at random from those created earlier
   survey <- sample(rDates, size = n, TRUE)
+  
+test_that("Test plot_DetectionPhenology", {
+  
+  sink(file = ifelse(Sys.info()["sysname"] == "Windows",
+                   "NUL",
+                   "/dev/null"))
+
   
   # format data
   suppressWarnings({visitData <- formatOccData(taxa = taxa,
