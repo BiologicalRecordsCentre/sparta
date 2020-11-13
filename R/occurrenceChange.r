@@ -1,15 +1,13 @@
 #' Calculate percentage change between two years using Bayesian output
 #' 
-#' Using the data returned from occDetModel this function models a linear
-#' trend between two years for each iteration of the models. The predicted
-#' values for the two years are then used to calculates a percentage
-#' change. The results is a percentage change estimate for each of the
-#' interations of the model. This distribution of the results is used to
+#' Using the data returned from occDetModel/occDetFunc this function models a 
+#' trend between two years for each iteration of the models. Several options are
+#' available for the method used to calculate the trend. This distribution of the results is used to
 #' calculate the mean estimate and the 95% credibale intervals. 
 #'
-#' @param firstYear numeric, the first year over which the change is to be estimated
-#' @param lastYear numeric, the last year over which the change is to be estimated
-#' @param bayesOut occDet object as returned from occDetModel
+#' @param bayesOut occDet object as returned from occDetModel or occDetFunc. 
+#' @param firstYear numeric, the first year over which the change is to be estimated. Defaults to the final year in the dataset
+#' @param lastYear numeric, the last year over which the change is to be estimated. Defaults to the first year in the dataset
 #' @param change A character string that specifies the type of change to be calculated, the default
 #' is annual growth rate.  See details for options.
 #' @param region A character string specifying the region name if change is to be determined regional estimates of occupancy.
@@ -71,11 +69,18 @@
 #' }                   
 #' @export
 
-occurrenceChange <- function(firstYear, lastYear, bayesOut, change = 'growthrate', region = NULL){
+occurrenceChange <- function(bayesOut, firstYear=NULL, lastYear=NULL, change = 'growthrate', region = NULL){
+
+  # error checks for years (or set to defaults)
+  if(is.null(firstYear)) 
+    firstYear <- bayesOut$min_year
+  else
+    if(!firstYear %in% bayesOut$min_year:bayesOut$max_year) stop('firstYear must be in the year range of the data')
   
-  # error checks for years
-  if(!firstYear %in% bayesOut$min_year:bayesOut$max_year) stop('firstYear must be in the year range of the data')
-  if(!lastYear %in% bayesOut$min_year:bayesOut$max_year) stop('lastYear must be in the year range of the data')
+  if(is.null(lastYear))  
+    lastYear <- bayesOut$max_year
+  else  
+    if(!lastYear %in% bayesOut$min_year:bayesOut$max_year) stop('lastYear must be in the year range of the data')
   
   # error checks for change
   if(!class(change) == 'character') stop('Change must be a character string identifying the change metric.  Either: difference, percentdif, growthrate or lineargrowth')

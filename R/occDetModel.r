@@ -4,7 +4,7 @@
 #' 
 #' This function requires both the R package R2jags and the program JAGS.
 #' These are not installed by default when sparta is loaded and so should be
-#' installed by the user. More details can be found in teh vignette.
+#' installed by the user. More details can be found in the vignette.
 #' 
 #' @param taxa A character vector of taxon names, as long as the number of observations.
 #' @param site A character vector of site names, as long as the number of observations.
