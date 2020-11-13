@@ -44,6 +44,8 @@ if(toms_PC) frespath <- 'C:/Frescalo_3a_windows.exe'
 
 test_that("Test errors", {
   
+  skip_on_appveyor('not run on appveyor')
+  skip_on_travis('not run on travis')
   if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
   if(grep("mac", .Platform$pkgType)) skip('Frescalo exe does not run on Mac OS')
   if (.Platform$OS.type == "windows" & !toms_PC) skip('Carbon black blocks Frescalo')
@@ -109,6 +111,8 @@ test_that("Test errors", {
 
 test_that("Runs without error", {
 
+  skip_on_appveyor('not run on appveyor')
+  skip_on_travis('not run on travis')
   if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
   if(grep("mac", .Platform$pkgType)) skip('Frescalo exe does not run on Mac OS')
   if (.Platform$OS.type == "windows" & !toms_PC) skip('Carbon black blocks Frescalo')
@@ -226,6 +230,8 @@ weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 
 test_that("Test plotting", {
   
+  skip_on_travis('not run on travis')
+  skip_on_appveyor('not run on appveyor')
   if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
   if(grep("mac", .Platform$pkgType)) skip('Frescalo exe does not run on Mac OS')
   if (.Platform$OS.type == "windows" & !toms_PC) skip('Carbon black blocks Frescalo')
@@ -293,6 +299,8 @@ weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 
 test_that("Runs high value of phi", {
   
+  skip_on_appveyor('not run on appveyor')
+  skip_on_travis('not run on travis')
   if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
   if(grep("mac", .Platform$pkgType)) skip('Frescalo exe does not run on Mac OS')
   if (.Platform$OS.type == "windows" & !toms_PC) skip('Carbon black blocks Frescalo')
