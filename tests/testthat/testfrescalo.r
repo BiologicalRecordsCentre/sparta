@@ -1,7 +1,7 @@
 context("Test frescalo")
 
 ### Frescalo testing is currently skipped if not on a ###
-### windows machine, or is libcurl is not supported.  ###
+### windows machine, or if libcurl is not supported.  ###
 
 # Create data
 n <- 1500 #size of dataset
@@ -38,7 +38,7 @@ weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 
 frespath <- file.path(tempdir(), 'fres.exe')
 
-toms_PC <- Sys.info()['nodename'] == "WLD-D5P2J42"
+toms_PC <- Sys.info()['nodename'] == "WLL-3RHYM53"
 
 if(toms_PC) frespath <- 'C:/Frescalo_3a_windows.exe'
 
