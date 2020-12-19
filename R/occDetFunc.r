@@ -44,8 +44,9 @@
 #' to \code{R2jags::jags} 'data' argument
 #' @param additional.init.values A named list giving user specified initial values to 
 #' be added to the defaults.
-#' @param return_data Logical, if \code{TRUE} (default) the bugs data object is returned with the data
-#'
+#' @param return_data Logical, if \code{TRUE} (default) the BUGS data object is returned with the data
+#' @param calc_metrics Logical, if \code{TRUE} (default) a dataset of metrics about the dataset are returned.
+#' 
 #' @details \code{modeltype} is used to choose the model as well as the associated initial values,
 #' and parameters to monitor. Elements to choose from can be separated into the following components:
 #' 
@@ -137,7 +138,7 @@
 #' 
 #' # Create somes dates
 #' first <- as.Date(strptime("2010/01/01", format="%Y/%m/%d")) 
-#' last <- as.Date(strptime(paste(2010+(nyr-1),"/12/31", sep=''), format"%Y/%m/%d")) 
+#' last <- as.Date(strptime(paste(2010+(nyr-1),"/12/31", sep=''), format="%Y/%m/%d")) 
 #' dt <- last-first 
 #' rDates <- first + (runif(nSamples)*dt)
 #' 
@@ -171,7 +172,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                         seed = NULL, model.function = NULL, regional_codes = NULL,
                         region_aggs = NULL, additional.parameters = NULL,
                         additional.BUGS.elements = NULL, additional.init.values = NULL,
-                        return_data = TRUE){
+                        return_data = TRUE, calc_metrics = TRUE){
   
   # Check if R2jags is installed
   if (!requireNamespace("R2jags", quietly = TRUE)) {
@@ -207,6 +208,12 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # Check the taxa_name is one of my species
   if(!taxa_name %in% colnames(spp_vis)) stop('taxa_name is not the name of a taxa in spp_vis')
+  
+  # calcluate a set of data metrics for this species
+  if(calc_metrics){
+    data_Metrics <- dataMetrics(sp = taxa_name, 
+                                formattedData = list(occDetdata=occDetdata, spp_vis=spp_vis))
+  } else data_Metrics <- NULL
   
   # Add the focal column (was the species recorded on the visit?). Use the spp_vis dataframe to extract this info
   nrow1 <- nrow(occDetdata)
@@ -619,6 +626,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                               gap_start = BD_MD$yeargaps$gap_start,
                               gap_end = BD_MD$yeargaps$gap_end,
                               gap_middle = BD_MD$yeargaps$gap_middle),
+               data_metrics = as.list(data_metrics),
                output_path = ifelse(test = write_results,
                                     file.path(getwd(), output_dir, paste(taxa_name, ".rdata", sep = "")),
                                     NA),

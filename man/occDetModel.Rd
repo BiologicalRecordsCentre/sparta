@@ -101,7 +101,7 @@ Run occupancy detection models as described in Isaac et al, 2014
 \details{
 This function requires both the R package R2jags and the program JAGS.
 These are not installed by default when sparta is loaded and so should be
-installed by the user. More details can be found in teh vignette.
+installed by the user. More details can be found in the vignette.
 
 \code{modeltype} is used to choose the model as well as the associated initial values,
 and parameters to monitor. Elements to choose from can be separated into the following components:
@@ -154,8 +154,8 @@ nSamples <- 100 # set number of dates
 nSites <- 50 # set number of sites
 
 # Create somes dates
-first <- as.Date(strptime("1980/01/01", "%Y/%m/%d")) 
-last <- as.Date(strptime(paste(1980+(nyr-1),"/12/31", sep=''), "%Y/%m/%d")) 
+first <- as.Date(strptime("1980/01/01", "\%Y/\%m/\%d")) 
+last <- as.Date(strptime(paste(1980+(nyr-1),"/12/31", sep=''), "\%Y/\%m/\%d")) 
 dt <- last-first 
 rDates <- first + (runif(nSamples)*dt)
 

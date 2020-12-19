@@ -36,5 +36,5 @@ Suggests:
     R2jags
 VignetteBuilder: knitr
 LazyData: TRUE
-RoxygenNote: 7.0.0
+RoxygenNote: 7.1.1
 Encoding: UTF-8

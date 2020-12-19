@@ -24,7 +24,8 @@ occDetFunc(
   additional.parameters = NULL,
   additional.BUGS.elements = NULL,
   additional.init.values = NULL,
-  return_data = TRUE
+  return_data = TRUE,
+  calc_metrics = TRUE
 )
 }
 \arguments{
@@ -85,7 +86,9 @@ to \code{R2jags::jags} 'data' argument}
 \item{additional.init.values}{A named list giving user specified initial values to 
 be added to the defaults.}
 
-\item{return_data}{Logical, if \code{TRUE} (default) the bugs data object is returned with the data}
+\item{return_data}{Logical, if \code{TRUE} (default) the BUGS data object is returned with the data}
+
+\item{calc_metrics}{Logical, if \code{TRUE} (default) a dataset of metrics about the dataset are returned.}
 }
 \value{
 A list including the model, JAGS model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
@@ -179,8 +182,8 @@ nSamples <- 100 # set number of dates
 nSites <- 50 # set number of sites
 
 # Create somes dates
-first <- as.Date(strptime("2010/01/01", "%Y/%m/%d")) 
-last <- as.Date(strptime(paste(2010+(nyr-1),"/12/31", sep=''), "%Y/%m/%d")) 
+first <- as.Date(strptime("2010/01/01", format="\%Y/\%m/\%d")) 
+last <- as.Date(strptime(paste(2010+(nyr-1),"/12/31", sep=''), format="\%Y/\%m/\%d")) 
 dt <- last-first 
 rDates <- first + (runif(nSamples)*dt)
 
