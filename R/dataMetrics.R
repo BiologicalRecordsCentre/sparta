@@ -85,6 +85,7 @@ dataMetrics <- function(sp, formattedData, suffix=NULL){
       repeats$concat <- paste0(repeats$site,'-',repeats$TP)
       
       # What proportion of these are > 1
+      # NJBI I am not sure this metric is especially meaningful, since it's restricted to just the dataset with records for this species
       prop_repeats_spc <- sum(repeats$Freq > 1) / nrow(repeats)
       
       # visits within the group for visits to each location within a year
@@ -95,13 +96,17 @@ dataMetrics <- function(sp, formattedData, suffix=NULL){
       
       # Find which of these group visits are to sites in years where the
       # species of interest was observed
+      # NJBI I don't understand the rationale here: the proportion of repeats should apply to the whole dataset,
+      # but here is just the site:year combinations on which the species of interest was recorded.
       site_year <- group_repeats$concat %in% repeats$concat
-      group_repeats <- group_repeats$Freq[site_year]
-      prop_repeats_grp <- sum(group_repeats > 1) / length(group_repeats)
+      temp <- group_repeats$Freq[site_year]
+      prop_repeats_grp <- sum(temp > 1) / length(temp) # NJBI THIS LOOKS WRONG
+      # numerator is the total number of visits (excluding non-repeats). Should be number of combos that were repeated.
+      # denominator includes site:year combos with zero visits
       
       # all visits to a site in a year where there was at least one observance
       # of species of interest
-      percentiles <- quantile(group_repeats,c(.5,.7,.8,.9))
+      percentiles <- quantile(temp,c(.5,.7,.8,.9))
       visits_median <- as.numeric(percentiles[1])
       visits_P70 <- as.numeric(percentiles[2])
       visits_P80 <- as.numeric(percentiles[3])

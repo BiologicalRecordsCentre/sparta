@@ -46,6 +46,7 @@
 #' be added to the defaults.
 #' @param return_data Logical, if \code{TRUE} (default) the BUGS data object is returned with the data
 #' @param calc_metrics Logical, if \code{TRUE} (default) a dataset of metrics about the dataset are returned.
+#' @param provenance An optional text string allowing the user to identify the dataset.
 #' 
 #' @details \code{modeltype} is used to choose the model as well as the associated initial values,
 #' and parameters to monitor. Elements to choose from can be separated into the following components:
@@ -160,7 +161,8 @@
 #'                       burnin = 15, 
 #'                       occDetdata = visitData$occDetdata,
 #'                       spp_vis = visitData$spp_vis,
-#'                       write_results = FALSE)
+#'                       write_results = FALSE,
+#'                       provenance  = "sparta test dataset")
 #' }
 #' @export
 #' @importFrom reshape2 acast
@@ -172,7 +174,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                         seed = NULL, model.function = NULL, regional_codes = NULL,
                         region_aggs = NULL, additional.parameters = NULL,
                         additional.BUGS.elements = NULL, additional.init.values = NULL,
-                        return_data = TRUE, calc_metrics = TRUE){
+                        return_data = TRUE, calc_metrics = TRUE, provenance = NULL){
   
   # Check if R2jags is installed
   if (!requireNamespace("R2jags", quietly = TRUE)) {
@@ -601,8 +603,12 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     return(NULL)
   } else {
     
-    # Add metadata
+    ########################################## Add metadata
     
+    # calcluate number of site:year combinations dataset
+    temp <- as.data.frame(with(occDetdata, table(site, TP)))$Freq
+    prop_visits_repeated <- mean(temp[temp>0] > 1)
+
     if(is.null(attributes(occDetdata))){
       metadata <- list()
     } else if('metadata' %in% names(attributes(occDetdata))){
@@ -626,7 +632,11 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                               gap_start = BD_MD$yeargaps$gap_start,
                               gap_end = BD_MD$yeargaps$gap_end,
                               gap_middle = BD_MD$yeargaps$gap_middle),
-               data_Metrics = as.list(data_Metrics),
+               spp_Metrics = as.list(data_Metrics),
+               dataset_Metrics = list(# dataset properties
+                              totalObservations = sum(occDetdata$L),
+                              propRepeats = prop_visits_repeated),
+               provenance = provenance,
                output_path = ifelse(test = write_results,
                                     file.path(getwd(), output_dir, paste(taxa_name, ".rdata", sep = "")),
                                     NA),

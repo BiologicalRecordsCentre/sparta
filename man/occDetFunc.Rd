@@ -25,7 +25,8 @@ occDetFunc(
   additional.BUGS.elements = NULL,
   additional.init.values = NULL,
   return_data = TRUE,
-  calc_metrics = TRUE
+  calc_metrics = TRUE,
+  provenance = NULL
 )
 }
 \arguments{
@@ -89,6 +90,8 @@ be added to the defaults.}
 \item{return_data}{Logical, if \code{TRUE} (default) the BUGS data object is returned with the data}
 
 \item{calc_metrics}{Logical, if \code{TRUE} (default) a dataset of metrics about the dataset are returned.}
+
+\item{provenance}{An optional text string allowing the user to identify the dataset.}
 }
 \value{
 A list including the model, JAGS model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
@@ -205,7 +208,8 @@ results <- occDetFunc(taxa_name = taxa[1],
                       burnin = 15, 
                       occDetdata = visitData$occDetdata,
                       spp_vis = visitData$spp_vis,
-                      write_results = FALSE)
+                      write_results = FALSE,
+                      provenance  = "sparta test dataset")
 }
 }
 \references{
