@@ -4,14 +4,14 @@
 \alias{dataMetrics}
 \title{Calculate dataset metrics}
 \usage{
-dataMetrics(sp, formattedData, suffix = NULL)
+dataMetrics(sp, formattedData, verbose = FALSE)
 }
 \arguments{
 \item{sp}{character string identifying the species name}
 
 \item{formattedData}{output from formattedOccData}
 
-\item{suffix}{Not used}
+\item{verbose}{Logical. Default (`FALSE`) returns seven metrics.}
 }
 \description{
 Takes a formattedOccData object and the name of a species. Runs a set of calculations on the dataset for that species
