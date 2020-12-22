@@ -5,13 +5,13 @@
 #'  
 #' @param sp character string identifying the species name
 #' @param formattedData output from formattedOccData
-#' @param suffix Not used
+#' @param verbose Logical. Default (`FALSE`) returns seven metrics. 
 #' 
 #' @references Pocock, Logie, Isaac, Outhwaite & August. Rapid assessment of the suitability of multi-species citizen science datasets for occupancy trend analysis. bioRxiv 813626 (2019) doi:10.1101/813626.
 #' @export
 
 
-dataMetrics <- function(sp, formattedData, suffix=NULL){
+dataMetrics <- function(sp, formattedData, verbose = FALSE){
   
     tFDall <- merge(formattedData$occDetdata,
                               formattedData$spp_vis)
@@ -85,24 +85,21 @@ dataMetrics <- function(sp, formattedData, suffix=NULL){
       repeats$concat <- paste0(repeats$site,'-',repeats$TP)
       
       # What proportion of these are > 1
-      # NJBI I am not sure this metric is especially meaningful, since it's restricted to just the dataset with records for this species
+      # this metric is restricted to just the dataset with records for this species
       prop_repeats_spc <- sum(repeats$Freq > 1) / nrow(repeats)
       
       # visits within the group for visits to each location within a year
-      #group_repeats <- count(tFDall, site, TP)
       group_repeats <- subset(as.data.frame(with(tFDall, table(site, TP))), Freq > 0)
       group_repeats$concat <-
         paste0(group_repeats$site,'-',group_repeats$TP)
       
       # Find which of these group visits are to sites in years where the
       # species of interest was observed
-      # NJBI I don't understand the rationale here: the proportion of repeats should apply to the whole dataset,
-      # but here is just the site:year combinations on which the species of interest was recorded.
       site_year <- group_repeats$concat %in% repeats$concat
       temp <- group_repeats$Freq[site_year]
       prop_repeats_grp <- sum(temp > 1) / length(temp) # NJBI THIS LOOKS WRONG
-      # numerator is the total number of visits (excluding non-repeats). Should be number of combos that were repeated.
-      # denominator includes site:year combos with zero visits
+      # NB this metric is restricted to just the site:year combos with records for this species
+      
       
       # all visits to a site in a year where there was at least one observance
       # of species of interest
@@ -139,7 +136,19 @@ dataMetrics <- function(sp, formattedData, suffix=NULL){
       TotalvisitPerYear <- Totalnvisits/total_years
     }
     
-    df <- data.frame(species = sp,
+    if(!verbose)
+      df <- data.frame(
+        median = median,
+        P90 = P90,
+        visits_median = visits_median,
+        visits_P90 = visits_P90,
+        prop_list_one = prop_list_one,
+        prop_repeats_grp = prop_repeats_grp,
+        prop_abs = prop_abs,
+        stringsAsFactors = FALSE
+      )
+    else 
+      df <- data.frame(#species = sp,
                      avVisitPerYear = avVisitPerYear,
                      median = median,
                      P70 = P70,
@@ -155,7 +164,6 @@ dataMetrics <- function(sp, formattedData, suffix=NULL){
                      zcoeffVar = zcoeffVar,
                      prop_repeats_spc = prop_repeats_spc,
                      prop_repeats_grp = prop_repeats_grp,
-                     visits_median = visits_median,
                      visits_P70 = visits_P70,
                      visits_P80 = visits_P80,
                      visits_P90 = visits_P90,
