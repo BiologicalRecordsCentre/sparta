@@ -469,6 +469,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                                                     paste0("a_", zero_sites))]
         # remove regions for regions_codes
         regional_codes <- regional_codes[ ,!colnames(regional_codes) %in% zero_sites]
+        region_names <- setdiff(region_names, zero_sites)
         
         # remove region aggregates
         rem_aggs <- unlist(lapply(region_aggs, FUN = function(x) any(zero_sites %in% x)))
@@ -492,10 +493,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     # add regional codes to this copy and get n_obs, max and min years and year gaps for each region
     for(region_name in region_names){
-      regions_nobs[paste0('n_obs_','r_', region_name)] <- sum(bugs_data_copy$y * bugs_data_copy[,paste0('r_', region_name)])
-      regions_sites[paste0('n_sites_','r_', region_name)] <- sum(region_codes_copy[,paste0('r_', region_name)])
-      
-      current_r <- bugs_data_copy$y * bugs_data_copy[,paste0('r_', region_name)] * bugs_data_copy$year
+      regions_nobs[paste0('n_obs_','r_', region_name)] <- sum(bugs_data_copy$y * bugs_data_copy[,region_name])
+      regions_sites[paste0('n_sites_','r_', region_name)] <- sum(bugs_data_copy[,region_name])
+      current_r <- bugs_data_copy$y * bugs_data_copy[,region_name] * bugs_data_copy$year
       current_r <- subset(current_r,current_r !=0)
       current_rmin <- (min_year-1) + min(current_r)
       current_rmax <- (min_year-1) + max(current_r)
@@ -685,7 +685,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     out$nsites <- bugs_data$nsite
     out$nvisits <- bugs_data$nvisit
     out$species_observations <- sum(bugs_data$y)
-    if(!is.null(regional_codes)) out$regions <- head(tail(colnames(regional_codes), -1), -2)
+    if(!is.null(regional_codes)) out$regions <- region_names
     if(!is.null(region_aggs)) out$region_aggs <- region_aggs
     if(return_data) out$bugs_data <- bugs_data
     attr(out, 'modeltype') <- modeltype

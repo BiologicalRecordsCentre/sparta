@@ -23,7 +23,6 @@ getModelFile <- function(modeltype, regional_codes = NULL, region_aggs = NULL, v
   # first get all the available model files
   modelFiles <- list.files(system.file("models", package = "sparta"),
                            full.names = TRUE)
-  # fileLocation <- '//nercwlctdb.ad.nerc.ac.uk/shared/SHARED1/PYWELL_SHARED/Pywell Projects/BRC/Charlie/0. Model Testing/2. Final models and function scripts'
   # modelFiles  <- list.files(path = fileLocation, full.names = TRUE, pattern = '^SPARTA_')
   
   # Now break them down
@@ -55,7 +54,7 @@ getModelFile <- function(modeltype, regional_codes = NULL, region_aggs = NULL, v
   # If we are using regions we need to edit this
   if(!is.null(regional_codes)){
     
-    regions <- colnames(regional_codes)[2:(length(colnames(regional_codes))-2)]
+    regions <- colnames(regional_codes)[-1]
     # remove spaces
     regions <- gsub(' ', '_', regions)
     
