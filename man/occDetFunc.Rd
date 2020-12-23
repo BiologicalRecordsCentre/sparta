@@ -24,7 +24,9 @@ occDetFunc(
   additional.parameters = NULL,
   additional.BUGS.elements = NULL,
   additional.init.values = NULL,
-  return_data = TRUE
+  return_data = TRUE,
+  criterion = 1,
+  provenance = NULL
 )
 }
 \arguments{
@@ -85,7 +87,13 @@ to \code{R2jags::jags} 'data' argument}
 \item{additional.init.values}{A named list giving user specified initial values to 
 be added to the defaults.}
 
-\item{return_data}{Logical, if \code{TRUE} (default) the bugs data object is returned with the data}
+\item{return_data}{Logical, if \code{TRUE} (default) the BUGS data object is returned with the data}
+
+\item{criterion}{Determines whether the model should be run. If an integer then this defines the threshold number of records (50 in Outhwaite et al 2019).
+Other options are `EqualWt` or `HighSpec`, which define the application of "rules of thumb" defined in Pocock et al 2019. 
+Defaults to 1, in which case the model is applied for so long there is a single record of the focal species.}
+
+\item{provenance}{An optional text string allowing the user to identify the dataset.}
 }
 \value{
 A list including the model, JAGS model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
@@ -174,13 +182,13 @@ set.seed(123)
 
 # Create data
 n <- 15000 #size of dataset
-nyr <- 20 # number of years in data
+nyear <- 20 # number of years in data
 nSamples <- 100 # set number of dates
 nSites <- 50 # set number of sites
 
 # Create somes dates
-first <- as.Date(strptime("2010/01/01", "%Y/%m/%d")) 
-last <- as.Date(strptime(paste(2010+(nyr-1),"/12/31", sep=''), "%Y/%m/%d")) 
+first <- as.Date(strptime("2010/01/01", format="\%Y/\%m/\%d")) 
+last <- as.Date(strptime(paste(2010+(nyear-1),"/12/31", sep=''), format="\%Y/\%m/\%d")) 
 dt <- last-first 
 rDates <- first + (runif(nSamples)*dt)
 
@@ -202,7 +210,8 @@ results <- occDetFunc(taxa_name = taxa[1],
                       burnin = 15, 
                       occDetdata = visitData$occDetdata,
                       spp_vis = visitData$spp_vis,
-                      write_results = FALSE)
+                      write_results = FALSE,
+                      provenance  = "sparta test dataset")
 }
 }
 \references{
@@ -213,6 +222,8 @@ Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (201
 Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac, N.J.B. (2018).
             Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. 
             \emph{Ecological Indicators}, 93: 333-343.
+
+Pocock, Logie, Isaac, Outhwaite & August. Rapid assessment of the suitability of multi-species citizen science datasets for occupancy trend analysis. \emph{bioRxiv} 813626 (2019) doi:10.1101/813626.
 }
 \keyword{bayesian,}
 \keyword{distribution,}

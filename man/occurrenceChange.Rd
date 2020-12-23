@@ -5,19 +5,19 @@
 \title{Calculate percentage change between two years using Bayesian output}
 \usage{
 occurrenceChange(
-  firstYear,
-  lastYear,
   bayesOut,
+  firstYear = NULL,
+  lastYear = NULL,
   change = "growthrate",
   region = NULL
 )
 }
 \arguments{
-\item{firstYear}{numeric, the first year over which the change is to be estimated}
+\item{bayesOut}{occDet object as returned from occDetModel or occDetFunc.}
 
-\item{lastYear}{numeric, the last year over which the change is to be estimated}
+\item{firstYear}{numeric, the first year over which the change is to be estimated. Defaults to the final year in the dataset}
 
-\item{bayesOut}{occDet object as returned from occDetModel}
+\item{lastYear}{numeric, the last year over which the change is to be estimated. Defaults to the first year in the dataset}
 
 \item{change}{A character string that specifies the type of change to be calculated, the default
 is annual growth rate.  See details for options.}
@@ -30,11 +30,9 @@ A list giving the mean, median, credible intervals and raw data from the
 estimations.
 }
 \description{
-Using the data returned from occDetModel this function models a linear
-trend between two years for each iteration of the models. The predicted
-values for the two years are then used to calculates a percentage
-change. The results is a percentage change estimate for each of the
-interations of the model. This distribution of the results is used to
+Using the data returned from occDetModel/occDetFunc this function models a 
+trend between two years for each iteration of the models. Several options are
+available for the method used to calculate the trend. This distribution of the results is used to
 calculate the mean estimate and the 95% credibale intervals.
 }
 \details{
@@ -60,8 +58,8 @@ nSamples <- 100 # set number of dates
 nSites <- 50 # set number of sites
 
 # Create somes dates
-first <- as.Date(strptime("1980/01/01", "%Y/%m/%d")) 
-last <- as.Date(strptime(paste(1980+(nyr-1),"/12/31", sep=''), "%Y/%m/%d")) 
+first <- as.Date(strptime("1980/01/01", "\%Y/\%m/\%d")) 
+last <- as.Date(strptime(paste(1980+(nyr-1),"/12/31", sep=''), "\%Y/\%m/\%d")) 
 dt <- last-first 
 rDates <- first + (runif(nSamples)*dt)
 

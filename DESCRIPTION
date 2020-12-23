@@ -1,8 +1,8 @@
 Package: sparta
 Type: Package
 Title: Trend Analysis for Unstructured Data
-Version: 0.2.08
-Date: 2020-10-15
+Version: 0.2.09
+Date: 2020-12-22
 Authors@R: c(person("Tom", "August", role = c("aut", "cre"), email = "tomaug@ceh.ac.uk"),
              person("Gary", "Powney", role = c("aut")),
              person("Charlie", "Outhwaite", role = c("aut")),
@@ -36,5 +36,5 @@ Suggests:
     R2jags
 VignetteBuilder: knitr
 LazyData: TRUE
-RoxygenNote: 7.0.0
+RoxygenNote: 7.1.1
 Encoding: UTF-8
