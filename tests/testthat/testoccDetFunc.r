@@ -589,14 +589,14 @@ test_that("Test occDetFunc with empty species post nyr filter", {
                    "/dev/null"))
   
   expect_warning(results <- occDetFunc(taxa_name = 'aa',
-                                       n_iterations = 50,
-                                       burnin = 15, 
-                                       occDetdata = visitData_filterError$occDetdata,
-                                       spp_vis = visitData_filterError$spp_vis,
-                                       write_results = FALSE,
-                                       seed = 111,
-                                       modeltype = c("ranwalk", "halfcauchy")),
-                 "aa has insufficient data after site filtering. Either decrease nyr or change the criterion")
+                                     n_iterations = 50,
+                                     burnin = 15, 
+                                     occDetdata = visitData_filterError$occDetdata,
+                                     spp_vis = visitData_filterError$spp_vis,
+                                     write_results = FALSE,
+                                     seed = 111,
+                                     modeltype = c("ranwalk", "halfcauchy")),
+                 'aa has insufficient data after site filtering. Either decrease nyr or change the criterion')
   sink()
   
 })

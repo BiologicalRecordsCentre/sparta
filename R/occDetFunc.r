@@ -192,7 +192,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   if(!taxa_name %in% colnames(spp_vis)) stop('taxa_name is not the name of a taxa in spp_vis')
   ################## 
   min_year <- min(occDetdata$TP)
-  
+
   # only include sites which have more than nyr of records
   yps <- rowSums(acast(occDetdata, site ~ TP, length, value.var = 'L') > 0)
   sites_to_include <- names(yps[yps >= nyr])
@@ -306,7 +306,6 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
       
       # strip these same sites out of the occDetdata
       bad_sites <- unique(c(abs_sites, sites_multi_row, sites_multi_region, sites_no_region, sites_no_region2))
-      
       regional_codes <- regional_codes[!regional_codes$site %in% bad_sites, ]
       occDetdata <- subset(occDetdata, !site %in% bad_sites)
     }
@@ -337,14 +336,14 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
         error_msg <- paste0('There are ', length(missing_yrs),' years with no visits, including ', missing_yrs[1],'. This will crash BUGS')
       stop(error_msg)
     }
-    
+
     # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
     site_match <- unique(data.frame(name = occDetdata$site, id = as.numeric(as.factor(occDetdata$site))))
     occDetdata <- merge(occDetdata, site_match, by.x='site', by.y="name")
     
     # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
     zst <- acast(occDetdata, id ~ factor(TP), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
-    
+
     # if the max_year is not null, edit the zst table to add the additional years required
     if(!is.null(max_year)){
       
@@ -431,7 +430,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
       bugs_data <- getBugsData(bugs_data, modeltype = btype,
                                occDetData = occDetdata)
     }
-    
+
     # Add additional elements if specified
     if(!is.null(additional.BUGS.elements)){
       if(!is.list(additional.BUGS.elements)){
@@ -447,6 +446,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     # Add regional elements to bugs data
     if(!is.null(regional_codes)){
+
       # removed unwanted bugs elements
       bugs_data <- bugs_data[!names(bugs_data) %in% c('psi0.a', 'psi0.b')]
       
@@ -470,7 +470,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
         # remove regions for regions_codes
         regional_codes <- regional_codes[ ,!colnames(regional_codes) %in% zero_sites]
         region_names <- setdiff(region_names, zero_sites)
-        
+
         # remove region aggregates
         rem_aggs <- unlist(lapply(region_aggs, FUN = function(x) any(zero_sites %in% x)))
         rem_aggs_names <- names(region_aggs)[rem_aggs]
@@ -484,11 +484,11 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
           parameters <- parameters[!parameters %in% paste0('psi.fs.r_', rem_aggs_names)]
         }
       } 
-    
+
     regions_years <- list()
     regions_nobs <- list()
     regions_sites <-list()
-    
+
     bugs_data_copy <- merge(bugs_data_copy, regional_codes, all.x = TRUE)
     
     # add regional codes to this copy and get n_obs, max and min years and year gaps for each region
