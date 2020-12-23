@@ -191,7 +191,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   # Check the taxa_name is one of my species
   if(!taxa_name %in% colnames(spp_vis)) stop('taxa_name is not the name of a taxa in spp_vis')
   ################## 
-  
+  min_year <- min(occDetdata$TP)
   
   # only include sites which have more than nyr of records
   yps <- rowSums(acast(occDetdata, site ~ TP, length, value.var = 'L') > 0)
@@ -227,7 +227,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   if(!proceed){
     # there is not enough data: set the outputs accordingly
-    bugs_data <- BD_MD <- NA
+    bugs_data <- list(y=0,nsite=0,nvisit=0)
+    BD_MD <- error_status <- site_match <- modelcode <- NA
     warning(paste(taxa_name,
                   "has insufficient data after site filtering. Either decrease nyr or change the criterion"))
     out <- list(message = "No model run: insufficient data")    
@@ -282,7 +283,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
       }
       if(any(is.na(regional_codes))){
         warning(paste(sum(is.na(regional_codes)),
-                      "NAs are present in regional_codes, these will be replaced with 0's"))
+                      "NAs are present in regional_codes, these will be replaced with 0s"))
         regional_codes[is.na(regional_codes)] <- 0
       }
       
@@ -307,7 +308,6 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
       bad_sites <- unique(c(abs_sites, sites_multi_row, sites_multi_region, sites_no_region, sites_no_region2))
       
       regional_codes <- regional_codes[!regional_codes$site %in% bad_sites, ]
-      sites_to_include <- setdiff(sites_to_include, bad_sites)
       occDetdata <- subset(occDetdata, !site %in% bad_sites)
     }
         
@@ -337,22 +337,13 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
         error_msg <- paste0('There are ', length(missing_yrs),' years with no visits, including ', missing_yrs[1],'. This will crash BUGS')
       stop(error_msg)
     }
-    # Record the max and min values of TP
-    min_year <- min(occDetdata$TP)
     
     # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
-    site_match <- data.frame(original_site = occDetdata$site, new_site_name = as.numeric(as.factor(occDetdata$site)))
-    site_match <- unique(site_match)
-    occDetdata$sitenum <- as.numeric(as.factor(occDetdata$site))
-    
-    # Convert the regional table to these numeric versions of site names
-    if(!is.null(regional_codes)){
-      regional_codes$numeric_site_name <- site_match$new_site_name[match(x = as.character(regional_codes[,1]),
-                                                                         table = as.character(site_match$original_site))]
-    }
+    site_match <- unique(data.frame(name = occDetdata$site, id = as.numeric(as.factor(occDetdata$site))))
+    occDetdata <- merge(occDetdata, site_match, by.x='site', by.y="name")
     
     # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
-    zst <- acast(occDetdata, sitenum ~ factor(TP), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
+    zst <- acast(occDetdata, id ~ factor(TP), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
     
     # if the max_year is not null, edit the zst table to add the additional years required
     if(!is.null(max_year)){
@@ -392,7 +383,6 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     # Parameter you wish to monitor, shown in the output
     parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a")
     
-    
     # If ranwalk + halfcauchy monitor mu.lp 
     if(all(c('ranwalk', 'halfcauchy') %in% modeltype)){
       if(!'centering' %in% tolower(modeltype) & !'intercept' %in% tolower(modeltype)){
@@ -415,12 +405,13 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     # add parameters for regions
     if(!is.null(regional_codes)){
-      regions <- colnames(regional_codes)[2:(length(colnames(regional_codes))-1)]
-      # remove spaces
-      regions <- gsub(' ', '_', regions)
+      # remove spaces from region names, then extract them
+      colnames(regional_codes)[-1] <- gsub(' ', '_', colnames(regional_codes)[-1])
+      region_names <- colnames(regional_codes)[-1]      
+      
       parameters <- c(parameters,
-                      paste0("psi.fs.r_", regions),
-                      paste0("a_", regions))
+                      paste0("psi.fs.r_", region_names),
+                      paste0("a_", region_names))
       # ignore some parameters not used in regions model
       parameters <- parameters[!parameters %in% c('a')]
     }
@@ -431,25 +422,15 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     }
     
     # now assemble the bugs_data and related objects
-    #need to convert Site identities into row numbers
-    site_to_row_lookup <- data.frame(sitenum = as.integer(row.names(zst)),
-                                     rownum = 1:nrow(zst)) 
-    
     # HERE IS THE BUGS DATA
-    bugs_data <- with(merge(occDetdata, site_to_row_lookup, 
-                            by="sitenum"), # adds rownum to occDetdata (used below)
-                      list(y = as.numeric(focal), Year = TP, Site = rownum, 
+    bugs_data <- with(occDetdata, 
+                      list(y = as.numeric(focal), Year = TP, Site = id, 
                            nyear = nTP, nsite = nrow(zst), nvisit = nrow(occDetdata)))
 
-    # added extra elements to bugs data if needed
-    occDetData_temp <- merge(occDetdata, site_to_row_lookup, by="sitenum")
-    
     for(btype in modeltype){ # one call per element of modeltype: each adds a section
       bugs_data <- getBugsData(bugs_data, modeltype = btype,
-                               occDetData = occDetData_temp)
+                               occDetData = occDetdata)
     }
-    
-    rm(list = 'occDetData_temp')
     
     # Add additional elements if specified
     if(!is.null(additional.BUGS.elements)){
@@ -460,27 +441,22 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
       }
     }
     
+    # make a copy of the bugs_data to calculate metadata from
+    bugs_data_copy <- with(occDetdata, data.frame(y = as.numeric(focal), year = TP, site = site))
+    BD_MD <- list()
+    
     # Add regional elements to bugs data
     if(!is.null(regional_codes)){
-      # use site_to_row_lookup to get the correct site names
-      regional_codes$rownum <- site_to_row_lookup$rownum[match(x = regional_codes$numeric_site_name, 
-                                                               table = site_to_row_lookup$site)]
-      
       # removed unwanted bugs elements
       bugs_data <- bugs_data[!names(bugs_data) %in% c('psi0.a', 'psi0.b')]
       
       zero_sites <- NULL
-      for(region_name in colnames(regional_codes)[2:(ncol(regional_codes)-2)]){
-        
-        if(sum(regional_codes[ , region_name]) != 0){
-          
-          bugs_data[paste0('r_', region_name)] <- list(regional_codes[order(regional_codes$rownum), region_name])
-          bugs_data[paste0('nsite_r_', region_name)] <- list(sum(regional_codes[order(regional_codes$rownum), region_name]))
-          
+      for(region in region_names){
+        if(sum(regional_codes[ , region]) != 0){
+          bugs_data[paste0('r_', region)] <- list(regional_codes[occDetdata$id,region])
+          bugs_data[paste0('nsite_r_', region)] <- sum(regional_codes[, region])
         } else {
-          
-          zero_sites <- c(zero_sites, region_name)
-          
+          zero_sites <- c(zero_sites, region)
         }
       }
       
@@ -507,26 +483,15 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
           parameters <- parameters[!parameters %in% paste0('psi.fs.r_', rem_aggs_names)]
         }
       } 
-    }
-    
-    # make a copy of the bugs_data to calculate metadata from
-    bugs_data_copy <- data.frame(y = bugs_data$y, year = bugs_data$Year, site = bugs_data$Site)
-    BD_MD <- list()
-    
-    if(!is.null(regional_codes)){region_codes_copy <- data.frame(site = 1:bugs_data$nsite)
     
     regions_years <- list()
     regions_nobs <- list()
     regions_sites <-list()
     
-    for(region_name in colnames(regional_codes)[2:(ncol(regional_codes)-2)]){
-      region_codes_copy[,paste0('r_', region_name)] <- bugs_data[paste0('r_', region_name)]}
-    
-    bugs_data_copy <- merge(bugs_data_copy, region_codes_copy, all.x = TRUE)
+    bugs_data_copy <- merge(bugs_data_copy, regional_codes, all.x = TRUE)
     
     # add regional codes to this copy and get n_obs, max and min years and year gaps for each region
-    for(region_name in colnames(regional_codes)[2:(ncol(regional_codes)-2)]){
-      
+    for(region_name in region_names){
       regions_nobs[paste0('n_obs_','r_', region_name)] <- sum(bugs_data_copy$y * bugs_data_copy[,paste0('r_', region_name)])
       regions_sites[paste0('n_sites_','r_', region_name)] <- sum(region_codes_copy[,paste0('r_', region_name)])
       
@@ -621,7 +586,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     ###
     
     if(identical(model.file, occDetBUGScode)){
-      warning('The current formulation of the priors on the state model are strongly informative (at 0 or 1) on the occupancy scale, this is not ideal, as it can cause issues when modelling species with sparse data.  We are currently investigating solutions to this issue as part of overall development work on the occupancy model.  A quick fix is to logit transform the prior for the year and site effects as shown on page 573 of Kery and Royle (2015) Applied hierarchical modelling in ecology')
+      warning("You have selected a formulation with potentially informative priors that are subject to boundary effects (See Outhwaite et al 2018 for details). 
+      This option is retained within sparta for backwards compatibility only: we strongly recommend that you do 
+              not use this option for inferring changes in species' distributions")
     }
     
     error_status <- try(    
@@ -642,7 +609,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     ########################################## Add metadata
     
     # calcluate number of site:year combinations with repeat visits (across the whole dataset)
-    temp <- as.data.frame(with(occDetdata, table(sitenum, TP)))$Freq
+    temp <- as.data.frame(with(occDetdata, table(site, TP)))$Freq
     prop_visits_repeated <- mean(temp[temp>0] > 1)
 
     if(is.null(attributes(occDetdata))){
@@ -653,21 +620,29 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
       metadata <- list()
     }
     
+    # get the sessionInfo and coerce into a useable format
+    session.info <- sessionInfo()
+    packages <- c(sapply(session.info[7][[1]], function(x) x$Version),
+                  sapply(session.info[8][[1]], function(x) x$Version))
+    
     MD <- list(method = 'sparta::occDetFunc',
                call =   call <- match.call(),
                date = Sys.Date(),
                user = Sys.info()['user'],
                summary = list(species = taxa_name,
-                              n_sites = bugs_data$nsite,
-                              n_years = bugs_data$nyear,
-                              n_obs = sum(bugs_data$y),
+                              n_sites = length(unique(occDetdata$site)),
+                              n_years = length(unique(occDetdata$TP)),
+                              n_visits = nrow(occDetdata),
+                              n_obs = sum(occDetdata$focal),
+                              n_species_sites <- length(unique(subset(occDetdata, focal=TRUE)$site)),
                               min_year_model = min_year,
-                              max_year_model = max_year,
+                              max_year_model = max_year),
+                gaps = ifelse(is.na(BD_MD), NA, list( 
                               min_year_data = BD_MD$min_year_data,
                               max_year_data = BD_MD$max_year_data,
                               gap_start = BD_MD$yeargaps$gap_start,
                               gap_end = BD_MD$yeargaps$gap_end,
-                              gap_middle = BD_MD$yeargaps$gap_middle),
+                              gap_middle = BD_MD$yeargaps$gap_middle)),
                spp_Metrics = as.list(data_Metrics),
                dataset_Metrics = list(# dataset properties
                               totalObservations = sum(occDetdata$L),
@@ -676,7 +651,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                output_path = ifelse(test = write_results,
                                     file.path(getwd(), output_dir, paste(taxa_name, ".rdata", sep = "")),
                                     NA),
-               session.info = sessionInfo())
+               session_info = list(session.info[-c(7:8)],
+                                   packages)
+               )
     
     # add regional elements if applicable
     if(!is.null(regional_codes)){
@@ -700,14 +677,13 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     metadata[name] <- list(MD)
     attr(out, 'metadata') <- metadata
-    
+
     out$SPP_NAME <- taxa_name
     out$min_year <- min_year
     out$max_year <- max_year
-    out$sites_included <- site_match[site_match$new_site_name %in% as.numeric(sites_to_include), "original_site"]
+    out$sites_included <- site_match
     out$nsites <- bugs_data$nsite
     out$nvisits <- bugs_data$nvisit
-    out$species_sites <- length(unique(bugs_data$Site[bugs_data$y == 1]))
     out$species_observations <- sum(bugs_data$y)
     if(!is.null(regional_codes)) out$regions <- head(tail(colnames(regional_codes), -1), -2)
     if(!is.null(region_aggs)) out$region_aggs <- region_aggs

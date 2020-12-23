@@ -38,7 +38,7 @@
 #'
 #' }
 #' @export
-#' @import dplyr
+#' @importFrom dplyr count
 
 
 visitsSummary <- function(x) {
