@@ -304,7 +304,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
       if(length(sites_no_region2) >= 1) 
         warning(paste(length(sites_no_region2), 'sites are in occurrence data but not in regional data and will be removed'))
       
-      # strip these same sites out of the occDetdata
+      # strip these same sites out of the occDetdata & the regional codes
       bad_sites <- unique(c(abs_sites, sites_multi_row, sites_multi_region, sites_no_region, sites_no_region2))
       regional_codes <- regional_codes[!regional_codes$site %in% bad_sites, ]
       occDetdata <- subset(occDetdata, !site %in% bad_sites)
