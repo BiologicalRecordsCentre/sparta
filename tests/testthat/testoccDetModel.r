@@ -44,6 +44,6 @@ test_that("Test occDetModel", {
   expect_identical(names(results[[1]]),
                    c("model", "BUGSoutput", "parameters.to.save", "model.file", 
                      "n.iter", "DIC", "SPP_NAME", "min_year", "max_year", "sites_included",
-                     "nsites", "nvisits", "species_sites", "species_observations"))
+                     "nsites", "nvisits", "species_observations"))
   
 })
