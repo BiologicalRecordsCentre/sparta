@@ -95,7 +95,7 @@ test_that("Test occDetFunc errors", {
                                     write_results = FALSE,
                                     criterion = "HighSpec",
                                     seed = 111),
-              'There are no visits in year 2018. This will crash BUGS')
+              'There are no visits in year 2018. This means there is no data, for any species in this year. BUGS cannot run if there is a year with no data. Quitting...')
 
   expect_error(results <- occDetFunc(taxa_name = 'a',
                                     n_iterations = 50,
@@ -104,7 +104,7 @@ test_that("Test occDetFunc errors", {
                                     spp_vis = visitData_missing2$spp_vis,
                                     write_results = FALSE,
                                     seed = 111),
-              'There are 2 years with no visits, including 2017. This will crash BUGS')
+              'There are 2 years with no visits, including 2017. This means there is no data, for any species in these years. BUGS cannot run if any year has no data. Quitting...')
  
   
  expect_error(results <- occDetFunc(taxa_name = 'a',
