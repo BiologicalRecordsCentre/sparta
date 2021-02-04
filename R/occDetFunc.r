@@ -199,9 +199,12 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # strip out the visits to sites that were visited in just one year
   i <- occDetdata$site %in% sites_to_include
-  occDetdata <- occDetdata[i,]
-  spp_vis <- spp_vis[i,]
   
+  if(sum(i) > 0){
+    occDetdata <- occDetdata[i,]
+    spp_vis <- spp_vis[i,]
+  } else stop(paste0("There are no sites visited in at least ", nyr, " years."))
+
   # calcluate a set of data metrics for this species
   data_Metrics <- dataMetrics(sp = taxa_name, 
                                 formattedData = list(occDetdata=occDetdata, spp_vis=spp_vis))
@@ -276,8 +279,16 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     if(!is.null(regional_codes)){
       if(!inherits(regional_codes, 'data.frame')) stop("regional_codes should be a data.frame")
       
+      # check whether there is a column called "site". 
+      #If not, let's assume that the site column is the first in the dataframe
+      #NB previous behaviour was to assume *both* that it was column 1 and named 'site'
+      if(!"site" %in% names(regional_codes)) {
+        warning(paste0("renaming ", names(regional_codes)[1], " as 'site'"))
+        names(regional_codes)[1] <- "site" 
+      }
+      
       # remove locations that are not in the data
-      abs_sites <- as.character(regional_codes[,1])[!as.character(regional_codes[,1]) %in% as.character(occDetdata$site)]
+      abs_sites <- as.character(regional_codes$site)[!as.character(regional_codes$site) %in% as.character(occDetdata$site)]
       if(length(abs_sites) > 0){
         warning(paste(length(abs_sites), 'sites are in regional_codes but not in occurrence data'))
       }
@@ -306,7 +317,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
       
       # strip these same sites out of the occDetdata & the regional codes
       bad_sites <- unique(c(abs_sites, sites_multi_row, sites_multi_region, sites_no_region, sites_no_region2))
-      regional_codes <- regional_codes[!regional_codes$site %in% bad_sites, ]
+      regional_codes <- subset(regional_codes, !site %in% bad_sites)
       occDetdata <- subset(occDetdata, !site %in% bad_sites)
     }
         
@@ -426,6 +437,11 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                       list(y = as.numeric(focal), Year = TP, Site = id, 
                            nyear = nTP, nsite = nrow(zst), nvisit = nrow(occDetdata)))
 
+    # temporary test
+    if(max(occDetdata$id) != bugs_data$nsite) stop(paste0("Site idenitifier exceeds nsite (",
+                                                          max(occDetdata$id),nsite,")"))
+    
+    
     for(btype in modeltype){ # one call per element of modeltype: each adds a section
       bugs_data <- getBugsData(bugs_data, modeltype = btype,
                                occDetData = occDetdata)
