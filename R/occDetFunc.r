@@ -331,9 +331,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
       # find out which years have no data
       missing_yrs <-  with(occDetdata, setdiff(min(TP):max(TP), unique(TP)))
       if(length(missing_yrs) ==1)
-        error_msg <- paste0('There are no visits in year ', missing_yrs,'. This will crash BUGS')
+        error_msg <- paste0('There are no visits in year ', missing_yrs,'. This means there is no data, for any species in this year. BUGS cannot run if there is a year with no data. Quitting...')
       else 
-        error_msg <- paste0('There are ', length(missing_yrs),' years with no visits, including ', missing_yrs[1],'. This will crash BUGS')
+        error_msg <- paste0('There are ', length(missing_yrs),' years with no visits, including ', missing_yrs[1],'. This means there is no data, for any species in these years. BUGS cannot run if any year has no data. Quitting...')
       stop(error_msg)
     }
 
