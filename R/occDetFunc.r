@@ -349,7 +349,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     }
 
     # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
-    site_match <- unique(data.frame(name = occDetdata$site, id = as.numeric(as.factor(occDetdata$site))))
+    nsite <- length(unique(occDetdata$site))
+    site_match <- data.frame(name = unique(occDetdata$site), id = 1:nsite)
     occDetdata <- merge(occDetdata, site_match, by.x='site', by.y="name")
     
     # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
@@ -435,11 +436,11 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     # HERE IS THE BUGS DATA
     bugs_data <- with(occDetdata, 
                       list(y = as.numeric(focal), Year = TP, Site = id, 
-                           nyear = nTP, nsite = nrow(zst), nvisit = nrow(occDetdata)))
+                           nyear = nTP, nsite = nsite, nvisit = nrow(occDetdata)))
 
     # temporary test
     if(max(occDetdata$id) != bugs_data$nsite) stop(paste0("Site idenitifier exceeds nsite (",
-                                                          max(occDetdata$id),nsite,")"))
+                                                          max(occDetdata$id), nsite,")"))
     
     
     for(btype in modeltype){ # one call per element of modeltype: each adds a section
