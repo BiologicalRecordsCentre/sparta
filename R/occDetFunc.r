@@ -509,19 +509,43 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     # add regional codes to this copy and get n_obs, max and min years and year gaps for each region
     for(region_name in region_names){
+      
       regions_nobs[paste0('n_obs_','r_', region_name)] <- sum(bugs_data_copy$y * bugs_data_copy[,region_name])
       regions_sites[paste0('n_sites_','r_', region_name)] <- sum(bugs_data_copy[,region_name])
       current_r <- bugs_data_copy$y * bugs_data_copy[,region_name] * bugs_data_copy$year
       current_r <- subset(current_r,current_r !=0)
-      current_rmin <- (min_year-1) + min(current_r)
-      current_rmax <- (min_year-1) + max(current_r)
-      regions_years[paste0('min_year_data_','r_', region_name)] <- current_rmin
-      regions_years[paste0('max_year_data_','r_', region_name)] <- current_rmax
-      current_datagaps <- dataGaps(current_r, min_year, max_year, current_rmin, current_rmax)
-      regions_years[paste0('gap_start_','r_', region_name)] <- current_datagaps$gap_start
-      regions_years[paste0('gap_end_','r_', region_name)] <- current_datagaps$gap_end
-      regions_years[paste0('gap_middle_','r_', region_name)] <- current_datagaps$gap_middle
-    }
+      
+      if(length(current_r) > 2){
+        
+        current_rmin <- (min_year-1) + min(current_r)
+        current_rmax <- (min_year-1) + max(current_r)
+        regions_years[paste0('min_year_data_','r_', region_name)] <- current_rmin
+        regions_years[paste0('max_year_data_','r_', region_name)] <- current_rmax
+        current_datagaps <- dataGaps(current_r, min_year, max_year, current_rmin, current_rmax)
+        regions_years[paste0('gap_start_','r_', region_name)] <- current_datagaps$gap_start
+        regions_years[paste0('gap_end_','r_', region_name)] <- current_datagaps$gap_end
+        regions_years[paste0('gap_middle_','r_', region_name)] <- current_datagaps$gap_middle
+      
+      } else if(length(current_r) == 1) {
+        
+        current_rmin <- (min_year-1) + min(current_r)
+        current_rmax <- (min_year-1) + max(current_r)
+        regions_years[paste0('min_year_data_','r_', region_name)] <- current_rmin
+        regions_years[paste0('max_year_data_','r_', region_name)] <- current_rmax
+        current_datagaps <- dataGaps(current_r, min_year, max_year, current_rmin, current_rmax)
+        regions_years[paste0('gap_start_','r_', region_name)] <- current_datagaps$gap_start
+        regions_years[paste0('gap_end_','r_', region_name)] <- current_datagaps$gap_end
+        regions_years[paste0('gap_middle_','r_', region_name)] <- NA
+        
+      } else if(length(current_r) < 1){
+        
+        regions_years[paste0('min_year_data_','r_', region_name)] <- NA
+        regions_years[paste0('max_year_data_','r_', region_name)] <- NA
+        regions_years[paste0('gap_start_','r_', region_name)] <- NA
+        regions_years[paste0('gap_end_','r_', region_name)] <- NA
+        regions_years[paste0('gap_middle_','r_', region_name)] <- NA
+        
+      }
     }
     
     # add max and min data years for the whole dataset
@@ -711,3 +735,4 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     return(out)
     }  	
   }
+}
