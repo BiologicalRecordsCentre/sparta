@@ -735,3 +735,4 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     return(out)
     }  	
   }
+}
