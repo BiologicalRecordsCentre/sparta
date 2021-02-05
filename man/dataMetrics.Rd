@@ -18,5 +18,7 @@ Takes a formattedOccData object and the name of a species. Runs a set of calcula
 Based on rules of thumb. Original version by Mark Logie; integrated into sparta by NJBI
 }
 \references{
-Pocock, Logie, Isaac, Outhwaite & August. Rapid assessment of the suitability of multi-species citizen science datasets for occupancy trend analysis. bioRxiv 813626 (2019) doi:10.1101/813626.
+Pocock, Logie, Isaac, Outhwaite & August (2019). 
+Rapid assessment of the suitability of multi-species citizen 
+science datasets for occupancy trend analysis. \emph{bioRxiv} 813626 doi:10.1101/813626.
 }
