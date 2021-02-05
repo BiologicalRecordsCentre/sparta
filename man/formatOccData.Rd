@@ -48,13 +48,13 @@ occupancy models (see value section)
 
 # Create data
 n <- 15000 #size of dataset
-nyr <- 20 # number of years in data
+nyear <- 20 # number of years in data
 nSurveys <- 100 # set number of dates
 nSites <- 50 # set number of sites
 
 # Create somes dates
-first <- as.Date(strptime("2010/01/01", "\%Y/\%m/\%d")) 
-last <- as.Date(strptime(paste(2010+(nyr-1),"/12/31", sep=''), "\%Y/\%m/\%d")) 
+first <- as.Date(strptime("2010/01/01", format="\%Y/\%m/\%d")) 
+last <- as.Date(strptime(paste(2010+(nyear-1),"/12/31", sep=''), format="\%Y/\%m/\%d")) 
 dt <- last-first 
 rDates <- first + (runif(nSurveys)*dt)
 

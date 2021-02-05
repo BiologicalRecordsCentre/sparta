@@ -7,7 +7,9 @@
 #' @param formattedData output from formattedOccData
 #' @param verbose Logical. Default (`FALSE`) returns seven metrics. 
 #' 
-#' @references Pocock, Logie, Isaac, Outhwaite & August. Rapid assessment of the suitability of multi-species citizen science datasets for occupancy trend analysis. bioRxiv 813626 (2019) doi:10.1101/813626.
+#' @references Pocock, Logie, Isaac, Outhwaite & August (2019). 
+#' Rapid assessment of the suitability of multi-species citizen 
+#' science datasets for occupancy trend analysis. \emph{bioRxiv} 813626 doi:10.1101/813626.
 #' @export
 
 

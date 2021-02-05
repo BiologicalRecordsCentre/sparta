@@ -34,13 +34,13 @@
 #' 
 #' # Create data
 #' n <- 15000 #size of dataset
-#' nyr <- 20 # number of years in data
+#' nyear <- 20 # number of years in data
 #' nSurveys <- 100 # set number of dates
 #' nSites <- 50 # set number of sites
 #' 
 #' # Create somes dates
-#' first <- as.Date(strptime("2010/01/01", "%Y/%m/%d")) 
-#' last <- as.Date(strptime(paste(2010+(nyr-1),"/12/31", sep=''), "%Y/%m/%d")) 
+#' first <- as.Date(strptime("2010/01/01", format="%Y/%m/%d")) 
+#' last <- as.Date(strptime(paste(2010+(nyear-1),"/12/31", sep=''), format="%Y/%m/%d")) 
 #' dt <- last-first 
 #' rDates <- first + (runif(nSurveys)*dt)
 #' 
@@ -157,7 +157,7 @@ formatOccData <- function(taxa, site, survey, replicate = NULL, closure_period =
   temp <- taxa_data[,c('taxa','visit')]
   names(temp)[1] <- "species_name"
   temp$pres <- TRUE # add TRUE column which will populate the spp with visit matrix/dataframe
-  spp_vis <- dcast(temp, formula = visit ~ species_name, value.var = "pres", fill = FALSE) # This is the dataframe that contains a row per visit and a column for each species present or not.  USed to create the focal column in the next step
+  spp_vis <- dcast(temp, formula = visit ~ species_name, value.var = "pres", fill = FALSE, fun=unique) # This is the dataframe that contains a row per visit and a column for each species present or not.  USed to create the focal column in the next step
   
   
   # Add Julian Day if needed

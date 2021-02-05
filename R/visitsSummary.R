@@ -40,6 +40,7 @@
 #' @export
 #' @importFrom dplyr count
 
+#' @importFrom dplyr arrange
 
 visitsSummary <- function(x) {
   

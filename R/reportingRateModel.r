@@ -83,8 +83,11 @@
 #' @importFrom plyr rbind.fill
 #' @importFrom dplyr distinct
 #' @references Roy, H.E., Adriaens, T., Isaac, N.J.B. et al. (2012) Invasive alien predator
-#'             causes rapid declines of native European ladybirds. Diversity & Distributions,
-#'             18, 717-725.
+#'             causes rapid declines of native European ladybirds. \emph{Diversity & Distributions},
+#'             18: 717-725.
+#' @references Isaac, N.J.B. et al. (2014) Extracting robust trends in species' distributions 
+#'             from unstructured opportunistic data: a comparison of methods.
+#'             \emph{bioRXiv} 006999, https://doi.org/10.1101/006999.
 
 reportingRateModel <- function(taxa, site, time_period, list_length = FALSE, site_effect = FALSE,
                                species_to_include = unique(taxa), overdispersion = FALSE,
