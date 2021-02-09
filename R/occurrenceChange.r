@@ -3,7 +3,7 @@
 #' Using the data returned from occDetModel/occDetFunc this function models a 
 #' trend between two years for each iteration of the models. Several options are
 #' available for the method used to calculate the trend. This distribution of the results is used to
-#' calculate the mean estimate and the 95% credibale intervals. 
+#' calculate the mean estimate and the 95% credible intervals. 
 #'
 #' @param bayesOut occDet object as returned from occDetModel or occDetFunc. 
 #' @param firstYear numeric, the first year over which the change is to be estimated. Defaults to the final year in the dataset
@@ -27,7 +27,7 @@
 #' \code{lineargrowth} calculates the linear growth rate from a linear model.
 #' 
 #' @return A list giving the mean, median, credible intervals and raw data from the
-#' estimations.
+#' estimations. It is recommended to use the median value.
 #' @examples
 #' \dontrun{
 #' 
