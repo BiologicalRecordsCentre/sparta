@@ -178,7 +178,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                         seed = NULL, model.function = NULL, regional_codes = NULL,
                         region_aggs = NULL, additional.parameters = NULL,
                         additional.BUGS.elements = NULL, additional.init.values = NULL,
-                        return_data = TRUE, criterion = 1, provenance = NULL){
+                        return_data = FALSE, criterion = 1, provenance = NULL, saveMatrix = FALSE){
   
   ################## BASIC CHECKS
   # first run the error checks
@@ -467,10 +467,13 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
       # removed unwanted bugs elements
       bugs_data <- bugs_data[!names(bugs_data) %in% c('psi0.a', 'psi0.b')]
       
+      # expand the lookup table to include regions
+      regional_lookup <- merge(regional_codes, site_match, by.y="name", by.x="site")
+      
       zero_sites <- NULL
       for(region in region_names){
         if(sum(regional_codes[ , region]) != 0){
-          bugs_data[paste0('r_', region)] <- list(regional_codes[occDetdata$id,region])
+          bugs_data[paste0('r_', region)] <- list(regional_lookup[order(regional_lookup$id),region])
           bugs_data[paste0('nsite_r_', region)] <- sum(regional_codes[, region])
         } else {
           zero_sites <- c(zero_sites, region)
@@ -720,6 +723,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     metadata[name] <- list(MD)
     attr(out, 'metadata') <- metadata
 
+    if(!saveMatrix) out$BUGSoutput$sims.matrix <- NULL
+    
     out$SPP_NAME <- taxa_name
     out$min_year <- min_year
     out$max_year <- max_year
@@ -727,6 +732,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     out$nsites <- bugs_data$nsite
     out$nvisits <- bugs_data$nvisit
     out$species_observations <- sum(bugs_data$y)
+    out$sparta_version <- packages["sparta"]
     if(!is.null(regional_codes)) out$regions <- region_names
     if(!is.null(region_aggs)) out$region_aggs <- region_aggs
     if(return_data) out$bugs_data <- bugs_data
