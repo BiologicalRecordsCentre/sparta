@@ -24,9 +24,10 @@ occDetFunc(
   additional.parameters = NULL,
   additional.BUGS.elements = NULL,
   additional.init.values = NULL,
-  return_data = TRUE,
+  return_data = FALSE,
   criterion = 1,
-  provenance = NULL
+  provenance = NULL,
+  saveMatrix = FALSE
 )
 }
 \arguments{
