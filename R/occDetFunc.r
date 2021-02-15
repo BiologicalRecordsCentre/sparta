@@ -45,6 +45,7 @@
 #' @param additional.init.values A named list giving user specified initial values to 
 #' be added to the defaults.
 #' @param return_data Logical, if \code{TRUE} (default) the BUGS data object is returned with the data
+#' @param saveMatrix Logical, if \code{FALSE} (default) the sims.matrix element of the jags object is omitted, in order to reduce the filesize.
 #' @param criterion Determines whether the model should be run. If an integer then this defines the threshold number of records (50 in Outhwaite et al 2019).
 #' Other options are `EqualWt` or `HighSpec`, which define the application of "rules of thumb" defined in Pocock et al 2019. 
 #' Defaults to 1, in which case the model is applied for so long there is a single record of the focal species.
