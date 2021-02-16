@@ -192,7 +192,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   # Check the taxa_name is one of my species
   if(!taxa_name %in% colnames(spp_vis)) stop('taxa_name is not the name of a taxa in spp_vis')
   ################## 
-  min_year_original <- min(occDetdata$TP)
+  min_year_original <- min_year <- min(occDetdata$TP)
   
   # only include sites which have more than nyr of records
   yps <- rowSums(acast(occDetdata, site ~ TP, length, value.var = 'L') > 0)
