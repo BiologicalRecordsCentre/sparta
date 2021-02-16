@@ -193,7 +193,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   if(!taxa_name %in% colnames(spp_vis)) stop('taxa_name is not the name of a taxa in spp_vis')
   ################## 
   min_year <- min(occDetdata$TP)
-  
+
   # only include sites which have more than nyr of records
   yps <- rowSums(acast(occDetdata, site ~ TP, length, value.var = 'L') > 0)
   sites_to_include <- names(yps[yps >= nyr])
@@ -205,29 +205,29 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     occDetdata <- occDetdata[i,]
     spp_vis <- spp_vis[i,]
   } else stop(paste0("There are no sites visited in at least ", nyr, " years."))
-  
+
   # calcluate a set of data metrics for this species
   data_Metrics <- dataMetrics(sp = taxa_name, 
-                              formattedData = list(occDetdata=occDetdata, spp_vis=spp_vis))
-  
+                                formattedData = list(occDetdata=occDetdata, spp_vis=spp_vis))
+
   is.wholenumber <-
     function(x, tol = .Machine$double.eps^0.5)  {
       if(is.numeric(x)) abs(x - round(x)) < tol
       else FALSE
-    }
-  
+      }
+
   # check there is enough data to run a model. If so, proceed with the main event
   if(is.wholenumber(criterion)) {
-    # the criterion is a whole number. this defines the number of records
-    # check whether the number of records meets this value
-    proceed <- sum(spp_vis[,taxa_name]) >= criterion
+      # the criterion is a whole number. this defines the number of records
+      # check whether the number of records meets this value
+      proceed <- sum(spp_vis[,taxa_name]) >= criterion
   } else if(criterion == "EqualWt") {
-    proceed <- applyRuleOfThumb(data_Metrics, "EqualWt")
+      proceed <- applyRuleOfThumb(data_Metrics, "EqualWt")
   } else if(criterion == "HighSpec") {
-    proceed <- applyRuleOfThumb(data_Metrics, "HighSpec")
+      proceed <- applyRuleOfThumb(data_Metrics, "HighSpec")
   } else
-    stop("Criterion must be either an integer, `EqualWt` or `HighSpec`")
-  
+      stop("Criterion must be either an integer, `EqualWt` or `HighSpec`")
+
   
   if(!proceed){
     # there is not enough data: set the outputs accordingly
@@ -321,7 +321,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
       regional_codes <- subset(regional_codes, !site %in% bad_sites)
       occDetdata <- subset(occDetdata, !site %in% bad_sites)
     }
-    
+        
     # If we are using regional aggregates do some checks
     if(!is.null(region_aggs)){
       if(is.null(regional_codes)) stop('Cannot use regional aggregates if regional_codes is not supplied')
@@ -348,7 +348,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
         error_msg <- paste0('There are ', length(missing_yrs),' years with no visits, including ', missing_yrs[1],'. This means there is no data, for any species in these years. BUGS cannot run if any year has no data. Quitting...')
       stop(error_msg)
     }
-    
+
     # year and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
     nsite <- length(unique(occDetdata$site))
     site_match <- data.frame(name = unique(occDetdata$site), id = 1:nsite)
@@ -356,7 +356,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
     zst <- acast(occDetdata, id ~ factor(TP), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
-    
+
     # if the max_year is not null, edit the zst table to add the additional years required
     if(!is.null(max_year)){
       
@@ -391,7 +391,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     # TP and site need to be numeric starting from 1 to length of them.  This is due to the way the bugs code is written
     occDetdata$TP <- occDetdata$TP - min(occDetdata$TP) + 1
-    
+  
     # Parameter you wish to monitor, shown in the output
     parameters <- c("psi.fs", "tau2", "tau.lp", "alpha.p", "a")
     
@@ -438,7 +438,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     bugs_data <- with(occDetdata, 
                       list(y = as.numeric(focal), Year = TP, Site = id, 
                            nyear = nTP, nsite = nsite, nvisit = nrow(occDetdata)))
-    
+
     # temporary test
     if(max(occDetdata$id) != bugs_data$nsite) stop(paste0("Site idenitifier exceeds nsite (",
                                                           max(occDetdata$id), nsite,")"))
@@ -448,7 +448,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
       bugs_data <- getBugsData(bugs_data, modeltype = btype,
                                occDetData = occDetdata)
     }
-    
+
     # Add additional elements if specified
     if(!is.null(additional.BUGS.elements)){
       if(!is.list(additional.BUGS.elements)){
@@ -464,7 +464,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     # Add regional elements to bugs data
     if(!is.null(regional_codes)){
-      
+
       # removed unwanted bugs elements
       bugs_data <- bugs_data[!names(bugs_data) %in% c('psi0.a', 'psi0.b')]
       
@@ -491,7 +491,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
         # remove regions for regions_codes
         regional_codes <- regional_codes[ ,!colnames(regional_codes) %in% zero_sites]
         region_names <- setdiff(region_names, zero_sites)
-        
+
         # remove region aggregates
         rem_aggs <- unlist(lapply(region_aggs, FUN = function(x) any(zero_sites %in% x)))
         rem_aggs_names <- names(region_aggs)[rem_aggs]
@@ -505,11 +505,11 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
           parameters <- parameters[!parameters %in% paste0('psi.fs.r_', rem_aggs_names)]
         }
       } 
-      
+
       regions_years <- list()
       regions_nobs <- list()
       regions_sites <-list()
-      
+  
       bugs_data_copy <- merge(bugs_data_copy, regional_codes, all.x = TRUE)
       
       # add regional codes to this copy and get n_obs, max and min years and year gaps for each region
@@ -530,7 +530,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
           regions_years[paste0('gap_start_','r_', region_name)] <- current_datagaps$gap_start
           regions_years[paste0('gap_end_','r_', region_name)] <- current_datagaps$gap_end
           regions_years[paste0('gap_middle_','r_', region_name)] <- current_datagaps$gap_middle
-          
+        
         } else if(length(current_r) == 1) {
           
           current_rmin <- (min_year-1) + min(current_r)
@@ -553,7 +553,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
         }
       }
     }
-    
+      
     # add max and min data years for the whole dataset
     all_years_data <- bugs_data_copy$y * bugs_data_copy$year
     all_years_data <- subset(all_years_data, all_years_data !=0)
@@ -645,101 +645,102 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     dir.create(path = output_dir, showWarnings = FALSE) # create the top results folder
     if (class(error_status) == "try-error" ){
-      
+        
       warning('JAGS returned an error when modelling', taxa_name, 'error:', error_status[1])
       return(NULL)
-      
+    
     }
   }  # end of "if(proceed)"
   
-  ########################################## Add metadata
+    ########################################## Add metadata
+    
+    # calcluate number of site:year combinations with repeat visits (across the whole dataset)
+    temp <- as.data.frame(with(occDetdata, table(site, TP)))$Freq
+    prop_visits_repeated <- mean(temp[temp>0] > 1)
+
+    if(is.null(attributes(occDetdata))){
+      metadata <- list()
+    } else if('metadata' %in% names(attributes(occDetdata))){
+      metadata <- attr(occDetdata, 'metadata')
+    } else {
+      metadata <- list()
+    }
+    
+    # get the sessionInfo and coerce into a useable format
+    session.info <- sessionInfo()
+    packages <- c(sapply(session.info[7][[1]], function(x) x$Version),
+                  sapply(session.info[8][[1]], function(x) x$Version))
+    
+    MD <- list(method = 'sparta::occDetFunc',
+               call =   call <- match.call(),
+               date = Sys.Date(),
+               user = Sys.info()['user'],
+               summary = list(species = taxa_name,
+                              n_sites = length(unique(occDetdata$site)),
+                              n_years = length(unique(occDetdata$TP)),
+                              n_visits = nrow(occDetdata),
+                              n_obs = sum(occDetdata$focal),
+                              n_species_sites <- length(unique(subset(occDetdata, focal=TRUE)$site)),
+                              min_year_model = min_year,
+                              max_year_model = max_year),
+                gaps = ifelse(is.na(BD_MD), NA, list( 
+                              min_year_data = BD_MD$min_year_data,
+                              max_year_data = BD_MD$max_year_data,
+                              gap_start = BD_MD$yeargaps$gap_start,
+                              gap_end = BD_MD$yeargaps$gap_end,
+                              gap_middle = BD_MD$yeargaps$gap_middle)),
+               spp_Metrics = as.list(data_Metrics),
+               dataset_Metrics = list(# dataset properties
+                              totalObservations = sum(occDetdata$L),
+                              propRepeats = prop_visits_repeated),
+               provenance = provenance,
+               output_path = ifelse(test = write_results,
+                                    file.path(getwd(), output_dir, paste(taxa_name, ".rdata", sep = "")),
+                                    NA),
+               session_info = list(session.info[-c(7:8)],
+                                   packages)
+               )
+    
+    # add regional elements if applicable
+    if(!is.null(regional_codes) & proceed){
+      MD$summary$region_nobs <- regions_nobs
+      MD$summary$region_years <- regions_years
+      MD$summary$region_nsite <- regions_sites
+    }else{
+      MD$summary$region_nobs <- NA
+      MD$summary$region_years <- NA
+      MD$summary$region_nsite <- NA
+    }
+    
+    # If the data coming in is the result of analysis we want to
+    # append this data
+    name <- 'analysis'
+    i = 1
+    while(name %in% names(metadata)){
+      name <- paste0(name, i)
+      i = i + 1 
+    }
+    
+    metadata[name] <- list(MD)
+    attr(out, 'metadata') <- metadata
+
+    if(!saveMatrix) out$BUGSoutput$sims.matrix <- NULL
+    
+    out$SPP_NAME <- taxa_name
+    out$min_year <- min_year
+    out$max_year <- max_year
+    out$sites_included <- ifelse(test = proceed, yes = site_match, no = NA)
+    out$nsites <- bugs_data$nsite
+    out$nvisits <- bugs_data$nvisit
+    out$species_observations <- sum(bugs_data$y)
+    out$sparta_version <- packages["sparta"]
+    if(!is.null(regional_codes)) out$regions <- region_names
+    if(!is.null(region_aggs)) out$region_aggs <- region_aggs
+    if(return_data) out$bugs_data <- bugs_data
+    attr(out, 'modeltype') <- modeltype
+    attr(out, 'modelcode') <- modelcode
+    class(out) <- 'occDet'
+    if(write_results) save(out, file = file.path(output_dir, paste(taxa_name, ".rdata", sep = "")))  
+    return(out)
+  }  	
   
-  # calcluate number of site:year combinations with repeat visits (across the whole dataset)
-  temp <- as.data.frame(with(occDetdata, table(site, TP)))$Freq
-  prop_visits_repeated <- mean(temp[temp>0] > 1)
-  
-  if(is.null(attributes(occDetdata))){
-    metadata <- list()
-  } else if('metadata' %in% names(attributes(occDetdata))){
-    metadata <- attr(occDetdata, 'metadata')
-  } else {
-    metadata <- list()
-  }
-  
-  # get the sessionInfo and coerce into a useable format
-  session.info <- sessionInfo()
-  packages <- c(sapply(session.info[7][[1]], function(x) x$Version),
-                sapply(session.info[8][[1]], function(x) x$Version))
-  
-  MD <- list(method = 'sparta::occDetFunc',
-             call =   call <- match.call(),
-             date = Sys.Date(),
-             user = Sys.info()['user'],
-             summary = list(species = taxa_name,
-                            n_sites = length(unique(occDetdata$site)),
-                            n_years = length(unique(occDetdata$TP)),
-                            n_visits = nrow(occDetdata),
-                            n_obs = sum(occDetdata$focal),
-                            n_species_sites <- length(unique(subset(occDetdata, focal=TRUE)$site)),
-                            min_year_model = min_year,
-                            max_year_model = max_year),
-             gaps = ifelse(is.na(BD_MD), NA, list( 
-               min_year_data = BD_MD$min_year_data,
-               max_year_data = BD_MD$max_year_data,
-               gap_start = BD_MD$yeargaps$gap_start,
-               gap_end = BD_MD$yeargaps$gap_end,
-               gap_middle = BD_MD$yeargaps$gap_middle)),
-             spp_Metrics = as.list(data_Metrics),
-             dataset_Metrics = list(# dataset properties
-               totalObservations = sum(occDetdata$L),
-               propRepeats = prop_visits_repeated),
-             provenance = provenance,
-             output_path = ifelse(test = write_results,
-                                  file.path(getwd(), output_dir, paste(taxa_name, ".rdata", sep = "")),
-                                  NA),
-             session_info = list(session.info[-c(7:8)],
-                                 packages)
-  )
-  
-  # add regional elements if applicable
-  if(!is.null(regional_codes) & proceed){
-    MD$summary$region_nobs <- regions_nobs
-    MD$summary$region_years <- regions_years
-    MD$summary$region_nsite <- regions_sites
-  }else{
-    MD$summary$region_nobs <- NA
-    MD$summary$region_years <- NA
-    MD$summary$region_nsite <- NA
-  }
-  
-  # If the data coming in is the result of analysis we want to
-  # append this data
-  name <- 'analysis'
-  i = 1
-  while(name %in% names(metadata)){
-    name <- paste0(name, i)
-    i = i + 1 
-  }
-  
-  metadata[name] <- list(MD)
-  attr(out, 'metadata') <- metadata
-  
-  if(!saveMatrix) out$BUGSoutput$sims.matrix <- NULL
-  
-  out$SPP_NAME <- taxa_name
-  out$min_year <- min_year
-  out$max_year <- max_year
-  out$sites_included <- ifelse(test = proceed, yes = site_match, no = NA)
-  out$nsites <- bugs_data$nsite
-  out$nvisits <- bugs_data$nvisit
-  out$species_observations <- sum(bugs_data$y)
-  out$sparta_version <- packages["sparta"]
-  if(!is.null(regional_codes)) out$regions <- region_names
-  if(!is.null(region_aggs)) out$region_aggs <- region_aggs
-  if(return_data) out$bugs_data <- bugs_data
-  attr(out, 'modeltype') <- modeltype
-  attr(out, 'modelcode') <- modelcode
-  class(out) <- 'occDet'
-  if(write_results) save(out, file = file.path(output_dir, paste(taxa_name, ".rdata", sep = "")))  
-  return(out)
-}  	
