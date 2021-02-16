@@ -191,7 +191,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # Check the taxa_name is one of my species
   if(!taxa_name %in% colnames(spp_vis)) stop('taxa_name is not the name of a taxa in spp_vis')
-
+  ################## 
+  min_year_original <- min(occDetdata$TP)
+  
   # only include sites which have more than nyr of records
   yps <- rowSums(acast(occDetdata, site ~ TP, length, value.var = 'L') > 0)
   sites_to_include <- names(yps[yps >= nyr])
@@ -357,6 +359,10 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
 
     # Calculate min year. We're doing it now as it's fine if we've dropped the first year(s) of data and nothing in the middle
     min_year <- min(occDetdata$TP)
+    if(min_year != min_year_original){
+      warning(paste0('\nThe first year of the data has changed, as the first years of data were dropped.\n',
+                    'The original first year was ',min_year_original,'. It is now ',min_year,'\n'))
+    }
     
     # if the max_year is not null, edit the zst table to add the additional years required
     if(!is.null(max_year)){
