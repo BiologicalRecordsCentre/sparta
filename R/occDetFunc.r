@@ -191,8 +191,6 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   
   # Check the taxa_name is one of my species
   if(!taxa_name %in% colnames(spp_vis)) stop('taxa_name is not the name of a taxa in spp_vis')
-  ################## 
-  min_year <- min(occDetdata$TP)
 
   # only include sites which have more than nyr of records
   yps <- rowSums(acast(occDetdata, site ~ TP, length, value.var = 'L') > 0)
@@ -357,6 +355,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
     zst <- acast(occDetdata, id ~ factor(TP), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
 
+    # Calculate min year. We're doing it now as it's fine if we've dropped the first year(s) of data and nothing in the middle
+    min_year <- min(occDetdata$TP)
+    
     # if the max_year is not null, edit the zst table to add the additional years required
     if(!is.null(max_year)){
       
