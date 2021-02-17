@@ -511,7 +511,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
           if(length(rem_aggs_names) > 0){
             warning(paste('The following region aggregates have to be removed as they contain a region with no data:',
                           paste(rem_aggs_names, collapse = ', '),
-                          '- These region aggregates will not be included in the model'))
+                          '- These region aggregates will not be included in the model\n',
+                          'If you want to keep aggregates with one or more missing regions,',
+                          'set rem_aggs_with_missing_regions=FALSE'))
             region_aggs <- region_aggs[!names(region_aggs) %in% rem_aggs_names]
             parameters <- parameters[!parameters %in% paste0('psi.fs.r_', rem_aggs_names)]
           }
