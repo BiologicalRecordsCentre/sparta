@@ -11,7 +11,7 @@ formulaBuilder <- function(family, list_length, site_effect, overdispersion){
   model_formula <- ifelse(family == 'Bernoulli',
                           'taxa ~ year',
                           'cbind(successes, failures) ~ year')
-  if(list_length) model_formula <- paste(model_formula, '+ listLength')
+  if(list_length) model_formula <- paste(model_formula, '+ log(listLength)')
   if(site_effect) model_formula <- paste(model_formula, '+ (1|site)')
   if(overdispersion) model_formula <- paste(model_formula, '+ (1|obs)')
 

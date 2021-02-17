@@ -24,9 +24,10 @@ occDetFunc(
   additional.parameters = NULL,
   additional.BUGS.elements = NULL,
   additional.init.values = NULL,
-  return_data = TRUE,
+  return_data = FALSE,
   criterion = 1,
-  provenance = NULL
+  provenance = NULL,
+  saveMatrix = FALSE
 )
 }
 \arguments{
@@ -94,6 +95,8 @@ Other options are `EqualWt` or `HighSpec`, which define the application of "rule
 Defaults to 1, in which case the model is applied for so long there is a single record of the focal species.}
 
 \item{provenance}{An optional text string allowing the user to identify the dataset.}
+
+\item{saveMatrix}{Logical, if \code{FALSE} (default) the sims.matrix element of the jags object is omitted, in order to reduce the filesize.}
 }
 \value{
 A list including the model, JAGS model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
