@@ -50,6 +50,8 @@
 #' Other options are `EqualWt` or `HighSpec`, which define the application of "rules of thumb" defined in Pocock et al 2019. 
 #' Defaults to 1, in which case the model is applied for so long there is a single record of the focal species.
 #' @param provenance An optional text string allowing the user to identify the dataset.
+#' @param rem_aggs_with_missing_regions An option which if TRUE will remove all aggregates which contain at least one region with no data.
+#' If FALSE, only aggregates where ALL regions in that aggregate contain no data, are dropped. Defaults to TRUE
 #' 
 #' @details \code{modeltype} is used to choose the model as well as the associated initial values,
 #' and parameters to monitor. Elements to choose from can be separated into the following components:
@@ -179,7 +181,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                         seed = NULL, model.function = NULL, regional_codes = NULL,
                         region_aggs = NULL, additional.parameters = NULL,
                         additional.BUGS.elements = NULL, additional.init.values = NULL,
-                        return_data = FALSE, criterion = 1, provenance = NULL, saveMatrix = FALSE){
+                        return_data = FALSE, criterion = 1, provenance = NULL, saveMatrix = FALSE,
+                        rem_aggs_with_missing_regions = TRUE){
   
   ################## BASIC CHECKS
   # first run the error checks
@@ -500,16 +503,45 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
         region_names <- setdiff(region_names, zero_sites)
 
         # remove region aggregates
-        rem_aggs <- unlist(lapply(region_aggs, FUN = function(x) any(zero_sites %in% x)))
-        rem_aggs_names <- names(region_aggs)[rem_aggs]
-        
-        # remove aggs if you need to
-        if(length(rem_aggs_names) > 0){
-          warning(paste('The following region aggregates have to be removed as they contain a region with no data:',
-                        paste(rem_aggs_names, collapse = ', '),
-                        '- These region aggregates will not be included in the model'))
-          region_aggs <- region_aggs[!names(region_aggs) %in% rem_aggs_names]
-          parameters <- parameters[!parameters %in% paste0('psi.fs.r_', rem_aggs_names)]
+        if(rem_aggs_with_missing_regions){
+          rem_aggs <- unlist(lapply(region_aggs, FUN = function(x) any(zero_sites %in% x)))
+          rem_aggs_names <- names(region_aggs)[rem_aggs]
+          
+          # remove aggs if you need to
+          if(length(rem_aggs_names) > 0){
+            warning(paste('The following region aggregates have to be removed as they contain a region with no data:',
+                          paste(rem_aggs_names, collapse = ', '),
+                          '- These region aggregates will not be included in the model'))
+            region_aggs <- region_aggs[!names(region_aggs) %in% rem_aggs_names]
+            parameters <- parameters[!parameters %in% paste0('psi.fs.r_', rem_aggs_names)]
+          }
+        } else {
+          rem_aggs <- unlist(lapply(region_aggs, FUN = function(x) all(x %in% zero_sites)))
+          rem_aggs_names <- names(region_aggs)[rem_aggs]
+          edit_aggs <- unlist(lapply(region_aggs, FUN = function(x) any(zero_sites %in% x)))
+          edit_aggs_names <- names(region_aggs)[edit_aggs & !(rem_aggs)]
+          
+          # edit aggs if you need to
+          if(length(edit_aggs_names) > 0){
+            warning(paste('The following region aggregates have to be edited as they contain regions with no data:',
+                          paste(edit_aggs_names, collapse = ', '),
+                          '\n- These region aggregates will still be included in the model\n'))
+            # Recreate aggs, removing regions without data
+            region_aggs_new <- lapply(region_aggs, FUN = function(agg){
+              agg[!(agg %in% zero_sites)]
+            })
+            names(region_aggs_new) <- names(region_aggs)
+            region_aggs <- region_aggs_new
+          }
+          
+          # remove aggs completely if you need to
+          if(length(rem_aggs_names) > 0){
+            warning(paste('The following region aggregates have to be removed as all regions within them have no data:',
+                          paste(rem_aggs_names, collapse = ', '),
+                          '- These region aggregates will not be included in the model'))
+            region_aggs <- region_aggs[!names(region_aggs) %in% rem_aggs_names]
+            parameters <- parameters[!parameters %in% paste0('psi.fs.r_', rem_aggs_names)]
+          }
         }
       } 
 
