@@ -65,7 +65,6 @@ plot_DetectionOverTime <- function(model, spname = NULL, min.yr = NULL, CI=95){
     pDet2 <- pDet4 <- NA
   }
 
-  
   pDet <- melt(list(pDet1, pDet2, pDet4))
   names(pDet) <- c("it", "year", "lgt_pDet", "ListLength")
   pDet$ListLength[pDet$ListLength==3] <- 4 # the "third" category is for a list of length 4
