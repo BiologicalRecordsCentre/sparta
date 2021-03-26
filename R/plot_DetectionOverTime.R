@@ -21,8 +21,18 @@
 #' @export
 
 
-plot_DetectionOverTime <- function(model, spname = NULL, min.yr = NULL){
+plot_DetectionOverTime <- function(model, spname = NULL, min.yr = NULL, CI=95){
 
+  
+  # convert the CI into quantiles
+  # first check that CI is sensible
+  if((CI > 100) | (CI <= 0)) stop("Credible intervals must be between 0 and 100")
+  CI2q <- function(CI) {
+    q <- (1 - CI/100)/2
+    return(c(q, 1-q))
+  }
+  q <- CI2q(CI)
+  
   sims_list <- model$BUGSoutput$sims.list
   
   # the base: alpha.p is common to all models: 
@@ -47,10 +57,14 @@ plot_DetectionOverTime <- function(model, spname = NULL, min.yr = NULL){
     # the model was fitted with categorical list length
     pDet2 <- pDet1 + sims_list$dtype2.p[,1]
     pDet4 <- pDet1 + sims_list$dtype3.p[,1]
-  } 
-  # there is also an option to ignore list length, 
-  # in which case the probability of detection is assumed to be constant across surveys
-  # i.e. if the survey was systematic
+  } else {
+    # there is also an option to ignore list length, 
+    # in which case the probability of detection is assumed to be constant across surveys
+    # i.e. if the survey was systematic
+    # in this case the there are no estimates for the other pDet values.
+    pDet2 <- pDet4 <- NULL
+  }
+
   
   pDet <- melt(list(pDet1, pDet2, pDet4))
   names(pDet) <- c("it", "year", "lgt_pDet", "ListLength")
