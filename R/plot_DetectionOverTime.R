@@ -31,7 +31,7 @@ plot_DetectionOverTime <- function(model, spname = NULL, min.yr = NULL, CI=95){
     q <- (1 - CI/100)/2
     return(c(q, 1-q))
   }
-  q <- CI2q(CI)
+  quant <- CI2q(CI)
   
   sims_list <- model$BUGSoutput$sims.list
   
@@ -74,9 +74,9 @@ plot_DetectionOverTime <- function(model, spname = NULL, min.yr = NULL, CI=95){
   # now summarize these posterior distributions
   pDet_summary <-ddply(
         pDet, .(year, ListLength), summarise, 
-        mean_pDet = mean(pDet),
-        lower95CI = quantile(pDet, 0.025),
-        upper95CI = quantile(pDet, 0.975))
+        mean_pDet = mean(pDet, na.rm=T),
+        lower95CI = quantile(pDet, quant[1], na.rm=T),
+        upper95CI = quantile(pDet, quant[2], na.rm=T))
   
   # if the user has supplied a year then switch the x axis to start at that minimum
   if(!is.null(min.yr)) pDet_summary$year <- pDet_summary$year + min.yr - 1
@@ -88,7 +88,7 @@ plot_DetectionOverTime <- function(model, spname = NULL, min.yr = NULL, CI=95){
     ylab("Detection probability") +
     ggtitle(spname) +
     theme_bw()
-  gp 
+  gp
 
 }
 
