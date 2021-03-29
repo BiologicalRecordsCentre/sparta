@@ -13,6 +13,10 @@
 #' @param replicate An optional vector to identify replicate samples (visits) per survey. Need not be globally unique (e.g can be 1, 2, .. n within surveys) 
 #' @param closure_period An optional vector of integers specifying the closure period. 
 #'        If \code{FALSE} then closure_period will be extracted as the year from the survey.
+#' @param criterion Determines whether the model should be run. If an integer then this defines the threshold number of records (50 in Outhwaite et al 2019).
+#' Other options are `EqualWt` or `HighSpec`, which define the application of "rules of thumb" defined in Pocock et al 2019. 
+#' Defaults to 1, in which case the model is applied for so long there is a single record of the focal species.
+#' @param provenance An optional text string allowing the user to identify the dataset.
 #' @param species_list A character vector of taxa names for which models should be run. This is
 #'        optional and by default models will be run for all taxa
 #' @param write_results logical, should results be saved to \code{output_dir}. This is
@@ -51,11 +55,6 @@
 #' @param additional.init.values A named list giving user specified initial values to 
 #' be added to the defaults.
 #' @param return_data Logical, if \code{TRUE} (default) the bugs data object is returned with the data
-#' @param criterion Determines whether the model should be run. If an integer then this defines the threshold number of records (50 in Outhwaite et al 2019).
-#' Other options are `EqualWt` or `HighSpec`, which define the application of "rules of thumb" defined in Pocock et al 2019. 
-#' Defaults to 1, in which case the model is applied for so long there is a single record of the focal species.
-#' @param provenance An optional text string allowing the user to identify the dataset.
-
 #' 
 #' @details \code{modeltype} is used to choose the model as well as the associated initial values,
 #' and parameters to monitor. Elements to choose from can be separated into the following components:
