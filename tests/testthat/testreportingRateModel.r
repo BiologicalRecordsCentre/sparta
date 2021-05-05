@@ -31,8 +31,8 @@ df <- data.frame(taxa = c(taxa,'bad'),
 test_that("Test errors and warnings", {
   
   # outside errorChecks this is the only catch present in this set of functions
-  expect_error(RR_out <- reportingRateModel(df$taxa, df$site, 1:length(df$time_period)),
-               "non-dates not yet supported for time_period")
+  #expect_error(RR_out <- reportingRateModel(df$taxa, df$site, 1:length(df$time_period)),
+  #             "non-dates not yet supported for time_period")
   # A couple in errorChecks for this function
   # warning when family is overridden by listlength
   expect_warning(RR_out <- reportingRateModel(df$taxa,
