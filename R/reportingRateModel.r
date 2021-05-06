@@ -5,9 +5,12 @@
 #' @param taxa A character vector of taxon names, as long as the number of observations.
 #' @param site A character vector of site names, as long as the number of observations.
 #' @param time_period A numeric vector of user defined time periods, or a date vector,
-#'        as long as the number of observations.
+#'        as long as the number of observations. Dates should be used where one wants to fit models at the "visit"
+#'        (typically one day) level. To fit models at coarser temporal resolutions then \code{time_period} 
+#'        should be numeric. Note that duplicae site x time_period x species records are dropped, so
+#'        your data will be substantially degraded if broad time periods are used. 
 #' @param list_length Logical, if \code{TRUE} then list length is added to the models as a fixed
-#'        effect. Note that since list_length is a property of each visit the model will run as 
+#'        effect. Note that since list_length is a property of each visit (or coarser period) the model will run as 
 #'        a binomial model rather that as a bernoulli model.
 #' @param site_effect Logical, if \code{TRUE} then site is added to the models as a random
 #'        effect.
@@ -171,6 +174,3 @@ reportingRateModel <- function(taxa, site, time_period, list_length = FALSE, sit
   
   return(coef_df)
 }
-
-
-
