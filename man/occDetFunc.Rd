@@ -28,7 +28,8 @@ occDetFunc(
   criterion = 1,
   provenance = NULL,
   saveMatrix = FALSE,
-  rem_aggs_with_missing_regions = TRUE
+  rem_aggs_with_missing_regions = TRUE,
+  allowSitesMultiRegions = FALSE
 )
 }
 \arguments{
@@ -99,7 +100,9 @@ Defaults to 1, in which case the model is applied for so long there is a single 
 
 \item{saveMatrix}{Logical, if \code{FALSE} (default) the sims.matrix element of the jags object is omitted, in order to reduce the filesize.}
 
-\item{rem_aggs_with_missing_regions}{An option which if TRUE will remove all aggregates which contain at least one region with no data.
+\item{rem_aggs_with_missing_regions}{An option which if TRUE will remove all aggregates which contain at least one region with no data.}
+
+\item{allowSitesMultiRegions}{An option that permits sites to be included in more than one region. If `FALSE` then these sites are dropped.
 If FALSE, only aggregates where ALL regions in that aggregate contain no data, are dropped. Defaults to TRUE}
 }
 \value{
@@ -125,13 +128,14 @@ Key aspects of the model output include:
  \item{\code{"out$SPP_NAME"}}{ - The name of the study species.}
  \item{\code{"out$min_year"}}{ - First year of data included in the occupancy model run.}
  \item{\code{"out$max_year"}}{ - Final year of data included in the occupancy model run or final year specified by the user.}
- \item{\code{"out$nsite"}}{ - The number of unique sites included in the occupancy model run.}
+ \item{\code{"out$sites_included"}}{ - List of the sites taken forward to the model (after filtering)}
+ \item{\code{"out$nsites"}}{ - The number of unique sites included in the occupancy model run.}
  \item{\code{"out$nvisits"}}{ - The number of unique visits included int he occupancy model run.}
- \item{\code{"out$species_sites"}}{ - The number of unique sites the species of interest was recorded in.}
  \item{\code{"out$species_observations"}}{ - The number of unique records for the species of interest.}
+ \item{\code{"out$sparta_version"}}{ - The version of sparta used to run the model.}
  \item{\code{"out$regions"}}{ - The names of the regions included in the model run.}
  \item{\code{"out$region_aggs"}}{ - The names of the region aggregates included in the model run.}
- \item{\code{"out$nsites_region"}}{ - Named vector containing the number of sites in each region included in the occupancy model run.}
+See also the `metadata` attribute for more detailed information about the data in the model.
 }
 }
 \description{

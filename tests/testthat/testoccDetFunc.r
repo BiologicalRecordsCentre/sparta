@@ -536,7 +536,7 @@ test_that("Test occDetFunc using regions and region aggregates", {
                                      modeltype = c("ranwalk", "halfcauchy"),
                                      regional_codes = regionsmulti,
                                      region_aggs = list(agg1 = c('region1', 'region2'))),
-               'sites are not assigned to a region in regional_codes and will be removed')
+               '1 sites are not assigned to a region in regional_codes and will be removed')
   
   # test for sites in occurence data but not regions
   regionsmissing <- regionsDF[2:50,]
@@ -551,7 +551,7 @@ test_that("Test occDetFunc using regions and region aggregates", {
                                      modeltype = c("ranwalk", "halfcauchy"),
                                      regional_codes = regionsmissing,
                                      region_aggs = list(agg1 = c('region1', 'region2'))),
-               '1 sites are in occurrence data but not in regional data and will be removed')
+               '1 sites are in occurrence data but not in regional_codes and will be removed')
   
   # test for regional aggregate containing unknown region
   expect_error(results <- occDetFunc(taxa_name = 'a',
