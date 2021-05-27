@@ -17,6 +17,8 @@
 #' Other options are `EqualWt` or `HighSpec`, which define the application of "rules of thumb" defined in Pocock et al 2019. 
 #' Defaults to 1, in which case the model is applied for so long there is a single record of the focal species.
 #' @param provenance An optional text string allowing the user to identify the dataset.
+#' @param rem_aggs_with_missing_regions An option which if TRUE will remove all aggregates which contain at least one region with no data.
+#' @param allowSitesMultiRegions An option that permits sites to be included in more than one region. If `FALSE` then these sites are dropped.
 #' @param species_list A character vector of taxa names for which models should be run. This is
 #'        optional and by default models will be run for all taxa
 #' @param write_results logical, should results be saved to \code{output_dir}. This is
@@ -184,6 +186,7 @@
 
 occDetModel <- function(taxa, site, survey, 
                         replicate = NULL, closure_period = NULL, criterion = 1, provenance = NULL,
+                        rem_aggs_with_missing_regions = TRUE, allowSitesMultiRegions = FALSE,
                         species_list = unique(taxa), write_results = TRUE,
                         output_dir = getwd(), nyr = 2, n_iterations = 5000,
                         burnin = 1500, thinning = 3, n_chains = 3, 
@@ -243,7 +246,9 @@ occDetModel <- function(taxa, site, survey,
                                       additional.init.values = additional.init.values,
                                       provenance = provenance,
                                       criterion = criterion,
-                                      return_data = return_data)
+                                      return_data = return_data,
+                                      rem_aggs_with_missing_regions = rem_aggs_with_missing_regions,
+                                      allowSitesMultiRegions = allowSitesMultiRegions)
   }
   
   class(output) <- 'occDetList'

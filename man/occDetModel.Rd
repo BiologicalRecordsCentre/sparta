@@ -12,6 +12,8 @@ occDetModel(
   closure_period = NULL,
   criterion = 1,
   provenance = NULL,
+  rem_aggs_with_missing_regions = TRUE,
+  allowSitesMultiRegions = FALSE,
   species_list = unique(taxa),
   write_results = TRUE,
   output_dir = getwd(),
@@ -50,6 +52,10 @@ Other options are `EqualWt` or `HighSpec`, which define the application of "rule
 Defaults to 1, in which case the model is applied for so long there is a single record of the focal species.}
 
 \item{provenance}{An optional text string allowing the user to identify the dataset.}
+
+\item{rem_aggs_with_missing_regions}{An option which if TRUE will remove all aggregates which contain at least one region with no data.}
+
+\item{allowSitesMultiRegions}{An option that permits sites to be included in more than one region. If `FALSE` then these sites are dropped.}
 
 \item{species_list}{A character vector of taxa names for which models should be run. This is
 optional and by default models will be run for all taxa}
