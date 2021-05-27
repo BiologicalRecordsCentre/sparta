@@ -100,10 +100,10 @@ Defaults to 1, in which case the model is applied for so long there is a single 
 
 \item{saveMatrix}{Logical, if \code{FALSE} (default) the sims.matrix element of the jags object is omitted, in order to reduce the filesize.}
 
-\item{rem_aggs_with_missing_regions}{An option which if TRUE will remove all aggregates which contain at least one region with no data.}
+\item{rem_aggs_with_missing_regions}{An option which if TRUE will remove all aggregates which contain at least one region with no data.
+If `FALSE`, only aggregates where ALL regions in that aggregate contain no data, are dropped. Defaults to TRUE}
 
-\item{allowSitesMultiRegions}{An option that permits sites to be included in more than one region. If `FALSE` then these sites are dropped.
-If FALSE, only aggregates where ALL regions in that aggregate contain no data, are dropped. Defaults to TRUE}
+\item{allowSitesMultiRegions}{An option that permits sites to be included in more than one region if `TRUE`. If `FALSE` then these sites are dropped. Defaults to `FALSE`}
 }
 \value{
 A list including the model, JAGS model output, the path of the model file used and information on the number of iterations, first year, last year, etc.

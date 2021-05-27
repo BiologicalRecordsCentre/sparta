@@ -51,8 +51,8 @@
 #' Defaults to 1, in which case the model is applied for so long there is a single record of the focal species.
 #' @param provenance An optional text string allowing the user to identify the dataset.
 #' @param rem_aggs_with_missing_regions An option which if TRUE will remove all aggregates which contain at least one region with no data.
-#' @param allowSitesMultiRegions An option that permits sites to be included in more than one region. If `FALSE` then these sites are dropped.
-#' If FALSE, only aggregates where ALL regions in that aggregate contain no data, are dropped. Defaults to TRUE
+#' If `FALSE`, only aggregates where ALL regions in that aggregate contain no data, are dropped. Defaults to TRUE
+#' @param allowSitesMultiRegions An option that permits sites to be included in more than one region if `TRUE`. If `FALSE` then these sites are dropped. Defaults to `FALSE`
 #' 
 #' @details \code{modeltype} is used to choose the model as well as the associated initial values,
 #' and parameters to monitor. Elements to choose from can be separated into the following components:
