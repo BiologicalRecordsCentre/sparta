@@ -5,9 +5,12 @@
 #' @param taxa A character vector of taxon names, as long as the number of observations.
 #' @param site A character vector of site names, as long as the number of observations.
 #' @param time_period A numeric vector of user defined time periods, or a date vector,
-#'        as long as the number of observations.
+#'        as long as the number of observations. Dates should be used where one wants to fit models at the "visit"
+#'        (typically one day) level. To fit models at coarser temporal resolutions then \code{time_period} 
+#'        should be numeric. Note that duplicae site x time_period x species records are dropped, so
+#'        your data will be substantially degraded if broad time periods are used. 
 #' @param list_length Logical, if \code{TRUE} then list length is added to the models as a fixed
-#'        effect. Note that since list_length is a property of each visit the model will run as 
+#'        effect. Note that since list_length is a property of each visit (or coarser period) the model will run as 
 #'        a binomial model rather that as a bernoulli model.
 #' @param site_effect Logical, if \code{TRUE} then site is added to the models as a random
 #'        effect.
@@ -91,7 +94,7 @@
 
 reportingRateModel <- function(taxa, site, time_period, list_length = FALSE, site_effect = FALSE,
                                species_to_include = unique(taxa), overdispersion = FALSE,
-                               verbose = FALSE, family = 'Binomial', print_progress = FALSE) {
+                               verbose = FALSE, family = 'Binomial', print_progress = TRUE) {
   
   # Do error checks
   errorChecks(taxa = taxa, site = site, time_period = time_period, list_length = list_length,
@@ -100,12 +103,12 @@ reportingRateModel <- function(taxa, site, time_period, list_length = FALSE, sit
   
   # Create dataframe from vectors
   taxa_data <- distinct(data.frame(taxa, site, time_period))
-  
+
   # Reshape the data so that it is suitable for model
   space_time <- dcast(taxa_data, time_period + site ~ ., value.var='taxa',
                       fun.aggregate = function(x) length(unique(x)))
   names(space_time)[ncol(space_time)] <- 'listLength'
-  
+
   # time_period could be a numeric or a date. If it is a date extract the year
   if('POSIXct' %in% class(time_period) | 'Date' %in% class(time_period)){
     
@@ -114,12 +117,14 @@ reportingRateModel <- function(taxa, site, time_period, list_length = FALSE, sit
     intercept_year <- median(unique(as.numeric(space_time$year)))
     space_time$year <- space_time$year - intercept_year    
     
-  } else{
-    
-    stop('non-dates not yet supported for time_period')
-    
+  } else {
+    # note that the term "year" is used loosely; may be a time period of any length
+    space_time$year <- space_time$time_period
+    intercept_year <- median(unique(space_time$year))
+    space_time$year <- space_time$year - intercept_year
+
   }
-  
+
   model_formula <- formulaBuilder(family,
                                   list_length,
                                   site_effect,
@@ -127,7 +132,7 @@ reportingRateModel <- function(taxa, site, time_period, list_length = FALSE, sit
   
   counter <- data.frame(species = species_to_include,
                         count = 1:length(species_to_include))
-    
+
   # Run an apply across all species which undertakes the modelling
   all_coefs <- lapply(species_to_include, function(species_name){ # the sort ensures species are done in order
     
@@ -156,10 +161,10 @@ reportingRateModel <- function(taxa, site, time_period, list_length = FALSE, sit
     }
     
   })
-      
+  
   # Bind the results of the apply into a data.frame
   coef_df <- do.call(rbind.fill, all_coefs)
-   
+ 
   # Get some attributes of the dataset
   attributes(coef_df) <- c(attributes(coef_df), list(intercept_year = intercept_year,
                                                      min_year =  min(unique(as.numeric(space_time$year))),
