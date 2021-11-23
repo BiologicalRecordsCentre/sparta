@@ -8,6 +8,12 @@ occDetModel(
   taxa,
   site,
   survey,
+  replicate = NULL,
+  closure_period = NULL,
+  criterion = 1,
+  provenance = NULL,
+  rem_aggs_with_missing_regions = TRUE,
+  allowSitesMultiRegions = FALSE,
   species_list = unique(taxa),
   write_results = TRUE,
   output_dir = getwd(),
@@ -35,6 +41,21 @@ occDetModel(
 
 \item{survey}{A  vector as long as the number of observations. 
 This must be a Date if includeJDay = \code{TRUE}}
+
+\item{replicate}{An optional vector to identify replicate samples (visits) per survey. Need not be globally unique (e.g can be 1, 2, .. n within surveys)}
+
+\item{closure_period}{An optional vector of integers specifying the closure period. 
+If \code{FALSE} then closure_period will be extracted as the year from the survey.}
+
+\item{criterion}{Determines whether the model should be run. If an integer then this defines the threshold number of records (50 in Outhwaite et al 2019).
+Other options are `EqualWt` or `HighSpec`, which define the application of "rules of thumb" defined in Pocock et al 2019. 
+Defaults to 1, in which case the model is applied for so long there is a single record of the focal species.}
+
+\item{provenance}{An optional text string allowing the user to identify the dataset.}
+
+\item{rem_aggs_with_missing_regions}{An option which if TRUE will remove all aggregates which contain at least one region with no data.}
+
+\item{allowSitesMultiRegions}{An option that permits sites to be included in more than one region. If `FALSE` then these sites are dropped.}
 
 \item{species_list}{A character vector of taxa names for which models should be run. This is
 optional and by default models will be run for all taxa}
@@ -222,9 +243,13 @@ Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac
             Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. 
             \emph{Ecological Indicators}, 93: 333-343.
 
-Roy, H.E., Adriaens, T., Isaac, N.J.B. et al. (2012) Invasive alien predator
-            causes rapid declines of native European ladybirds. Diversity & Distributions,
-            18, 717-725.
+Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
+            Statistics for citizen science: extracting signals of change from noisy ecological data.
+            \emph{Methods in Ecology and Evolution}, 5: 1052-1060.
+
+Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac, N.J.B. (2018).
+            Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. 
+            \emph{Ecological Indicators}, 93: 333-343.
 }
 \keyword{bayesian,}
 \keyword{distribution,}

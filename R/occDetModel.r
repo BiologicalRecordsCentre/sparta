@@ -10,6 +10,15 @@
 #' @param site A character vector of site names, as long as the number of observations.
 #' @param survey A  vector as long as the number of observations. 
 #'        This must be a Date if includeJDay = \code{TRUE}
+#' @param replicate An optional vector to identify replicate samples (visits) per survey. Need not be globally unique (e.g can be 1, 2, .. n within surveys) 
+#' @param closure_period An optional vector of integers specifying the closure period. 
+#'        If \code{FALSE} then closure_period will be extracted as the year from the survey.
+#' @param criterion Determines whether the model should be run. If an integer then this defines the threshold number of records (50 in Outhwaite et al 2019).
+#' Other options are `EqualWt` or `HighSpec`, which define the application of "rules of thumb" defined in Pocock et al 2019. 
+#' Defaults to 1, in which case the model is applied for so long there is a single record of the focal species.
+#' @param provenance An optional text string allowing the user to identify the dataset.
+#' @param rem_aggs_with_missing_regions An option which if TRUE will remove all aggregates which contain at least one region with no data.
+#' @param allowSitesMultiRegions An option that permits sites to be included in more than one region. If `FALSE` then these sites are dropped.
 #' @param species_list A character vector of taxa names for which models should be run. This is
 #'        optional and by default models will be run for all taxa
 #' @param write_results logical, should results be saved to \code{output_dir}. This is
@@ -168,11 +177,16 @@
 #'                        region_aggs = list(agg1 = c('region1', 'region2')))       
 #' }
 #' @export
-#' @references Roy, H.E., Adriaens, T., Isaac, N.J.B. et al. (2012) Invasive alien predator
-#'             causes rapid declines of native European ladybirds. Diversity & Distributions,
-#'             18, 717-725.
+#' @references Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (2014).
+#'             Statistics for citizen science: extracting signals of change from noisy ecological data.
+#'             \emph{Methods in Ecology and Evolution}, 5: 1052-1060.
+#' @references Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac, N.J.B. (2018).
+#'             Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. 
+#'             \emph{Ecological Indicators}, 93: 333-343.
 
-occDetModel <- function(taxa, site, survey,
+occDetModel <- function(taxa, site, survey, 
+                        replicate = NULL, closure_period = NULL, criterion = 1, provenance = NULL,
+                        rem_aggs_with_missing_regions = TRUE, allowSitesMultiRegions = FALSE,
                         species_list = unique(taxa), write_results = TRUE,
                         output_dir = getwd(), nyr = 2, n_iterations = 5000,
                         burnin = 1500, thinning = 3, n_chains = 3, 
@@ -202,6 +216,8 @@ occDetModel <- function(taxa, site, survey,
   visitData <- formatOccData(taxa = taxa,
                              site = site,
                              survey = survey,
+                             replicate = replicate, 
+                             closure_period = replicate,
                              includeJDay = includeJDay)
   
   ### loop through the species list running the Bayesian occupancy model function ###
@@ -228,7 +244,11 @@ occDetModel <- function(taxa, site, survey,
                                       additional.parameters = additional.parameters,
                                       additional.BUGS.elements = additional.BUGS.elements,
                                       additional.init.values = additional.init.values,
-                                      return_data = return_data)
+                                      provenance = provenance,
+                                      criterion = criterion,
+                                      return_data = return_data,
+                                      rem_aggs_with_missing_regions = rem_aggs_with_missing_regions,
+                                      allowSitesMultiRegions = allowSitesMultiRegions)
   }
   
   class(output) <- 'occDetList'

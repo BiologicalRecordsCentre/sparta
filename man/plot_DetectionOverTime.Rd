@@ -4,7 +4,7 @@
 \alias{plot_DetectionOverTime}
 \title{Diagnostics for the detection model with respect to Length}
 \usage{
-plot_DetectionOverTime(model, spname = NULL, min.yr = NULL)
+plot_DetectionOverTime(model, spname = NULL, min.yr = NULL, CI = 95)
 }
 \arguments{
 \item{model}{a fitted sparta model of class \code{OccDet}.}
