@@ -97,7 +97,9 @@
 #' @importFrom dplyr distinct
 #' @importFrom dplyr summarise
 #' @importFrom dplyr group_by
-#' @importFrom reshape2 dcast
+#' @importFrom data.table setDF
+#' @importFrom data.table setDT
+#' @importFrom data.table dcast
 
 formatOccData <- function(taxa, site, survey, replicate = NULL, closure_period = NULL, includeJDay = FALSE){
 
@@ -157,8 +159,8 @@ formatOccData <- function(taxa, site, survey, replicate = NULL, closure_period =
   temp <- taxa_data[,c('taxa','visit')]
   names(temp)[1] <- "species_name"
   temp$pres <- TRUE # add TRUE column which will populate the spp with visit matrix/dataframe
-  spp_vis <- dcast(temp, formula = visit ~ species_name, value.var = "pres", fill = FALSE, fun=unique) # This is the dataframe that contains a row per visit and a column for each species present or not.  USed to create the focal column in the next step
-  
+  spp_vis <- data.table::dcast(setDT(temp), formula = visit ~ species_name, value.var = "pres", fill = FALSE, fun=unique) # This is the dataframe that contains a row per visit and a column for each species present or not.  USed to create the focal column in the next step
+  spp_vis <- setDF(spp_vis) # convert back to dataframe from datatable
   
   # Add Julian Day if needed
   if(includeJDay){
