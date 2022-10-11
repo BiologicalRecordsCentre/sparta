@@ -51,7 +51,8 @@
 #' Defaults to 1, in which case the model is applied for so long there is a single record of the focal species.
 #' @param provenance An optional text string allowing the user to identify the dataset.
 #' @param rem_aggs_with_missing_regions An option which if TRUE will remove all aggregates which contain at least one region with no data.
-#' If FALSE, only aggregates where ALL regions in that aggregate contain no data, are dropped. Defaults to TRUE
+#' If `FALSE`, only aggregates where ALL regions in that aggregate contain no data, are dropped. Defaults to TRUE
+#' @param allowSitesMultiRegions An option that permits sites to be included in more than one region if `TRUE`. If `FALSE` then these sites are dropped. Defaults to `FALSE`
 #' 
 #' @details \code{modeltype} is used to choose the model as well as the associated initial values,
 #' and parameters to monitor. Elements to choose from can be separated into the following components:
@@ -115,13 +116,14 @@
 #'  \item{\code{"out$SPP_NAME"}}{ - The name of the study species.}
 #'  \item{\code{"out$min_year"}}{ - First year of data included in the occupancy model run.}
 #'  \item{\code{"out$max_year"}}{ - Final year of data included in the occupancy model run or final year specified by the user.}
-#'  \item{\code{"out$nsite"}}{ - The number of unique sites included in the occupancy model run.}
+#'  \item{\code{"out$sites_included"}}{ - List of the sites taken forward to the model (after filtering)}
+#'  \item{\code{"out$nsites"}}{ - The number of unique sites included in the occupancy model run.}
 #'  \item{\code{"out$nvisits"}}{ - The number of unique visits included int he occupancy model run.}
-#'  \item{\code{"out$species_sites"}}{ - The number of unique sites the species of interest was recorded in.}
 #'  \item{\code{"out$species_observations"}}{ - The number of unique records for the species of interest.}
+#'  \item{\code{"out$sparta_version"}}{ - The version of sparta used to run the model.}
 #'  \item{\code{"out$regions"}}{ - The names of the regions included in the model run.}
 #'  \item{\code{"out$region_aggs"}}{ - The names of the region aggregates included in the model run.}
-#'  \item{\code{"out$nsites_region"}}{ - Named vector containing the number of sites in each region included in the occupancy model run.}
+#' See also the `metadata` attribute for more detailed information about the data in the model.
 #' }
 #'
 #' @keywords trends, species, distribution, occupancy, bayesian, modeling
@@ -182,7 +184,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                         region_aggs = NULL, additional.parameters = NULL,
                         additional.BUGS.elements = NULL, additional.init.values = NULL,
                         return_data = FALSE, criterion = 1, provenance = NULL, saveMatrix = FALSE,
-                        rem_aggs_with_missing_regions = TRUE){
+                        rem_aggs_with_missing_regions = TRUE, allowSitesMultiRegions = FALSE){
   
   ################## BASIC CHECKS
   # first run the error checks
@@ -231,6 +233,11 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   } else
       stop("Criterion must be either an integer, `EqualWt` or `HighSpec`")
 
+  # Add the focal column (was the species recorded on the visit?). Use the spp_vis dataframe to extract this info
+  nrow1 <- nrow(occDetdata)
+  occDetdata <- merge(occDetdata, spp_vis[,c("visit", taxa_name)])
+  names(occDetdata)[names(occDetdata) == taxa_name] <- "focal"
+  if(nrow1 != nrow(occDetdata)) stop('some visits have been lost')
   
   if(!proceed){
     # there is not enough data: set the outputs accordingly
@@ -271,14 +278,6 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
       if(JAGS_test[[1]] == '') stop('R cannot find jags-terminal.exe, check that you have installed JAGS')
     }
     
-    # Add the focal column (was the species recorded on the visit?). Use the spp_vis dataframe to extract this info
-    nrow1 <- nrow(occDetdata)
-    occDetdata <- merge(occDetdata, spp_vis[,c("visit", taxa_name)])
-    
-    if(nrow1 != nrow(occDetdata)) stop('some visits have been lost')
-    
-    names(occDetdata)[names(occDetdata) == taxa_name] <- "focal"
-    
     # If we are using regional codes do some checks
     if(!is.null(regional_codes)){
       if(!inherits(regional_codes, 'data.frame')) stop("regional_codes should be a data.frame")
@@ -290,6 +289,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
         warning(paste0("renaming ", names(regional_codes)[1], " as 'site'"))
         names(regional_codes)[1] <- "site" 
       }
+      siteCol <- grep("site", names(regional_codes))
       
       # remove locations that are not in the data
       abs_sites <- as.character(regional_codes$site)[!as.character(regional_codes$site) %in% as.character(occDetdata$site)]
@@ -302,25 +302,30 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
         regional_codes[is.na(regional_codes)] <- 0
       }
       
-      sites_no_region <- as.character(regional_codes$site[rowSums(regional_codes[,2:ncol(regional_codes)]) == 0])
-      sites_multi_region <- as.character(regional_codes$site[rowSums(regional_codes[,2:ncol(regional_codes)]) > 1])
-      site_counts <- table(regional_codes[,1])
+      sites_no_region <- as.character(regional_codes$site[rowSums(regional_codes[,-siteCol]) == 0])
+      sites_multi_region <- as.character(regional_codes$site[rowSums(regional_codes[,-siteCol]) > 1])
+      site_counts <- table(regional_codes$site)
       sites_multi_row <- names(site_counts[site_counts > 1])
       
       if(length(sites_no_region) > 0) 
         warning(paste(length(sites_no_region), 'sites are not assigned to a region in regional_codes and will be removed'))
-      if(length(sites_multi_region) > 0) 
-        warning(paste(length(sites_multi_region), 'sites are assigned to more than one region in regional_codes and will be removed'))
       if(length(sites_multi_row) > 0)
-        warning(paste(length(bad_sites), 'site(s) are present in more than one region and will be removed'))
+        warning(paste(length(sites_multi_row), 'sites appear more than once in regional_codes. These will be removed'))
+      if(length(sites_multi_region) > 0) 
+        if(allowSitesMultiRegions)
+          warning(paste(length(sites_multi_region), 'sites are assigned to multiple region in regional_codes: you have specified this is allowed'))
+        else
+          warning(paste(length(sites_multi_region), 'sites are assigned to more than one region in regional_codes and will be removed'))
       
       # finally check that every site with species data also has a region
       sites_no_region2 <- setdiff(sites_to_include, as.character(regional_codes$site))
       if(length(sites_no_region2) >= 1) 
-        warning(paste(length(sites_no_region2), 'sites are in occurrence data but not in regional data and will be removed'))
+        warning(paste(length(sites_no_region2), 'sites are in occurrence data but not in regional_codes and will be removed'))
       
       # strip these same sites out of the occDetdata & the regional codes
-      bad_sites <- unique(c(abs_sites, sites_multi_row, sites_multi_region, sites_no_region, sites_no_region2))
+      bad_sites <- c(abs_sites, sites_multi_row, sites_no_region, sites_no_region2)
+      if(!allowSitesMultiRegions) bad_sites <- c(bad_sites, sites_multi_region)
+      bad_sites <- unique(bad_sites)
       regional_codes <- subset(regional_codes, !site %in% bad_sites)
       occDetdata <- subset(occDetdata, !site %in% bad_sites)
     }
@@ -329,12 +334,12 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     if(!is.null(region_aggs)){
       if(is.null(regional_codes)) stop('Cannot use regional aggregates if regional_codes is not supplied')
       stopifnot(inherits(region_aggs, 'list'))
-      if(!all(unique(unlist(region_aggs)) %in% tail(colnames(regional_codes), -1))){
+      if(!all(unique(unlist(region_aggs)) %in% colnames(regional_codes)[-siteCol])){
         stop(paste0('Aggregate members [',
-                    paste(unique(unlist(region_aggs))[!unique(unlist(region_aggs)) %in% tail(colnames(regional_codes), -1)],
+                    paste(unique(unlist(region_aggs))[!unique(unlist(region_aggs)) %in% colnames(regional_codes)[-siteCol]],
                           collapse = ', '),
                     '] not in regional_codes column names [',
-                    paste(tail(colnames(regional_codes), -1),
+                    paste(colnames(regional_codes)[-siteCol],
                           collapse = ', '),
                     ']')) 
       }
@@ -428,8 +433,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     # add parameters for regions
     if(!is.null(regional_codes)){
       # remove spaces from region names, then extract them
-      colnames(regional_codes)[-1] <- gsub(' ', '_', colnames(regional_codes)[-1])
-      region_names <- colnames(regional_codes)[-1]      
+      colnames(regional_codes) <- gsub(' ', '_', colnames(regional_codes))
+      region_names <- setdiff(colnames(regional_codes), "site")      
       
       parameters <- c(parameters,
                       paste0("psi.fs.r_", region_names),
@@ -467,10 +472,6 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
         bugs_data <- c(bugs_data, additional.BUGS.elements)
       }
     }
-    
-    # make a copy of the bugs_data to calculate metadata from
-    bugs_data_copy <- with(occDetdata, data.frame(y = as.numeric(focal), year = TP, site = site))
-    BD_MD <- list()
     
     # Add regional elements to bugs data
     if(!is.null(regional_codes)){
@@ -548,16 +549,19 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
       } 
 
       regions_years <- list()
-      regions_nobs <- list()
-      regions_sites <-list()
+      temp <- bugs_data[grepl("^r_", names(bugs_data))]
+      regions_nobs <- sapply(temp, function(x) sum(x[bugs_data$Site] * bugs_data$y))
+      regions_sites <- unlist(bugs_data[grepl("nsite_r", names(bugs_data))])
   
+      # make a copy of the bugs_data to calculate metadata from
+      bugs_data_copy <- with(occDetdata, data.frame(y = as.numeric(focal), year = TP, site = site))
       bugs_data_copy <- merge(bugs_data_copy, regional_codes, all.x = TRUE)
       
-      # add regional codes to this copy and get n_obs, max and min years and year gaps for each region
+      # add regional codes to this copy and get max and min years and year gaps for each region
       for(region_name in region_names){
         
-        regions_nobs[paste0('n_obs_','r_', region_name)] <- sum(bugs_data_copy$y * bugs_data_copy[,region_name])
-        regions_sites[paste0('n_sites_','r_', region_name)] <- sum(bugs_data_copy[,region_name])
+        #regions_nobs[paste0('n_obs_','r_', region_name)] <- sum(bugs_data_copy$y * bugs_data_copy[,region_name])
+        #regions_sites[paste0('n_sites_','r_', region_name)] <- sum(bugs_data_copy[,region_name])
         current_r <- bugs_data_copy$y * bugs_data_copy[,region_name] * bugs_data_copy$year
         current_r <- subset(current_r,current_r !=0)
         
@@ -594,9 +598,12 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
         }
       }
     }
-      
+    
+    # start preparing metadata
+    BD_MD <- list()
+    
     # add max and min data years for the whole dataset
-    all_years_data <- bugs_data_copy$y * bugs_data_copy$year
+    all_years_data <- bugs_data$y * bugs_data$Year
     all_years_data <- subset(all_years_data, all_years_data !=0)
     BD_MD$min_year_data <- (min_year-1) + min(all_years_data)
     BD_MD$max_year_data <- (min_year-1) + max(all_years_data)
@@ -721,7 +728,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                               n_years = length(unique(occDetdata$TP)),
                               n_visits = nrow(occDetdata),
                               n_obs = sum(occDetdata$focal),
-                              n_species_sites <- length(unique(subset(occDetdata, focal=TRUE)$site)),
+                              n_species_sites = length(unique(subset(occDetdata, focal==TRUE)$site)),
                               min_year_model = min_year,
                               max_year_model = max_year),
                 gaps = ifelse(is.na(BD_MD), NA, list( 
@@ -745,7 +752,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     # add regional elements if applicable
     if(!is.null(regional_codes) & proceed){
       MD$summary$region_nobs <- regions_nobs
-      MD$summary$region_years <- regions_years
+      MD$summary$region_years <- unlist(regions_years)
       MD$summary$region_nsite <- regions_sites
     }else{
       MD$summary$region_nobs <- NA

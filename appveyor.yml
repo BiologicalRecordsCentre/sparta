@@ -24,6 +24,7 @@ environment:
 # Adapt as necessary starting from here
 
   matrix:
+
   # - R_VERSION: devel
   #   NOT_CRAN: true
   #   R_CHECK_ARGS: "--no-manual"
@@ -40,7 +41,7 @@ environment:
     NOT_CRAN: false
     USE_RTOOLS: true
     WARNINGS_AS_ERRORS: OFF
-    
+
   - R_VERSION: stable
     NOT_CRAN: false
     USE_RTOOLS: true
