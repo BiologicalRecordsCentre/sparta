@@ -50,6 +50,8 @@
 #' Other options are `EqualWt` or `HighSpec`, which define the application of "rules of thumb" defined in Pocock et al 2019. 
 #' Defaults to 1, in which case the model is applied for so long there is a single record of the focal species.
 #' @param provenance An optional text string allowing the user to identify the dataset.
+#' @param rem_aggs_with_missing_regions An option which if TRUE will remove all aggregates which contain at least one region with no data.
+#' If FALSE, only aggregates where ALL regions in that aggregate contain no data, are dropped. Defaults to TRUE
 #' 
 #' @details \code{modeltype} is used to choose the model as well as the associated initial values,
 #' and parameters to monitor. Elements to choose from can be separated into the following components:
@@ -179,7 +181,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                         seed = NULL, model.function = NULL, regional_codes = NULL,
                         region_aggs = NULL, additional.parameters = NULL,
                         additional.BUGS.elements = NULL, additional.init.values = NULL,
-                        return_data = FALSE, criterion = 1, provenance = NULL, saveMatrix = FALSE){
+                        return_data = FALSE, criterion = 1, provenance = NULL, saveMatrix = FALSE,
+                        rem_aggs_with_missing_regions = TRUE){
   
   ################## BASIC CHECKS
   # first run the error checks
@@ -192,8 +195,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
   # Check the taxa_name is one of my species
   if(!taxa_name %in% colnames(spp_vis)) stop('taxa_name is not the name of a taxa in spp_vis')
   ################## 
-  min_year <- min(occDetdata$TP)
-
+  min_year_original <- min_year <- min(occDetdata$TP)
+  
   # only include sites which have more than nyr of records
   yps <- rowSums(acast(occDetdata, site ~ TP, length, value.var = 'L') > 0)
   sites_to_include <- names(yps[yps >= nyr])
@@ -357,6 +360,13 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     # need to get a measure of whether the species was on that site in that year, unequivocally, in zst
     zst <- acast(occDetdata, id ~ factor(TP), value.var = 'focal', max, fill = 0) # initial values for the latent state = observed state
 
+    # Calculate min year. We're doing it now as it's fine if we've dropped the first year(s) of data and nothing in the middle
+    min_year <- min(occDetdata$TP)
+    if(min_year != min_year_original){
+      warning(paste0('\nThe first year of the data has changed, as the first years of data were dropped.\n',
+                    'The original first year was ',min_year_original,'. It is now ',min_year,'\n'))
+    }
+    
     # if the max_year is not null, edit the zst table to add the additional years required
     if(!is.null(max_year)){
       
@@ -493,16 +503,47 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
         region_names <- setdiff(region_names, zero_sites)
 
         # remove region aggregates
-        rem_aggs <- unlist(lapply(region_aggs, FUN = function(x) any(zero_sites %in% x)))
-        rem_aggs_names <- names(region_aggs)[rem_aggs]
-        
-        # remove aggs if you need to
-        if(length(rem_aggs_names) > 0){
-          warning(paste('The following region aggregates have to be removed as they contain a region with no data:',
-                        paste(rem_aggs_names, collapse = ', '),
-                        '- These region aggregates will not be included in the model'))
-          region_aggs <- region_aggs[!names(region_aggs) %in% rem_aggs_names]
-          parameters <- parameters[!parameters %in% paste0('psi.fs.r_', rem_aggs_names)]
+        if(rem_aggs_with_missing_regions){
+          rem_aggs <- unlist(lapply(region_aggs, FUN = function(x) any(zero_sites %in% x)))
+          rem_aggs_names <- names(region_aggs)[rem_aggs]
+          
+          # remove aggs if you need to
+          if(length(rem_aggs_names) > 0){
+            warning(paste('The following region aggregates have to be removed as they contain a region with no data:',
+                          paste(rem_aggs_names, collapse = ', '),
+                          '- These region aggregates will not be included in the model\n',
+                          'If you want to keep aggregates with one or more missing regions,',
+                          'set rem_aggs_with_missing_regions=FALSE'))
+            region_aggs <- region_aggs[!names(region_aggs) %in% rem_aggs_names]
+            parameters <- parameters[!parameters %in% paste0('psi.fs.r_', rem_aggs_names)]
+          }
+        } else {
+          rem_aggs <- unlist(lapply(region_aggs, FUN = function(x) all(x %in% zero_sites)))
+          rem_aggs_names <- names(region_aggs)[rem_aggs]
+          edit_aggs <- unlist(lapply(region_aggs, FUN = function(x) any(zero_sites %in% x)))
+          edit_aggs_names <- names(region_aggs)[edit_aggs & !(rem_aggs)]
+          
+          # edit aggs if you need to
+          if(length(edit_aggs_names) > 0){
+            warning(paste('The following region aggregates have to be edited as they contain regions with no data:',
+                          paste(edit_aggs_names, collapse = ', '),
+                          '\n- These region aggregates will still be included in the model\n'))
+            # Recreate aggs, removing regions without data
+            region_aggs_new <- lapply(region_aggs, FUN = function(agg){
+              agg[!(agg %in% zero_sites)]
+            })
+            names(region_aggs_new) <- names(region_aggs)
+            region_aggs <- region_aggs_new
+          }
+          
+          # remove aggs completely if you need to
+          if(length(rem_aggs_names) > 0){
+            warning(paste('The following region aggregates have to be removed as all regions within them have no data:',
+                          paste(rem_aggs_names, collapse = ', '),
+                          '- These region aggregates will not be included in the model'))
+            region_aggs <- region_aggs[!names(region_aggs) %in% rem_aggs_names]
+            parameters <- parameters[!parameters %in% paste0('psi.fs.r_', rem_aggs_names)]
+          }
         }
       } 
 

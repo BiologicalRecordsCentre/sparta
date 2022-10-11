@@ -22,17 +22,24 @@ site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
 # the date of visit is selected at random from those created earlier
 time_period <- sample(rDates, size = n, TRUE)
 
+# create a numeric vector of time periods to test for
+num_period <- as.numeric(format(time_period,'%Y'))
+
+# create additional dates with month and dat = 01 in to test if numeric and date format time_periods give equivalent results
+dates <- as.POSIXct(strptime(paste0(num_period, "/01/01"), "%Y/%m/%d")) 
+
 # combine this to a dataframe (adding a final row of 'bad' data)
 df <- data.frame(taxa = c(taxa,'bad'),
                  site = c(site,'A1'),
-                 time_period = c(time_period, as.POSIXct(strptime("1200/01/01", "%Y/%m/%d"))))
+                 time_period = c(time_period, as.POSIXct(strptime("1200/01/01", "%Y/%m/%d"))),
+                 num_period = c(num_period, 1200),
+                 comparison_dates = c(dates, as.POSIXct(strptime("1200/01/01", "%Y/%m/%d"))))
 
 ######################
 test_that("Test errors and warnings", {
   
   # outside errorChecks this is the only catch present in this set of functions
-  expect_error(RR_out <- reportingRateModel(df$taxa, df$site, 1:length(df$time_period)),
-               "non-dates not yet supported for time_period")
+
   # A couple in errorChecks for this function
   # warning when family is overridden by listlength
   expect_warning(RR_out <- reportingRateModel(df$taxa,
@@ -69,7 +76,7 @@ test_that("Test errors and warnings", {
 })
 
 test_that("Test formulaBuilder", {
-  
+
     
   family <- 'binomial'
   list_length <- FALSE
@@ -104,5 +111,9 @@ test_that("Check outputs are in the correct form", {
   expect_equal(atts$model_formula, "cbind(successes, failures) ~ year")
   expect_is(RR_out, "data.frame")
   expect_identical(c('a','b','c'), sort(as.character(RR_out$species_name)))
+  ## check outputs are equal when time_periods are numeric or in date format
+  expect_equal(reportingRateModel(df$taxa, df$site, df$num_period, species_to_include = c('a','b','c')), 
+               reportingRateModel(df$taxa, df$site, df$num_period, species_to_include = c('a','b','c')))
 
 })
+
