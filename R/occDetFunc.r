@@ -211,7 +211,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     spp_vis <- spp_vis[i,]
   } else stop(paste0("There are no sites visited in at least ", nyr, " years."))
 
-  # calcluate a set of data metrics for this species
+  # calculate a set of data metrics for this species
   data_Metrics <- dataMetrics(sp = taxa_name, 
                                 formattedData = list(occDetdata=occDetdata, spp_vis=spp_vis))
 
