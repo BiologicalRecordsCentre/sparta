@@ -170,7 +170,7 @@ occurrenceChange <- function(bayesOut, firstYear=NULL, lastYear=NULL, change = '
   
   
   if(change == 'growthrate'){
-    nyr <- length(years)
+    nyr <- length(years)-1
     first <- years[1]
     last <- years[length(years)]
     res_tab <- data.frame(occ_it[, colnames(occ_it) == first],
