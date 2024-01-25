@@ -716,8 +716,9 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     # get the sessionInfo and coerce into a useable format
     session.info <- sessionInfo()
-    packages <- c(sapply(session.info[7][[1]], function(x) x$Version),
-                  sapply(session.info[8][[1]], function(x) x$Version))
+    
+    packages <- c(sapply(session.info$otherPkgs, function(x) x$Version),
+                  sapply(session.info$loadedOnly, function(x) x$Version))
     
     MD <- list(method = 'sparta::occDetFunc',
                call =   call <- match.call(),

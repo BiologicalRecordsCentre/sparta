@@ -88,6 +88,9 @@
 #'                                 closure_period = closure_period)
 #'  
 #' # format the unicorns data
+#'
+#' unicorns <- unicorns[complete.cases(unicorns$kmsq), ]
+#'
 #' formatted_data <- formatOccData(taxa = unicorns$CONCEPT,
 #'                                survey = unicorns$Date,
 #'                                site = unicorns$kmsq)
@@ -134,14 +137,21 @@ formatOccData <- function(taxa, site, survey, replicate = NULL, closure_period =
     temp <- group_by(.data = taxa_data, survey, replicate)  
             
     temp <- summarise(temp, ns = length(unique(TP)))
+    
     if(any(temp$ns) > 1) {
       # return a warning but assume they know what they're doing
       warning(paste(as.numeric(table(temp$ns >1)[2]), 'survey identities appear in multiple closure periods'))
     }
+    
+    #print(min(as.numeric(format(taxa_data$survey, format = '%Y'))))
+    
+   # taxa_data$TP = taxa_data$TP + min(as.numeric(format(taxa_data$survey,'%Y')))
   } else {
     # we need to create the TP from the survey date.
     # survey should be a date if we've got this far, so extract the year
-    taxa_data$TP <- as.numeric(format(taxa_data$survey,'%Y')) # take year from date year 
+    taxa_data$TP <- as.numeric(format(taxa_data$survey, format = '%Y')) # take year from date year 
+    
+    print(taxa_data$TP)
   }
   
   # remove duplicates (in order that List Length is correctly calculated)
