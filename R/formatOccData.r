@@ -143,15 +143,11 @@ formatOccData <- function(taxa, site, survey, replicate = NULL, closure_period =
       warning(paste(as.numeric(table(temp$ns >1)[2]), 'survey identities appear in multiple closure periods'))
     }
     
-    #print(min(as.numeric(format(taxa_data$survey, format = '%Y'))))
-    
-   # taxa_data$TP = taxa_data$TP + min(as.numeric(format(taxa_data$survey,'%Y')))
   } else {
     # we need to create the TP from the survey date.
     # survey should be a date if we've got this far, so extract the year
     taxa_data$TP <- as.numeric(format(taxa_data$survey, format = '%Y')) # take year from date year 
     
-    print(taxa_data$TP)
   }
   
   # remove duplicates (in order that List Length is correctly calculated)
