@@ -211,7 +211,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     spp_vis <- spp_vis[i,]
   } else stop(paste0("There are no sites visited in at least ", nyr, " years."))
 
-  # calcluate a set of data metrics for this species
+  # calculate a set of data metrics for this species
   data_Metrics <- dataMetrics(sp = taxa_name, 
                                 formattedData = list(occDetdata=occDetdata, spp_vis=spp_vis))
 
@@ -716,8 +716,8 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
     
     # get the sessionInfo and coerce into a useable format
     session.info <- sessionInfo()
-    packages <- c(sapply(session.info[7][[1]], function(x) x$Version),
-                  sapply(session.info[8][[1]], function(x) x$Version))
+    packages <- c(sapply(session.info$basePkgs, packageVersion, simplify = FALSE),
+                  sapply(session.info$otherPkgs, function(x) x$Version))
     
     MD <- list(method = 'sparta::occDetFunc',
                call =   call <- match.call(),
@@ -745,7 +745,7 @@ occDetFunc <- function (taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr
                output_path = ifelse(test = write_results,
                                     file.path(getwd(), output_dir, paste(taxa_name, ".rdata", sep = "")),
                                     NA),
-               session_info = list(session.info[-c(7:8)],
+               session_info = list(session.info[1:2],
                                    packages)
                )
     
