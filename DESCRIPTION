@@ -1,7 +1,7 @@
 Package: sparta
 Type: Package
 Title: Trend Analysis for Unstructured Data
-Version: 0.2.19
+Version: 0.2.20
 Date: 2020-05-26
 Authors@R: c(person("Tom", "August", role = c("aut", "cre"), email = "tomaug@ceh.ac.uk"),
              person("Gary", "Powney", role = c("aut")),
@@ -28,7 +28,8 @@ Imports:
     gdata,
     LearnBayes,
     rmarkdown,
-    boot
+    boot,
+    data.table
 Suggests:
     testthat (>= 0.8.0),
     roxygen2,
