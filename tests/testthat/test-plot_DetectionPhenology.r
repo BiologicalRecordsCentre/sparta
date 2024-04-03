@@ -1,4 +1,9 @@
 test_that("Test plot_DetectionPhenology", {
+
+  # skip the test if jagsUI is not installed
+  if ((!requireNamespace("jagsUI", quietly = TRUE))) {
+    skip("jagsUI software not available")
+  }
   
   sink(file = ifelse(Sys.info()["sysname"] == "Windows",
                    "NUL",
