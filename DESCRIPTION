@@ -1,40 +1,56 @@
-Package: sparta
 Type: Package
+Package: sparta
 Title: Trend Analysis for Unstructured Data
 Version: 0.2.19
 Date: 2020-05-26
-Authors@R: c(person("Tom", "August", role = c("aut", "cre"), email = "tomaug@ceh.ac.uk"),
-             person("Gary", "Powney", role = c("aut")),
-             person("Charlie", "Outhwaite", role = c("aut")),
-             person("Colin", "Harrower", role = c("aut")),
-             person("Mark", "Hill", role = c("aut")),
-             person("Jack", "Hatfield", role = c("aut")),
-             person("Francesca", "Mancini", role = c("aut")),
-             person("Nick", "Isaac", role = c("aut")))
+Authors@R: c(
+    person("Dylan", "Carbone", , "dylcar@ceh.ac.uk", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0003-5290-786X")),
+    person("Tom", "August", , "tomaug@ceh.ac.uk", role = "aut",
+           comment = c(ORCID = "0000-0003-1116-3385")),
+    person("Gary", "Powney", role = "aut",
+           comment = c(ORCID = "0000-0003-3313-7786")),
+    person("Charlie", "Outhwaite", role = "aut",
+           comment = c(ORCID = "0000-0001-9997-6780")),
+    person("Jack", "Hatfield", role = "aut",
+           comment = c(ORCID = "0000-0002-6361-0629")),
+    person("Nick", "Isaac", role = "aut",
+           comment = c(ORCID = "0000-0002-4869-8052")),
+    person("Francesca", "Mancini", role = "aut",
+           comment = c(ORCID = "0000-0003-4085-4978")),
+    person("Mark", "Hill", role = "aut",
+           comment = c(ORCID = "0000-0002-3323-4458")),
+    person("Colin", "Harrower", role = "aut",
+           comment = c(ORCID = "0000-0001-5070-5293"))
+  )
 Maintainer: Tom August <tomaug@ceh.ac.uk>
-Description: Methods used to analyse trends in unstructured
-    occurrence datasets such as those collected by volunteer recording
-    schemes.
+Description: Methods used to analyse trends in unstructured occurrence
+    datasets such as those collected by volunteer recording schemes.
 License: MIT + file LICENSE
+URL: https://github.com/BiologicalRecordsCentre/sparta
+BugReports: https://github.com/BiologicalRecordsCentre/sparta/issues
 Depends:
-    R (>= 3.1.0),
-    lme4 (>= 1.0)
+    lme4 (>= 1.0),
+    R (>= 3.1.0)
 Imports:
-    plyr,
+    boot,
     dplyr (>= 0.4.1),
-    sp,
-    reshape2,
-    ggplot2,
     gdata,
+    ggplot2,
     LearnBayes,
+    plyr,
+    reshape2,
     rmarkdown,
-    boot
+    sp
 Suggests:
-    testthat (>= 0.8.0),
-    roxygen2,
     knitr,
-    R2jags
-VignetteBuilder: knitr
+    R2jags,
+    roxygen2,
+    testthat (>= 0.8.0)
+VignetteBuilder: 
+    knitr
+Encoding: UTF-8
 LazyData: TRUE
 RoxygenNote: 7.2.3
-Encoding: UTF-8
+SystemRequirements: JAGS
+    (https://sourceforge.net/projects/mcmc-jags/files/JAGS/)

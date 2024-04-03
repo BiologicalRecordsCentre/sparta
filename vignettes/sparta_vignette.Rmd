@@ -32,7 +32,6 @@ library(devtools)
 install_github('biologicalrecordscentre/sparta')
 ```
 
-
 ```r
 # Once installed, load the package
 library(sparta)
