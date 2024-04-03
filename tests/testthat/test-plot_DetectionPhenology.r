@@ -1,28 +1,3 @@
-context("Test plot_DetectionPhenology")
-
-  # Create data
-  n <- 15000 #size of dataset
-  nyr <- 20 # number of years in data
-  nSamples <- 100 # set number of dates
-  nSites <- 50 # set number of sites
-  set.seed(125)
-  
-  # Create somes dates
-  first <- as.Date(strptime("2010/01/01", format = "%Y/%m/%d")) 
-  last <- as.Date(strptime(paste(2010+(nyr-1), "/12/31", sep=''),
-                           format = "%Y/%m/%d")) 
-  dt <- last-first 
-  rDates <- first + (runif(nSamples)*dt)
-  
-  # taxa are set as random letters
-  taxa <- sample(letters, size = n, TRUE)
-  
-  # three sites are visited randomly
-  site <- sample(paste('A', 1:nSites, sep = ''), size = n, TRUE)
-  
-  # the date of visit is selected at random from those created earlier
-  survey <- sample(rDates, size = n, TRUE)
-  
 test_that("Test plot_DetectionPhenology", {
   
   sink(file = ifelse(Sys.info()["sysname"] == "Windows",
@@ -79,8 +54,7 @@ test_that("Test plot_DetectionPhenology", {
   head_data_JulianDay <- c(1, 34.0909090909091, 67.1818181818182, 100.272727272727, 133.363636363636, 
                            166.454545454545)
   
-  
-  expect_identical(names(results), c("data", "layers", "scales", "mapping", "theme", "coordinates", "facet", "plot_env", "labels"))
+  expect_identical(names(results), c("data", "layers", "scales", "guides", "mapping", "theme", "coordinates", "facet", "plot_env", "layout", "labels"))
   expect_identical(names(results$data), c("bin", "mean_pDet", "lower95CI", "upper95CI", "JulianDay"))
   expect_equal(head(results$data$bin), head_data_bin, tolerance = 1e-3)
   expect_equal(head(results$data$mean_pDet), head_data_mean_pDet, tolerance = 1e-3)
