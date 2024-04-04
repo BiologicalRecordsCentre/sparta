@@ -46,7 +46,7 @@ Suggests:
     knitr,
     R2jags,
     roxygen2,
-    testthat (>= 0.8.0)
+    testthat (>= 0.8.0),
     BRCindicators
 VignetteBuilder: 
     knitr
