@@ -47,9 +47,11 @@ Suggests:
     R2jags,
     roxygen2,
     testthat (>= 0.8.0)
+    BRCindicators
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
+remotes: BiologicalRecordsCentre/BRCindicators
 LazyData: TRUE
 RoxygenNote: 7.2.3
 SystemRequirements: JAGS
