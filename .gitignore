@@ -11,3 +11,6 @@ frescalo.exe
 sparta.Rproj
 
 misc/
+/doc/
+/Meta/
+inst/doc

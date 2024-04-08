@@ -10,3 +10,5 @@ frescalo.exe
 misc/
 ^appveyor\.yml$
 ^\.github$
+^doc$
+^Meta$

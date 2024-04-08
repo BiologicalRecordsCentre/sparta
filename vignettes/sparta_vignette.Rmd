@@ -2,7 +2,7 @@
 title: "sparta - Species Presence Absence R Trends Analyses"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Overview}
+  %\VignetteIndexEntry{sparta - Species Presence Absence R Trends Analyses}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
