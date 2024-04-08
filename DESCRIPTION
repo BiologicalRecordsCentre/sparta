@@ -41,7 +41,8 @@ Imports:
     plyr,
     reshape2,
     rmarkdown,
-    sp
+    sp,
+    xfun (>= 0.4.3)
 Suggests:
     knitr,
     R2jags,
