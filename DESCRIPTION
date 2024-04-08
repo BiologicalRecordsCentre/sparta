@@ -23,7 +23,7 @@ Authors@R: c(
     person("Colin", "Harrower", role = "aut",
            comment = c(ORCID = "0000-0001-5070-5293"))
   )
-Maintainer: Tom August <tomaug@ceh.ac.uk>
+Maintainer: Dylan Carbone <dylcar@ceh.ac.uk>
 Description: Methods used to analyse trends in unstructured occurrence
     datasets such as those collected by volunteer recording schemes.
 License: MIT + file LICENSE
@@ -47,11 +47,9 @@ Suggests:
     R2jags,
     roxygen2,
     testthat (>= 0.8.0),
-    BRCindicators
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
-remotes: BiologicalRecordsCentre/BRCindicators
 LazyData: TRUE
 RoxygenNote: 7.2.3
 SystemRequirements: JAGS
