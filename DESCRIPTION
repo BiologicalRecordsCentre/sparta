@@ -4,9 +4,9 @@ Title: Trend Analysis for Unstructured Data
 Version: 0.2.19
 Date: 2020-05-26
 Authors@R: c(
-    person("Dylan", "Carbone", , "dylcar@ceh.ac.uk", role = c("aut", "cre"),
+    person("Dylan", "Carbone", email = "dylcar@ceh.ac.uk", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0003-5290-786X")),
-    person("Tom", "August", , "tomaug@ceh.ac.uk", role = "aut",
+    person("Tom", "August", email = "tomaug@ceh.ac.uk", role = "aut",
            comment = c(ORCID = "0000-0003-1116-3385")),
     person("Gary", "Powney", role = "aut",
            comment = c(ORCID = "0000-0003-3313-7786")),
