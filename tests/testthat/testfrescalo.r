@@ -102,7 +102,6 @@ test_that("Test errors", {
 
 })
 
-
 test_that("Runs without error", {
 
   # skip_on_appveyor()
@@ -114,16 +113,14 @@ test_that("Runs without error", {
   temp <- tempfile(pattern = 'dir')
   dir.create(temp)
   sink(file.path(temp, 'null'))
-  fres_try <- try(frescalo(Data = df1, 
+  fres_try <- frescalo(Data = df1, 
                            Fres_weights = weights,
                            frespath = frespath,
                            time_periods = data.frame(start=c(1980,1990),end=c(1989,1999)),
                            site_col = 'site',
                            sp_col = 'taxa',
                            year = 'year',
-                           sinkdir = temp),
-                  silent=TRUE
-  )
+                           sinkdir = temp)
   sink()
   unlink(temp, recursive = TRUE)
   
@@ -162,7 +159,7 @@ test_that("Runs without error", {
   temp <- tempfile(pattern = 'dir')
   dir.create(temp)
   sink(file.path(temp, 'null'))
-  fres_try <- try(suppressWarnings(frescalo(Data = df1,
+  fres_try <- frescalo(Data = df1,
                            phi = 0.51,
                            Fres_weights = weights,
                            frespath = frespath,
@@ -170,8 +167,7 @@ test_that("Runs without error", {
                            site_col = 'site',
                            sp_col = 'taxa',
                            year = 'year',
-                           sinkdir = temp)),
-                  silent=TRUE)
+                           sinkdir = temp)
   sink()
   unlink(temp, recursive = TRUE)
   
@@ -230,7 +226,7 @@ test_that("Test plotting", {
   temp <- tempfile(pattern = 'dir')
   dir.create(temp)
   sink(file.path(temp, 'null'))
-  fres_try <- try(frescalo(Data = df1,
+  fres_try <- frescalo(Data = df1,
                            Fres_weights = weights,
                            frespath = frespath,
                            time_periods = data.frame(start=c(1980,1990),end=c(1989,1999)),
@@ -238,8 +234,7 @@ test_that("Test plotting", {
                            sp_col = 'taxa',
                            year = 'year',
                            plot_fres = TRUE,
-                           sinkdir = temp),
-                  silent=TRUE
+                           sinkdir = temp)
   )
   sink()
   unlink(temp, recursive = TRUE)
@@ -298,7 +293,7 @@ test_that("Runs high value of phi", {
   temp <- tempfile(pattern = 'dir')
   dir.create(temp)
   sink(file.path(temp, 'null'))
-  fres_try <- try(suppressWarnings(frescalo(Data = df1,
+  fres_try <- frescalo(Data = df1,
                            Fres_weights = weights,
                            phi = NULL,
                            frespath = frespath,
@@ -306,8 +301,7 @@ test_that("Runs high value of phi", {
                            site_col = 'site',
                            sp_col = 'taxa',
                            year = 'year',
-                           sinkdir = temp)),
-                  silent=TRUE)
+                           sinkdir = temp)
   sink()
   unlink(temp, recursive = TRUE)
   
