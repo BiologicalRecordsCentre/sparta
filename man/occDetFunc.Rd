@@ -71,29 +71,29 @@ this number ensures repeatabl analyses}
 including the example there, for how this is done)}
 
 \item{regional_codes}{A data.frame object detailing which site is associated with which region.
-each row desginates a site and each column represents a region. The first column represents the 
+each row desginates a site and each column represents a region. The first column represents the
 site name (as in \code{site}). Subsequent columns are named for each regions with 1 representing
 the site is in that region and 0 that it is not. NOTE a site should only be in one region}
 
 \item{region_aggs}{A named list giving aggregations of regions that you want trend
 estimates for. For example \code{region_aggs = list(GB = c('england', 'scotland', 'wales'))}
 will produced a trend for GB (Great Britain) as well as its constituent nations. Note that
-'england', scotland' and 'wales' must appear as names of columns in \code{regional_codes}. 
+'england', scotland' and 'wales' must appear as names of columns in \code{regional_codes}.
 More than one aggregate can be given, eg \code{region_aggs = list(GB = c('england', 'scotland',
  'wales'), UK = c('england', 'scotland', 'wales', 'northern_ireland'))}.}
 
 \item{additional.parameters}{A character vector of additional parameters to monitor}
 
-\item{additional.BUGS.elements}{A named list giving additioanl bugs elements passed 
+\item{additional.BUGS.elements}{A named list giving additioanl bugs elements passed
 to \code{R2jags::jags} 'data' argument}
 
-\item{additional.init.values}{A named list giving user specified initial values to 
+\item{additional.init.values}{A named list giving user specified initial values to
 be added to the defaults.}
 
 \item{return_data}{Logical, if \code{TRUE} (default) the BUGS data object is returned with the data}
 
 \item{criterion}{Determines whether the model should be run. If an integer then this defines the threshold number of records (50 in Outhwaite et al 2019).
-Other options are `EqualWt` or `HighSpec`, which define the application of "rules of thumb" defined in Pocock et al 2019. 
+Other options are `EqualWt` or `HighSpec`, which define the application of "rules of thumb" defined in Pocock et al 2019.
 Defaults to 1, in which case the model is applied for so long there is a single record of the focal species.}
 
 \item{provenance}{An optional text string allowing the user to identify the dataset.}
@@ -192,22 +192,22 @@ These options are provided as a vector of characters, e.g. \code{modeltype = c('
 set.seed(123)
 
 # Create data
-n <- 15000 #size of dataset
+n <- 15000 # size of dataset
 nyear <- 20 # number of years in data
 nSamples <- 100 # set number of dates
 nSites <- 50 # set number of sites
 
 # Create somes dates
-first <- as.Date(strptime("2010/01/01", format="\%Y/\%m/\%d")) 
-last <- as.Date(strptime(paste(2010+(nyear-1),"/12/31", sep=''), format="\%Y/\%m/\%d")) 
-dt <- last-first 
-rDates <- first + (runif(nSamples)*dt)
+first <- as.Date(strptime("2010/01/01", format = "\%Y/\%m/\%d"))
+last <- as.Date(strptime(paste(2010 + (nyear - 1), "/12/31", sep = ""), format = "\%Y/\%m/\%d"))
+dt <- last - first
+rDates <- first + (runif(nSamples) * dt)
 
 # taxa are set as random letters
 taxa <- sample(letters, size = n, TRUE)
 
 # sites are visited randomly
-site <- sample(paste('A', 1:nSites, sep=''), size = n, TRUE)
+site <- sample(paste("A", 1:nSites, sep = ""), size = n, TRUE)
 
 # the date of visit is selected at random from those created earlier
 survey <- sample(rDates, size = n, TRUE)
@@ -216,13 +216,15 @@ survey <- sample(rDates, size = n, TRUE)
 visitData <- formatOccData(taxa = taxa, site = site, survey = survey)
 
 # run the model with these data for one species (very small number of iterations)
-results <- occDetFunc(taxa_name = taxa[1],
-                      n_iterations = 50,
-                      burnin = 15, 
-                      occDetdata = visitData$occDetdata,
-                      spp_vis = visitData$spp_vis,
-                      write_results = FALSE,
-                      provenance  = "sparta test dataset")
+results <- occDetFunc(
+  taxa_name = taxa[1],
+  n_iterations = 50,
+  burnin = 15,
+  occDetdata = visitData$occDetdata,
+  spp_vis = visitData$spp_vis,
+  write_results = FALSE,
+  provenance = "sparta test dataset"
+)
 }
 }
 \references{
@@ -231,7 +233,7 @@ Isaac, N.J.B., van Strien, A.J., August, T.A., de Zeeuw, M.P. and Roy, D.B. (201
             \emph{Methods in Ecology and Evolution}, 5: 1052-1060.
 
 Outhwaite, C.L., Chandler, R.E., Powney, G.D., Collen, B., Gregory, R.D. & Isaac, N.J.B. (2018).
-            Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data. 
+            Prior specification in Bayesian occupancy modelling improves analysis of species occurrence data.
             \emph{Ecological Indicators}, 93: 333-343.
 
 Pocock, Logie, Isaac, Outhwaite & August. Rapid assessment of the suitability of multi-species citizen science datasets for occupancy trend analysis. \emph{bioRxiv} 813626 (2019) doi:10.1101/813626.

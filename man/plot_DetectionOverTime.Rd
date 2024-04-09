@@ -11,9 +11,9 @@ plot_DetectionOverTime(model, spname = NULL, min.yr = NULL, CI = 95)
 
 \item{spname}{optional name of the species (used for plotting)}
 
-\item{bins}{number of points to estimate across the year. Defaults to 12}
+\item{min.yr}{Minimum year for the detection (e.g., 1990).}
 
-\item{density_function}{whether the model used a density function to fit Julian date. This form was implemented from version 0.1.48 onwards. For models ran using earlier versions of the package this should be set to FALSE}
+\item{CI}{Confidence interval}
 }
 \value{
 This function returns plot showing the detection probability on the y axis and year on the x.
