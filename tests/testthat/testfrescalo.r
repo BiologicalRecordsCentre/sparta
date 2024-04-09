@@ -1,5 +1,3 @@
-context("Test frescalo")
-
 ### Frescalo testing is currently skipped if not on a ###
 ### windows machine, or if libcurl is not supported.  ###
 
@@ -38,33 +36,29 @@ weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 
 frespath <- file.path(tempdir(), 'fres.exe')
 
-toms_PC <- Sys.info()['nodename'] == "WLL-3RHYM53"
-
-if(toms_PC) frespath <- 'C:/Frescalo_3a_windows.exe'
+# Save the system info as an object
+system_info <- Sys.info()
 
 test_that("Test errors", {
   
-  skip_on_appveyor()
-  skip_on_travis()
+  # skip_on_appveyor()
+  # skip_on_travis()
   if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
   if(grepl("mac", .Platform$pkgType)) skip('Frescalo exe does not run on Mac OS')
-  if (.Platform$OS.type == "windows" & !toms_PC) skip('Carbon black blocks Frescalo')
   
-  if(!toms_PC){
-    if(.Platform$OS.type == "windows"){
-      download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_windows.exe',
-                    destfile = frespath,
-                    method = "libcurl",
-                    mode = 'wb', quiet = TRUE)
-    } else if(.Platform$OS.type == "unix"){
-      download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_linux.exe',
-                    destfile = frespath,
-                    method = "libcurl",
-                    quiet = TRUE)
-      system(command = paste('chmod', '+x', normalizePath(frespath)))
-    } else{
-      stop(paste('frescalo is not supported on', .Platform$OS.type))
-    }
+  if (system_info['sysname'] == 'Windows') {
+    download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_windows.exe',
+                  destfile = frespath,
+                  method = "libcurl",
+                  mode = 'wb', quiet = TRUE)
+  } else if(system_info['sysname'] == 'Linux'){
+    download.file(url = 'https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_linux.exe',
+                  destfile = frespath,
+                  method = "libcurl",
+                  quiet = TRUE)
+    system(command = paste('chmod', '+x', normalizePath(frespath)))
+  } else{
+    stop(paste('frescalo is not supported on'))
   }
   
   temp <- tempfile(pattern = 'dir')
@@ -111,11 +105,10 @@ test_that("Test errors", {
 
 test_that("Runs without error", {
 
-  skip_on_appveyor()
-  skip_on_travis()
+  # skip_on_appveyor()
+  # skip_on_travis()
   if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
   if(grepl("mac", .Platform$pkgType)) skip('Frescalo exe does not run on Mac OS')
-  if (.Platform$OS.type == "windows" & !toms_PC) skip('Carbon black blocks Frescalo')
   
   # This first run is done using years
   temp <- tempfile(pattern = 'dir')
@@ -144,7 +137,7 @@ test_that("Runs without error", {
   
   dir.create(temp)
   sink(file.path(temp, 'null'))
-  fres_try <- try(frescalo(Data = df1,
+  fres_try <- frescalo(Data = df1,
                            Fres_weights = weights,
                            start_col = 'startdate',
                            end_col = 'enddate',
@@ -153,9 +146,7 @@ test_that("Runs without error", {
                            site_col = 'site',
                            sp_col = 'taxa',
                            year = 'year',
-                           sinkdir = temp),
-                  silent=TRUE
-  )
+                           sinkdir = temp)
   sink()
   unlink(temp, recursive = TRUE)
   
@@ -234,7 +225,6 @@ test_that("Test plotting", {
   skip_on_appveyor()
   if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
   if(grepl("mac", .Platform$pkgType)) skip('Frescalo exe does not run on Mac OS')
-  if (.Platform$OS.type == "windows" & !toms_PC) skip('Carbon black blocks Frescalo')
   
   # test plotting
   temp <- tempfile(pattern = 'dir')
@@ -299,11 +289,10 @@ weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 
 test_that("Runs high value of phi", {
   
-  skip_on_appveyor()
-  skip_on_travis()
+  # skip_on_appveyor()
+  # skip_on_travis()
   if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
   if(grepl("mac", .Platform$pkgType)) skip('Frescalo exe does not run on Mac OS')
-  if (.Platform$OS.type == "windows" & !toms_PC) skip('Carbon black blocks Frescalo')
   
   # test a very low value of phi
   temp <- tempfile(pattern = 'dir')
