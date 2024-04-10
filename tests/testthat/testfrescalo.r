@@ -63,41 +63,41 @@ test_that("Test errors", {
   
   temp <- tempfile(pattern = 'dir')
   dir.create(temp)
-  expect_error(frescalo(Data = df1,
+  expect_error(suppressWarnings(frescalo(Data = df1,
                         frespath = frespath,
                         time_periods = data.frame(start=c(1980,1990),end=c(1989,1999)),
                         site_col = 'site',
                         sp_col = 'FOO',
                         year = 'year',
-                        sinkdir = temp),
+                        sinkdir = temp)),
                'FOO is not the name of a column in data')
   
-  expect_error(frescalo(Data = df1,
+  expect_error(suppressWarnings(frescalo(Data = df1,
                         frespath = frespath,
                         time_periods = c(1980,1990,1989,1999),
                         site_col = 'site',
                         sp_col = 'taxa',
                         year = 'year',
-                        sinkdir = temp),
+                        sinkdir = temp)),
                'time_periods should be a data.frame')
   
-  expect_error(frescalo(Data = df1,
+  expect_error(suppressWarnings(frescalo(Data = df1,
                         frespath = frespath,
                         time_periods = data.frame(start=c(1980,1850),end=c(1989,1999)),
                         site_col = 'site',
                         sp_col = 'taxa',
                         year = 'year',
-                        sinkdir = temp),
+                        sinkdir = temp)),
                'In time_periods year ranges should not overlap')
   
 
-  expect_error(frescalo(Data = df1,
+  expect_error(suppressWarnings(frescalo(Data = df1,
                         frespath = frespath,
                         time_periods = data.frame(start=c(1980,1990),end=c(1989,1999)),
                         site_col = 'site',
                         sp_col = 'taxa',
                         year = 'year',
-                        sinkdir = temp),
+                        sinkdir = temp)),
                'the sites in your data do not match those in your weights file')
 
 })
@@ -113,14 +113,14 @@ test_that("Runs without error", {
   temp <- tempfile(pattern = 'dir')
   dir.create(temp)
   sink(file.path(temp, 'null'))
-  fres_try <- frescalo(Data = df1, 
+  fres_try <- suppressWarnings(frescalo(Data = df1, 
                            Fres_weights = weights,
                            frespath = frespath,
                            time_periods = data.frame(start=c(1980,1990),end=c(1989,1999)),
                            site_col = 'site',
                            sp_col = 'taxa',
                            year = 'year',
-                           sinkdir = temp)
+                           sinkdir = temp))
   sink()
   unlink(temp, recursive = TRUE)
   
@@ -134,7 +134,7 @@ test_that("Runs without error", {
   
   dir.create(temp)
   sink(file.path(temp, 'null'))
-  fres_try <- frescalo(Data = df1,
+  fres_try <- suppressWarnings(frescalo(Data = df1,
                            Fres_weights = weights,
                            start_col = 'startdate',
                            end_col = 'enddate',
@@ -143,7 +143,7 @@ test_that("Runs without error", {
                            site_col = 'site',
                            sp_col = 'taxa',
                            year = 'year',
-                           sinkdir = temp)
+                           sinkdir = temp))
   sink()
   unlink(temp, recursive = TRUE)
   
@@ -159,7 +159,7 @@ test_that("Runs without error", {
   temp <- tempfile(pattern = 'dir')
   dir.create(temp)
   sink(file.path(temp, 'null'))
-  fres_try <- frescalo(Data = df1,
+  fres_try <- suppressWarnings(frescalo(Data = df1,
                            phi = 0.51,
                            Fres_weights = weights,
                            frespath = frespath,
@@ -167,7 +167,7 @@ test_that("Runs without error", {
                            site_col = 'site',
                            sp_col = 'taxa',
                            year = 'year',
-                           sinkdir = temp)
+                           sinkdir = temp))
   sink()
   unlink(temp, recursive = TRUE)
   
@@ -180,7 +180,6 @@ test_that("Runs without error", {
                 "lm_stats" %in% names(fres_try))
 
 })
-
 
 # Create data
 n <- 1500 #size of dataset
@@ -226,7 +225,7 @@ test_that("Test plotting", {
   temp <- tempfile(pattern = 'dir')
   dir.create(temp)
   sink(file.path(temp, 'null'))
-  fres_try <- frescalo(Data = df1,
+  fres_try <- suppressWarnings(frescalo(Data = df1,
                            Fres_weights = weights,
                            frespath = frespath,
                            time_periods = data.frame(start=c(1980,1990),end=c(1989,1999)),
@@ -234,8 +233,7 @@ test_that("Test plotting", {
                            sp_col = 'taxa',
                            year = 'year',
                            plot_fres = TRUE,
-                           sinkdir = temp)
-  )
+                           sinkdir = temp))
   sink()
   unlink(temp, recursive = TRUE)
   
@@ -293,7 +291,7 @@ test_that("Runs high value of phi", {
   temp <- tempfile(pattern = 'dir')
   dir.create(temp)
   sink(file.path(temp, 'null'))
-  fres_try <- frescalo(Data = df1,
+  fres_try <- suppressWarnings(frescalo(Data = df1,
                            Fres_weights = weights,
                            phi = NULL,
                            frespath = frespath,
@@ -301,7 +299,7 @@ test_that("Runs high value of phi", {
                            site_col = 'site',
                            sp_col = 'taxa',
                            year = 'year',
-                           sinkdir = temp)
+                           sinkdir = temp))
   sink()
   unlink(temp, recursive = TRUE)
   
