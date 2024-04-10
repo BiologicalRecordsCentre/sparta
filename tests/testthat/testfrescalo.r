@@ -43,7 +43,7 @@ test_that("Test errors", {
   
   # skip_on_appveyor()
   # skip_on_travis()
-  if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
+  #if (!capabilities('libcurl')) skip('skipping as libcurl not supported')
   if(grepl("mac", .Platform$pkgType)) skip('Frescalo exe does not run on Mac OS')
   
   if (system_info['sysname'] == 'Windows') {
