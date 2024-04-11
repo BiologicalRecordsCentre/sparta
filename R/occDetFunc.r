@@ -854,3 +854,4 @@ occDetFunc <- function(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr 
   if (write_results) save(out, file = file.path(output_dir, paste(taxa_name, ".rdata", sep = "")))
   return(out)
 }
+    
