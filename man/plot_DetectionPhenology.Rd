@@ -34,7 +34,7 @@ Takes a object of \code{OccDet} fitted with the \code{jul_date} option
 Calculates the phenology of detection and produces a plot of detectability over time for the reference data type.
 }
 \references{
-van Strien, A.J., Termaat, T., Groenendijk, D., Mensing, V. & Kéry, M. (2010) 
-            Site-occupancy models may offer new opportunities for dragonfly monitoring based on daily species lists. 
+van Strien, A.J., Termaat, T., Groenendijk, D., Mensing, V. & Kéry, M. (2010)
+            Site-occupancy models may offer new opportunities for dragonfly monitoring based on daily species lists.
             \emph{Basic and Applied Ecology}, 11, 495–503.
 }

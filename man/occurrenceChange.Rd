@@ -27,13 +27,13 @@ Region names must match those in the model output.}
 }
 \value{
 A list giving the mean, median, credible intervals and raw data from the
-estimations.
+estimations. It is recommended to use the median value.
 }
 \description{
 Using the data returned from occDetModel/occDetFunc this function models a 
 trend between two years for each iteration of the models. Several options are
 available for the method used to calculate the trend. This distribution of the results is used to
-calculate the mean estimate and the 95% credibale intervals.
+calculate the mean estimate and the 95% credible intervals.
 }
 \details{
 \code{change} is used to specify which change measure to be calculated.

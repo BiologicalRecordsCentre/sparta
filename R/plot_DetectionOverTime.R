@@ -4,8 +4,8 @@
 
 #' @param model a fitted sparta model of class \code{OccDet}.
 #' @param spname optional name of the species (used for plotting)
-#' @param bins number of points to estimate across the year. Defaults to 12
-#' @param density_function whether the model used a density function to fit Julian date. This form was implemented from version 0.1.48 onwards. For models ran using earlier versions of the package this should be set to FALSE
+#' @param min.yr Minimum year for the detection (e.g., 1990).
+#' @param CI Confidence interval
 #' 
 #' @details 
 #' Takes a object of \code{OccDet}
