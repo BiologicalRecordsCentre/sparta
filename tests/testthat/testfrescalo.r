@@ -39,6 +39,11 @@ weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 frespath <- file.path(tempdir(), "fres.exe")
 
 test_that("Does the function stop when the operating system is not mac or Windows", {
+
+  if (system_info["sysname"] == "Darwin") {
+    skip("Frescalo installation failures")
+  }
+
     temp <- tempfile(pattern = "dir")
     dir.create(temp)
 
@@ -81,6 +86,10 @@ system_info <- Sys.info()
     }
 
 test_that("Test errors", {
+
+  if (system_info["sysname"] == "Darwin") {
+    skip("Frescalo installation failures")
+  }
 
   temp <- tempfile(pattern = "dir")
   dir.create(temp)
@@ -139,6 +148,11 @@ test_that("Test errors", {
   })
 
 test_that("Runs without error", {
+
+  if (system_info["sysname"] == "Darwin") {
+    skip("Frescalo installation failures")
+  }
+
   if (!detect_os_compat()) {
     skip("Operating system incompatible with Frescalo")
   }
@@ -237,6 +251,11 @@ weights <- merge(allsites, allsites)
 weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 
 test_that("Test plotting", {
+
+  if (system_info["sysname"] == "Darwin") {
+    skip("Frescalo installation failures")
+  }
+
   if (!detect_os_compat()) {
     skip("Operating system incompatible with Frescalo")
   }
@@ -285,6 +304,11 @@ weights <- merge(allsites, allsites)
 weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 
 test_that("Runs high value of phi", {
+
+  if (system_info["sysname"] == "Darwin") {
+    skip("Frescalo installation failures")
+  }
+
   if (!detect_os_compat()) {
     skip("Operating system incompatible with Frescalo")
   }
