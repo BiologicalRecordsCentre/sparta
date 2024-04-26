@@ -38,6 +38,9 @@ weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 
 frespath <- file.path(tempdir(), "fres.exe")
 
+# Save the system info as an object
+system_info <- Sys.info()
+
 test_that("Does the function stop when the operating system is not mac or Windows", {
 
   if (system_info["sysname"] == "Darwin") {
@@ -64,9 +67,6 @@ test_that("Does the function stop when the operating system is not mac or Window
     )
 })
 
-# Save the system info as an object
-system_info <- Sys.info()
-
  if (system_info["sysname"] == "Windows") {
     download.file(
       url = "https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_windows.exe",
@@ -74,7 +74,7 @@ system_info <- Sys.info()
       method = "libcurl",
       mode = "wb", quiet = TRUE
     )
-  } else if (system_info["sysname"] == "Linux") {
+  } else if (system_info["sysname"] == "Darwin") {
     download.file(
       url = "https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_linux.exe",
       destfile = frespath,
