@@ -38,34 +38,31 @@ weights$W <- runif(n = nrow(weights), min = 0, max = 1)
 
 frespath <- file.path(tempdir(), "fres.exe")
 
+test_that("Does the function stop when the operating system is not mac or Windows", {
+    temp <- tempfile(pattern = "dir")
+    dir.create(temp)
+
+    with_mock(
+        "detect_os_compat" = function() FALSE,
+        {
+            expect_error(suppressWarnings(frescalo(
+                Data = df1,
+                Fres_weights = weights,
+                frespath = frespath,
+                time_periods = data.frame(start = c(1980, 1990), end = c(1989, 1999)),
+                site_col = "site",
+                sp_col = "taxa",
+                year = "year",
+                sinkdir = temp
+            )), "Apologies, Frescalo is currently only avaiable on mac and Windows operating systems.")
+        }
+    )
+})
+
 # Save the system info as an object
 system_info <- Sys.info()
 
-test_that("Does the function stop when the operating system is not mac or Windows", {
-  temp <- tempfile(pattern = "dir")
-  dir.create(temp)
-
-  # Mock `detect_os_compat` to return FALSE
-  mockery::stub(frescalo, "detect_os_compat", FALSE, depth = 2)
-
-  expect_error(suppressWarnings(frescalo(
-    Data = df1,
-    Fres_weights = weights,
-    frespath = frespath,
-    time_periods = data.frame(start = c(1980, 1990), end = c(1989, 1999)),
-    site_col = "site",
-    sp_col = "taxa",
-    year = "year",
-    sinkdir = temp
-  )), "Apologies, Frescalo is currently only avaiable on mac and Windows operating systems.")
-})
-
-test_that("Test errors", {
-  if (!detect_os_compat()) {
-    skip("Operating system incompatible with Frescalo")
-  }
-
-  if (system_info["sysname"] == "Windows") {
+ if (system_info["sysname"] == "Windows") {
     download.file(
       url = "https://github.com/BiologicalRecordsCentre/frescalo/raw/master/Frescalo_3a_windows.exe",
       destfile = frespath,
@@ -79,10 +76,11 @@ test_that("Test errors", {
       method = "libcurl",
       quiet = TRUE
     )
+
     system(command = paste("chmod", "+x", normalizePath(frespath)))
-  } else {
-    stop(paste("frescalo is not supported on"))
-  }
+    }
+
+test_that("Test errors", {
 
   temp <- tempfile(pattern = "dir")
   dir.create(temp)
@@ -98,8 +96,8 @@ test_that("Test errors", {
     )),
     "FOO is not the name of a column in data"
   )
-
-  expect_error(
+  
+    expect_error(
     suppressWarnings(frescalo(
       Data = df1,
       frespath = frespath,
@@ -125,7 +123,6 @@ test_that("Test errors", {
     "In time_periods year ranges should not overlap"
   )
 
-
   expect_error(
     suppressWarnings(frescalo(
       Data = df1,
@@ -138,7 +135,8 @@ test_that("Test errors", {
     )),
     "the sites in your data do not match those in your weights file"
   )
-})
+  
+  })
 
 test_that("Runs without error", {
   if (!detect_os_compat()) {
@@ -148,7 +146,7 @@ test_that("Runs without error", {
   # This first run is done using years
   temp <- tempfile(pattern = "dir")
   dir.create(temp)
-  sink(file.path(temp, "null"))
+  ##sink(file.path(temp, "null"))
   fres_try <- suppressWarnings(frescalo(
     Data = df1,
     Fres_weights = weights,
@@ -159,7 +157,7 @@ test_that("Runs without error", {
     year = "year",
     sinkdir = temp
   ))
-  sink()
+  ##sink()
   unlink(temp, recursive = TRUE)
 
   expect_equal(class(fres_try), "frescalo")
@@ -171,7 +169,7 @@ test_that("Runs without error", {
     "lm_stats" %in% names(fres_try))
 
   dir.create(temp)
-  sink(file.path(temp, "null"))
+  #sink(file.path(temp, "null"))
   fres_try <- suppressWarnings(frescalo(
     Data = df1,
     Fres_weights = weights,
@@ -184,7 +182,7 @@ test_that("Runs without error", {
     year = "year",
     sinkdir = temp
   ))
-  sink()
+  #sink()
   unlink(temp, recursive = TRUE)
 
   expect_equal(class(fres_try), "frescalo")
@@ -198,7 +196,7 @@ test_that("Runs without error", {
   # test a very low value of phi
   temp <- tempfile(pattern = "dir")
   dir.create(temp)
-  sink(file.path(temp, "null"))
+  #sink(file.path(temp, "null"))
   fres_try <- suppressWarnings(frescalo(
     Data = df1,
     phi = 0.51,
@@ -210,7 +208,7 @@ test_that("Runs without error", {
     year = "year",
     sinkdir = temp
   ))
-  sink()
+  #sink()
   unlink(temp, recursive = TRUE)
 
   expect_equal(class(fres_try), "frescalo")
@@ -222,27 +220,8 @@ test_that("Runs without error", {
     "lm_stats" %in% names(fres_try))
 })
 
-# Create data
-n <- 1500 # size of dataset
-nyr <- 20 # number of years in data
-nSamples <- 100 # set number of dates
-nSites <- 50 # set number of sites
-set.seed(125)
-
-# Create somes dates
-first <- as.Date(strptime("1980/01/01", "%Y/%m/%d"))
-last <- as.Date(strptime(paste(1980 + (nyr - 1), "/12/31", sep = ""), "%Y/%m/%d"))
-dt <- last - first
-rDates <- first + (runif(nSamples) * dt)
-
-# taxa are set as random letters
-taxa <- sample(letters, size = n, TRUE)
-
 # three sites are visited randomly
 site <- sample(paste("SK", 11:(nSites + 10), sep = ""), size = n, TRUE)
-
-# the date of visit is selected at random from those created earlier
-time_period <- sample(rDates, size = n, TRUE)
 
 df1 <- data.frame(
   taxa = taxa,
@@ -265,7 +244,7 @@ test_that("Test plotting", {
   # test plotting
   temp <- tempfile(pattern = "dir")
   dir.create(temp)
-  sink(file.path(temp, "null"))
+  #sink(file.path(temp, "null"))
   fres_try <- suppressWarnings(frescalo(
     Data = df1,
     Fres_weights = weights,
@@ -277,7 +256,7 @@ test_that("Test plotting", {
     plot_fres = TRUE,
     sinkdir = temp
   ))
-  sink()
+  #sink()
   unlink(temp, recursive = TRUE)
 
   expect_equal(class(fres_try), "frescalo")
@@ -289,27 +268,8 @@ test_that("Test plotting", {
     "lm_stats" %in% names(fres_try))
 })
 
-# Create data
-n <- 15000 # size of dataset
-nyr <- 20 # number of years in data
-nSamples <- 100 # set number of dates
-nSites <- 50 # set number of sites
-set.seed(125)
-
-# Create somes dates
-first <- as.Date(strptime("1980/01/01", "%Y/%m/%d"))
-last <- as.Date(strptime(paste(1980 + (nyr - 1), "/12/31", sep = ""), "%Y/%m/%d"))
-dt <- last - first
-rDates <- first + (runif(nSamples) * dt)
-
-# taxa are set as random letters
-taxa <- sample(letters, size = n, TRUE)
-
 # three sites are visited randomly
 site <- sample(paste("A", 1:nSites, sep = ""), size = n, TRUE)
-
-# the date of visit is selected at random from those created earlier
-time_period <- sample(rDates, size = n, TRUE)
 
 df1 <- data.frame(
   taxa = taxa,
@@ -332,7 +292,7 @@ test_that("Runs high value of phi", {
   # test a very low value of phi
   temp <- tempfile(pattern = "dir")
   dir.create(temp)
-  sink(file.path(temp, "null"))
+  #sink(file.path(temp, "null"))
   fres_try <- suppressWarnings(frescalo(
     Data = df1,
     Fres_weights = weights,
@@ -344,7 +304,7 @@ test_that("Runs high value of phi", {
     year = "year",
     sinkdir = temp
   ))
-  sink()
+  #sink()
   unlink(temp, recursive = TRUE)
 
   expect_equal(class(fres_try), "frescalo")
