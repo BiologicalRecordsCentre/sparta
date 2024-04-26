@@ -143,15 +143,6 @@ test_that("Runs without error", {
     skip("Operating system incompatible with Frescalo")
   }
 
-  if (system_info['sysname'] == 'Linux') {
-  # More detailed checks can be done for specific distributions if necessary,
-  # but generally, Ubuntu will report 'Linux' as sysname
-  skip("Installation related failures")
-} else if (system_info['sysname'] == 'Darwin') {
-  print("The system is macOS.")
-
-
-
   # This first run is done using years
   temp <- tempfile(pattern = "dir")
   dir.create(temp)
