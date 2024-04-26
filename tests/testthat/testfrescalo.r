@@ -42,7 +42,7 @@ test_that("Does the function stop when the operating system is not mac or Window
     temp <- tempfile(pattern = "dir")
     dir.create(temp)
 
-    with_mock(
+    with_mocked_bindings(
         "detect_os_compat" = function() FALSE,
         {
             expect_error(suppressWarnings(frescalo(
