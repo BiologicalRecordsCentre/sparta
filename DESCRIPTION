@@ -39,7 +39,6 @@ Imports:
     ggplot2,
     LearnBayes,
     plyr,
-    mockr,
     reshape2,
     rmarkdown,
     sp,
