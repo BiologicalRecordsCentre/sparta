@@ -17,6 +17,11 @@ function(
 	Plot=TRUE
 	
 ){
+
+if (!detect_os_compat()) {
+    stop("Apologies, Frescalo is currently only avaiable on mac and Windows operating systems.")
+}
+
 # BODY OF FUNCTION
 	# Print status to screen 
 		cat("\nSAVING DATA TO FRESCALO WORKING DIRECTORY\n",rep("*",20),"\n\n", sep="")
