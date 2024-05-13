@@ -189,7 +189,7 @@ head(telfer_results)
 
 The reporting rates models in sparta are all either GLMs or GLMMs with year as a continuous covariate but are flexible, giving the user a number of options for their analyses. These options include the addition of covariates to account for biases in the data including a random site effect and fixed effect of list length.
 
-In [Isaac et al (2014)](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract) it was shown that reporting rate models can be susceptible to type 1 errors under certain scenarios and that with site and list length covariates the models performed better when the data were bias. These methods were found to out perform simple methods like Telfer.
+In [Isaac et al (2014)](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract) it was shown that reporting rate models can be susceptible to type 1 errors under certain scenarios and that with site and list length covariates the models performed better when the data were biased. These methods were found to out perform simple methods like Telfer.
 
 The common feature among these models is that the quantity under consideration is the 'probability of being recorded'. When binomial models are used (as is the default), it's the 'probability for an average visit' for the Bernoulli version it is the probability of being recorded per time period.
 
@@ -281,7 +281,7 @@ nrow(myDataSubset)
 
 ### Running Reporting Rate Models
 
-Once you have subset your data using the above functions (or perhaps not at all) the reporting rate models can be applied using the function `reportingRateModel`. This function offers flexibility in the model you wish to fit, allowing the user to specify whether list length and site should be used as covariates, whether over-dispersion should be used, and whether the family should be binomial or Bernoulli. A number of these variants are presented in [Isaac et al (2014)](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract). While multi-species data is required it is not nessecary to model all species. In fact you can save a significant amount of time by only modelling hte species you are interested in.
+Once you have subset your data using the above functions (or perhaps not at all) the reporting rate models can be applied using the function `reportingRateModel`. This function offers flexibility in the model you wish to fit, allowing the user to specify whether list length and site should be used as covariates, whether over-dispersion should be used, and whether the family should be binomial or Bernoulli. A number of these variants are presented in [Isaac et al (2014)](http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract). While multi-species data is required it is not nessecary to model all species. In fact you can save a significant amount of time by only modelling the species you are interested in.
 
 ```{r,cache = TRUE}
 # Run the reporting rate model using list length as a fixed effect and 
@@ -321,7 +321,7 @@ with(RR_out,
 
 The returned object is a data frame with one row per species. Each column gives information on an element of the model output including covariate estimates, standard errors and p-values. This object also has some attributes giving the year that was chosen as the intercept, the number of visits in the dataset and the model formula used. 
 
-These models can take a long time to run when your data set is larg or you have a large number of species to model. To make this faster it is possible to parallelise this process across species which can significantly improve your run times. Here is an example of how we would parallelise the above example using hte R package snowfall.
+These models can take a long time to run when your data set is large or you have a large number of species to model. To make this faster it is possible to parallelise this process across species which can significantly improve your run times. Here is an example of how we would parallelise the above example using hte R package snowfall.
 
 ```{r,cache = TRUE}
 # Load in snowfall
@@ -411,13 +411,31 @@ This function works in a very similar fashion to that of the previous functions 
 # Here is our data
 str(myData)
 
+################################################
+# Create new entries for the year 1986
+new_dates <- seq(as.Date("1986-01-01"), as.Date("1986-12-31"), by = "1 month")
+
+# Create a dataframe with similar values for the new dates
+new_data <- data.frame(taxa = rep("x", length(new_dates)),
+                       site = rep("A99", length(new_dates)),
+                       time_period = new_dates,
+                       tp = NA)
+
+# Append the new data to the existing dataframe
+myData <- rbind(myData, new_data)
+
+# View the updated dataframe
+head(myData)
+
+################################################
+
 # Run an occupancy model for three species
 # Here we use very small number of iterations 
 # to avoid a long run time
 system.time({
 occ_out <- occDetModel(taxa = myData$taxa,
                        site = myData$site,
-                       time_period = myData$time_period,
+                       survey = myData$time_period,
                        species_list = c('a','b','c','d'),
                        write_results = FALSE,
                        n_iterations = 200,
@@ -447,7 +465,7 @@ head(occ_out$a$BUGSoutput$summary)
 plot(occ_out$a)
 ```
 
-He we have run a small example but in reality these models are usually run for many thousands of iterations, making the analysis of more than a handful of species impractical. For those with access to the necessary facilities it is possible to parallelise across species. To do this we use a pair of functions that are used internally by `occDetModel`. These are `formatOccData` which is used to format our occurrence data into the format needed by JAGS, and `occDetFunc`, the function which undertakes the modelling.
+Here we have run a small example but in reality these models are usually run for many thousands of iterations, making the analysis of more than a handful of species impractical. For those with access to the necessary facilities it is possible to parallelise across species. To do this we use a pair of functions that are used internally by `occDetModel`. These are `formatOccData` which is used to format our occurrence data into the format needed by JAGS, and `occDetFunc`, the function which undertakes the modelling.
 
 ```{r,cache = TRUE}
 # First format our data

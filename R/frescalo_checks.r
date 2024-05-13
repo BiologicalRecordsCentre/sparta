@@ -8,7 +8,7 @@ frescalo_checks <- function(site_col, sp_col, year_col, start_col, end_col,
   # Check column names are in the data
   new.colnames <- c(site_col,sp_col,year_col,start_col,end_col)
   missingColNames <- new.colnames[!new.colnames %in% names(Data)]
-  if(length(missingColNames) > 0) stop(paste(unlist(missingColNames),'is not the name of a column in data'))
+  if(length(missingColNames) > 0) stop(paste(unlist(missingColNames),'is not the name of a column in data\n\n'))
   
   # Remove columns that are not needed
   Data <- Data[,names(Data) %in% new.colnames]

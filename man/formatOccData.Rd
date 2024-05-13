@@ -100,13 +100,11 @@ formatted_data <- formatOccData(taxa = taxa,
                                 survey = survey,
                                 closure_period = closure_period)
  
-# format the unicorns data
+# OR format the unicorns data
+formatted_data <- formatOccData(taxa = unicorns$species,
+                               survey = unicorns$start_date,
+                               site = unicorns$site)
 
-unicorns <- unicorns[complete.cases(unicorns$kmsq), ]
-
-formatted_data <- formatOccData(taxa = unicorns$CONCEPT,
-                               survey = unicorns$Date,
-                               site = unicorns$kmsq)
 }
 
 }
