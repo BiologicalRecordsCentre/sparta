@@ -3,7 +3,7 @@
 <!-- badges: start -->
 [![codecov.io](https://codecov.io/github/BiologicalRecordsCentre/sparta/coverage.svg?branch=master)](https://codecov.io/github/BiologicalRecordsCentre/sparta?branch=master)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![R-CMD-check](https://github.com/BiologicalRecordsCentre/sparta/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/DylanCarbone/sparta/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/BiologicalRecordsCentre/sparta/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/BiologicalRecordsCentre/sparta/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 This R package includes methods used to analyse trends in unstructured occurrence datasets and a range of useful functions for mapping such data in the UK. The package is under continious development, but you can find stable releases in the release section. Note that frescalo currently uses an .exe compiled only for windows. 
