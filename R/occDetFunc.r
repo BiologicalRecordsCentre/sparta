@@ -79,7 +79,7 @@
 #' a combination that is not supported. There is usually a good reason why that
 #' combination is not a good idea. Here are the model elements available:
 #'
-#' \itemize{
+#' \describe{
 #'  \item{\code{"sparta"}}{ - This uses the same model as in Isaac et al (2014)}
 #'  \item{\code{"indran"}}{ - Here the prior for the year effect of the state model is modelled as a random effect.  This allows the model to adapt to interannual variability.}
 #'  \item{\code{"ranwalk"}}{ - Here the prior for the year effect of the state model is modelled as a random walk.  Each estimate for the year effect is dependent on that of the previous year.}
@@ -96,7 +96,7 @@
 #'
 #' @return A list including the model, JAGS model output, the path of the model file used and information on the number of iterations, first year, last year, etc.
 #' Key aspects of the model output include:
-#' \itemize{
+#' \describe{
 #'  \item{\code{"out$model"}}{ - The model used as provided to JAGS. Also contained is a list of fully observed variables. These are those listed in the BUGS data.}
 #'  \item{\code{"out$BUGSoutput$n.chains"}}{ - The number of Markov chains ran in the MCMC simulations.}
 #'  \item{\code{"out$BUGSoutput$n.iter"}}{ - The total number of iterations per chain.}
