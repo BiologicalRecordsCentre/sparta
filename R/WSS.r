@@ -31,7 +31,8 @@
 #'         column \code{error_message}.\cr
 #'         
 #'         The data.frame has a number of attributes:
-#'         \itemize{
+#' 
+#'          \describe{
 #'          \item{\code{intercept_year}}{ - The year used for the intercept (i.e. the
 #'           year whose value is set to 0). Setting the intercept to the median year helps
 #'           to increase model stability}
@@ -42,7 +43,8 @@
 #'           combination of arguements used}
 #'          \item{\code{minL}}{ - The setting of minL used in site selection}
 #'          \item{\code{minTP}}{ - The setting of minTP used in site selection}
-#'          } 
+#'
+#' }
 #' @references Roy, H.E., Adriaens, T., Isaac, N.J.B. et al. (2012) Invasive alien predator
 #'             causes rapid declines of native European ladybirds. Diversity & Distributions,
 #'             18, 717-725.

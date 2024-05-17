@@ -149,19 +149,20 @@ Not all combinations are available in sparta. You will get an error if you try a
 a combination that is not supported. There is usually a good reason why that
 combination is not a good idea. Here are the model elements available:
 
-\itemize{
- \item{\code{"sparta"}}{ - This uses the same model as in Isaac et al (2014)}
- \item{\code{"indran"}}{ - Here the prior for the year effect of the state model is modelled as a random effect.  This allows the model to adapt to interannual variability.}
- \item{\code{"ranwalk"}}{ - Here the prior for the year effect of the state model is modelled as a random walk.  Each estimate for the year effect is dependent on that of the previous year.}
- \item{\code{"halfcauchy"}}{ - Includes half-Cauchy hyperpriors for all random effects within the model.  The half-Cauchy is a special case of the Student’s t distribution with 1 degree of freedom. }
- \item{\code{"inversegamma"}}{ - Includes inverse-gamma hyperpriors for random effects within the model}
- \item{\code{"catlistlength"}}{ - This specifies that list length should be considered as a catagorical variable. There are 3 classes, lists of length 1, 2-3, and 4 and over. If none of the list length options are specifed 'contlistlength' is used}
- \item{\code{"contlistlength"}}{ - This specifies that list length should be considered as a continious variable. If none of the list length options are specifed 'contlistlength' is used}
- \item{\code{"nolistlength"}}{ - This specifies that no list length should be used. If none of the list length options are specifed 'contlistlength' is used}
- \item{\code{"jul_date"}}{ - This adds Julian date to the model as a normal distribution with its mean and standard deviation as monitered parameters.}
- \item{\code{"intercept"}}{ - No longer available.  Includes an intercept term in the state and observation model.  By including intercept terms, the occupancy and detection probabilities in each year are centred on an overall mean level.}
- \item{\code{"centering"}}{ - No longer available.  Includes hierarchical centering of the model parameters.   Centring does not change the model explicitly but writes it in a way that allows parameter estimates to be updated simultaneously.}
+\describe{
+\item{\code{"sparta"}}{ - This uses the same model as in Isaac et al (2014).}
+\item{\code{"indran"}}{ - Here the prior for the year effect of the state model is modelled as a random effect. This allows the model to adapt to interannual variability.}
+\item{\code{"ranwalk"}}{ - Here the prior for the year effect of the state model is modelled as a random walk. Each estimate for the year effect is dependent on that of the previous year.}
+\item{\code{"halfcauchy"}}{ - Includes half-Cauchy hyperpriors for all random effects within the model. The half-Cauchy is a special case of the Student’s t distribution with 1 degree of freedom.}
+\item{\code{"inversegamma"}}{ - Includes inverse-gamma hyperpriors for random effects within the model.}
+\item{\code{"catlistlength"}}{ - This specifies that list length should be considered as a categorical variable. There are 3 classes: lists of length 1, 2-3, and 4 and over. If none of the list length options are specified, 'contlistlength' is used.}
+\item{\code{"contlistlength"}}{ - This specifies that list length should be considered as a continuous variable. If none of the list length options are specified, 'contlistlength' is used.}
+\item{\code{"nolistlength"}}{ - This specifies that no list length should be used. If none of the list length options are specified, 'contlistlength' is used.}
+\item{\code{"jul_date"}}{ - This adds Julian date to the model as a normal distribution with its mean and standard deviation as monitored parameters.}
+\item{\code{"intercept"}}{ - No longer available. Includes an intercept term in the state and observation model. By including intercept terms, the occupancy and detection probabilities in each year are centred on an overall mean level.}
+\item{\code{"centering"}}{ - No longer available. Includes hierarchical centering of the model parameters. Centering does not change the model explicitly but writes it in a way that allows parameter estimates to be updated simultaneously.}
 }
+
 These options are provided as a vector of characters, e.g. \code{modeltype = c('indran', 'halfcauchy', 'catlistlength')}
 }
 \examples{

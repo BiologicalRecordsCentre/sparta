@@ -7,5 +7,5 @@
 #' Issac et al (2014), available at \url{http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12254/abstract}
 #'
 #' @name sparta
-#' @docType _PACKAGE
-NULL
+#' @keywords internal
+"_PACKAGE"
