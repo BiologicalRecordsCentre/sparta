@@ -33,14 +33,14 @@
 #'         
 #'         The data.frame has a number of attributes:
 #'         \itemize{
-#'          \item{\code{intercept_year}}{ - The year used for the intercept (i.e. the
+#'         \item{\code{intercept_year}}{ - The year used for the intercept (i.e. the
 #'           year whose value is set to 0). Setting the intercept to the median year helps
 #'           to increase model stability}
-#'          \item{\code{min_year} and \code{max_year}}{ - The earliest and latest year
+#'         \item{\code{min_year} and \code{max_year}}{ - The earliest and latest year
 #'           in the dataset (after years have been centered on \code{intercept_year}}
-#'          \item{\code{nVisits}}{ - The total number of visits that were in the dataset}
-#'          \item{\code{model_formula}}{ - The model used, this will vary depending on the
-#'           combination of arguements used}
+#'         \item{\code{nVisits}}{ - The total number of visits that were in the dataset}
+#'         \item{\code{model_formula}}{ - The model used, this will vary depending on the
+#'           combination of arguments used}
 #'          }
 #'          
 #' @keywords trends, species, distribution
@@ -88,7 +88,7 @@
 #' @references Isaac, N.J.B. et al. (2014) Extracting robust trends in species' distributions 
 #'             from unstructured opportunistic data: a comparison of methods.
 #'             \emph{bioRXiv} 006999, https://doi.org/10.1101/006999.
-
+#'
 reportingRateModel <- function(taxa, site, time_period, list_length = FALSE, site_effect = FALSE,
                                species_to_include = unique(taxa), overdispersion = FALSE,
                                verbose = FALSE, family = 'Binomial', print_progress = FALSE) {

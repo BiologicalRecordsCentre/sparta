@@ -142,9 +142,9 @@ See also the `metadata` attribute for more detailed information about the data i
 Run occupancy detection models using the output from \code{formatOccData}
 }
 \details{
-This function requires both the R package R2jags and the program JAGS.
-These are not installed by default when sparta is loaded and so should be
-installed by the user. More details can be found in teh vignette.
+This function requires the program JAGS.
+This is not installed by default when sparta is loaded and should be
+installed by the user. More details can be found in the vignette.
 
 \code{modeltype} is used to choose the model as well as the associated initial values,
 and parameters to monitor. Elements to choose from can be separated into the following components:

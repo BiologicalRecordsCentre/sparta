@@ -151,17 +151,17 @@
 #' # Load data
 #' data(unicorns)
 #'
-#' # Run frescalo (data is save to the working directory as sinkdir is not given)
 #' fres_out <- frescalo(Data = unicorns,
+#'                      frespath = file.path(getwd(), "Frescalo.exe"),
 #'                      time_periods = data.frame(start=c(1980,1990),end=c(1989,1999)),
-#'                      site_col = 'hectad',
-#'                      sp_col = 'CONCEPT',
-#'                      start_col = 'TO_STARTDATE',
-#'                      end_col = 'Date')
+#'                      site_col = 'site',
+#'                      sp_col = 'species',
+#'                      start_col = 'start_date',
+#'                      end_col = 'end_date')
 #'}
 
 frescalo <-
-  function(Data,#your Data (.rdata files) as a file path (or list of file paths)
+  function(Data, #your Data as a dataframe object
            frespath, #path to the exe
            time_periods, #a list of vector pairs used in frescalo (ie 'c((1990,1995),(1996,2000))')
            site_col, # name of site column
