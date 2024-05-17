@@ -32,6 +32,7 @@
 #'         columns will be \code{NA}\cr
 #'         
 #'         The data.frame has a number of attributes:
+#'         \itemize{
 #'         \item{\code{intercept_year}}{ - The year used for the intercept (i.e. the
 #'           year whose value is set to 0). Setting the intercept to the median year helps
 #'           to increase model stability}
@@ -40,6 +41,7 @@
 #'         \item{\code{nVisits}}{ - The total number of visits that were in the dataset}
 #'         \item{\code{model_formula}}{ - The model used, this will vary depending on the
 #'           combination of arguments used}
+#'          }
 #'          
 #' @keywords trends, species, distribution
 #' @examples

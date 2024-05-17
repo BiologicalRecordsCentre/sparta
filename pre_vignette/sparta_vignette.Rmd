@@ -411,24 +411,6 @@ This function works in a very similar fashion to that of the previous functions 
 # Here is our data
 str(myData)
 
-################################################
-# Create new entries for the year 1986
-new_dates <- seq(as.Date("1986-01-01"), as.Date("1986-12-31"), by = "1 month")
-
-# Create a dataframe with similar values for the new dates
-new_data <- data.frame(taxa = rep("x", length(new_dates)),
-                       site = rep("A99", length(new_dates)),
-                       time_period = new_dates,
-                       tp = NA)
-
-# Append the new data to the existing dataframe
-myData <- rbind(myData, new_data)
-
-# View the updated dataframe
-head(myData)
-
-################################################
-
 # Run an occupancy model for three species
 # Here we use very small number of iterations 
 # to avoid a long run time
