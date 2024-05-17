@@ -32,7 +32,7 @@
 #'         
 #'         The data.frame has a number of attributes:
 #' 
-#'          \describe{
+#'          \itemize{
 #'          \item{\code{intercept_year}}{ - The year used for the intercept (i.e. the
 #'           year whose value is set to 0). Setting the intercept to the median year helps
 #'           to increase model stability}
