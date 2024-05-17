@@ -2,9 +2,9 @@
 #'
 #' Run occupancy detection models using the output from \code{formatOccData}
 #'
-#' This function requires both the R package R2jags and the program JAGS.
-#' These are not installed by default when sparta is loaded and so should be
-#' installed by the user. More details can be found in teh vignette.
+#' This function requires the program JAGS.
+#' This is not installed by default when sparta is loaded and should be
+#' installed by the user. More details can be found in the vignette.
 #'
 #' @param taxa_name A character giving the name of the species to be modelled.
 #' @param occDetdata The 2nd element of the object returned by formatOccData.
