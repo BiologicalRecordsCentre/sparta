@@ -2,27 +2,26 @@ Type: Package
 Package: sparta
 Title: Trend Analysis for Unstructured Data
 Version: 0.2.19
-Date: 2020-05-26
+Date: 2024-05-29
 Authors@R: c(
-    person("Dylan", "Carbone", email = "dylcar@ceh.ac.uk", role = c("aut", "cre"),
-           comment = c(ORCID = "0009-0003-5290-786X")),
-    person("Tom", "August", email = "tomaug@ceh.ac.uk", role = "aut",
-           comment = c(ORCID = "0000-0003-1116-3385")),
-    person("Gary", "Powney", role = "aut",
-           comment = c(ORCID = "0000-0003-3313-7786")),
-    person("Charlie", "Outhwaite", role = "aut",
-           comment = c(ORCID = "0000-0001-9997-6780")),
-    person("Jack", "Hatfield", role = "aut",
-           comment = c(ORCID = "0000-0002-6361-0629")),
     person("Nick", "Isaac", role = "aut",
            comment = c(ORCID = "0000-0002-4869-8052")),
-    person("Francesca", "Mancini", role = "aut",
-           comment = c(ORCID = "0000-0003-4085-4978")),
+    person("Tom", "August", email = "tomaug@ceh.ac.uk", role = "aut",
+           comment = c(ORCID = "0000-0003-1116-3385")),
+    person("Dylan", "Carbone", email = "dylcar@ceh.ac.uk", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0003-5290-786X")),
+    person("Colin", "Harrower", role = "aut",
+           comment = c(ORCID = "0000-0001-5070-5293")),
+    person("Jack", "Hatfield", role = "aut",
+           comment = c(ORCID = "0000-0002-6361-0629")),
     person("Mark", "Hill", role = "aut",
            comment = c(ORCID = "0000-0002-3323-4458")),
-    person("Colin", "Harrower", role = "aut",
-           comment = c(ORCID = "0000-0001-5070-5293"))
-  )
+    person("Francesca", "Mancini", role = "aut",
+           comment = c(ORCID = "0000-0003-4085-4978")),
+    person("Charlie", "Outhwaite", role = "aut",
+           comment = c(ORCID = "0000-0001-9997-6780")),
+    person("Gary", "Powney", role = "aut",
+           comment = c(ORCID = "0000-0003-3313-7786")))
 Maintainer: Dylan Carbone <dylcar@ceh.ac.uk>
 Description: Methods used to analyse trends in unstructured occurrence
     datasets such as those collected by volunteer recording schemes.
