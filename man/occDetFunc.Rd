@@ -28,7 +28,7 @@ occDetFunc(
   criterion = 1,
   provenance = NULL,
   saveMatrix = FALSE,
-  rem_aggs_with_missing_regions = TRUE,
+  rem_aggs_with_missing_regions = FALSE,
   allowSitesMultiRegions = FALSE
 )
 }
@@ -101,7 +101,7 @@ Defaults to 1, in which case the model is applied for so long there is a single 
 \item{saveMatrix}{Logical, if \code{FALSE} (default) the sims.matrix element of the jags object is omitted, in order to reduce the filesize.}
 
 \item{rem_aggs_with_missing_regions}{An option which if TRUE will remove all aggregates which contain at least one region with no data.
-If `FALSE`, only aggregates where ALL regions in that aggregate contain no data, are dropped. Defaults to TRUE}
+If `FALSE`, only aggregates where ALL regions in that aggregate contain no data, are dropped. Defaults to FALSE}
 
 \item{allowSitesMultiRegions}{An option that permits sites to be included in more than one region if `TRUE`. If `FALSE` then these sites are dropped. Defaults to `FALSE`}
 }
