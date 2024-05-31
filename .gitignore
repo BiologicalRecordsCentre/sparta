@@ -8,6 +8,7 @@
 *.Rproj
 
 # etc
+frescalo_installation/
 frescalo.exe
 sparta.Rproj
 misc/
@@ -15,3 +16,4 @@ misc/
 /Meta/
 create_unicorn.r
 error_reproduction_scripts/
+inst/doc
