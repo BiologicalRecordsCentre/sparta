@@ -199,10 +199,10 @@ occDetModel <- function(taxa, site, survey,
                         return_data = FALSE){
  
   # Error checking done in lower functions
-  # Check if R2jags is installed
-  if (!requireNamespace("R2jags", quietly = TRUE)) {
-    stop("Package 'R2jags' is needed for the 'occDetModel' function to work. Please insatll this from CRAN. You will also be required to install JAGS, which you can download from https://sourceforge.net/projects/mcmc-jags/files/JAGS/",
-         call. = FALSE)
+  # Check if JAGS is installed
+  if (!detect_jags()) {
+  stop("No installation of JAGS has been detected. You can install JAGS from https://sourceforge.net/projects/mcmc-jags/files/JAGS/",
+        call. = FALSE)
   }
     
   # Do we have JAGS installed - this works only on windows

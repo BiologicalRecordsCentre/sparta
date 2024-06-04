@@ -1,7 +1,7 @@
 ---
 title: "sparta - Species Presence/Absence R Trends Analyses"
 author: "Tom August"
-date: "June 2015"
+date: "May 2024"
 output:
   pdf_document:
     toc: yes
@@ -32,11 +32,11 @@ NOTE: JAGS must be installed before the R package installation will work. JAGS c
 ```{r, eval=FALSE}
 # Install the package from CRAN
 # THIS WILL WORK ONLY AFTER THE PACKAGE IS PUBLISHED
-install.packages('sparta')
+# install.packages('sparta')
 
 # Or install the development version from GitHub
 library(devtools)
-install_github('biologicalrecordscentre/sparta')
+# install_github('biologicalrecordscentre/sparta')
 ```
 
 ```{r, }
@@ -604,7 +604,7 @@ The `createWeights` function follows the procedure outlined in [Hill (2012)](htt
 ```{r,cache = TRUE}
 # First we need to enter the location where we placed the .exe
 # In my case I saved it to a folder within the source package directory. Note that this installer has been filtered out in the .gitignore to reduce size, and therefore you will need to install it separately
-myFrescaloPath <- file.path(getwd(), 'frescalo.exe')
+myFrescaloPath <- file.path(getwd(), "vignette_frescalo.exe")
 
 # I then want to set up the time periods I want to analyse
 # Here I say I want to compare 1980-89 to 1990-99
@@ -613,7 +613,7 @@ head(myTimePeriods)
 
 # I also need to specify where I want my results to be saved
 # I'm going to save it in a folder in my working directory
-myFolder <- '~/myFolder'
+myFolder <- 'myFolder'
 
 # Simple run of frescalo
 frescalo_results <- frescalo(Data = myData, 
@@ -672,14 +672,17 @@ If your data are from the UK and sites are given as grid referenes that there is
 data(unicorns)
 head(unicorns)
 
+# Create a new time period range
+myTimePeriods <- data.frame(start= c(1968, 2001), end = c(2000, 2023))
+
 # Now run frescalo using hte built in weights file
 unicorn_results <- frescalo(Data = unicorns, 
                             frespath = myFrescaloPath,
                             time_periods = myTimePeriods,
-                            site_col = 'hectad',
-                            sp_col = 'CONCEPT',
-                            start_col = 'TO_STARTDATE',
-                            end_col = 'Date',
+                            site_col = "site",
+                            sp_col = "species",
+                            start_col = "start_date",
+                            end_col = 'end_date',
                             sinkdir = myFolder)
 ```
 

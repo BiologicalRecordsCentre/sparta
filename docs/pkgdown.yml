@@ -1,7 +1,7 @@
 pandoc: '3.2'
-pkgdown: 2.0.9.9000
-pkgdown_sha: 11e1a8fe0fff6b1981721f50f18a958635177919
+pkgdown: 2.0.9
+pkgdown_sha: ~
 articles:
-  sparta_vignette: sparta_vignette.html
-last_built: 2024-05-31T09:00Z
+  vignette: vignette.html
+last_built: 2024-06-04T09:50Z
 

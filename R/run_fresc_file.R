@@ -197,11 +197,21 @@ if (!detect_os_compat()) {
 		    # Read Target value of phi
 		    tar_phi = as.numeric(gsub("(Target value of phi[ ]*)([[:digit:]]{1}[.][[:digit:]]{2})","\\2", tar_txt))
 		    
-        if(fres_warn & act_phi > tar_phi){
-          warning('Your value of phi (',tar_phi,') is smaller than the 98.5 percentile of input phi (',act_phi,'). It is reccommended your phi be similar to this value. For more information see Hill (2011) reference in frescalo help file',sep='')
-        } else if (fres_warn){
-          warning('Frescalo has a warning message. Please check the log file [$log]')
-        }
+
+		# return a warning if an error occurs in phi value calculation
+		if(any(sapply(log_out, FUN = function(line){grepl("98.5 percentile of input phi -1.#J", line)}))){
+
+			warning("-1.#J phi value calculated")
+			
+		} else{
+
+			if(fres_warn & act_phi > tar_phi){
+			warning('Your value of phi (',tar_phi,') is smaller than the 98.5 percentile of input phi (',act_phi,'). It is reccommended your phi be similar to this value. For more information see Hill (2011) reference in frescalo help file',sep='')
+			} else if (fres_warn){
+			warning('Frescalo has a warning message. Please check the log file [$log]')
+			}
+
+		}
         
 		  }
 			

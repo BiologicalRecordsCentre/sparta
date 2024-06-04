@@ -152,7 +152,7 @@
 #' data(unicorns)
 #'
 #' fres_out <- frescalo(Data = unicorns,
-#'                      frespath = file.path(getwd(), "Frescalo.exe"),
+#'                      frespath = file.path(getwd(), "frescalo.exe"),
 #'                      time_periods = data.frame(start=c(1980,1990),end=c(1989,1999)),
 #'                      site_col = 'site',
 #'                      sp_col = 'species',
