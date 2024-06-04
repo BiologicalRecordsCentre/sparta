@@ -8,9 +8,11 @@
 *.Rproj
 
 # etc
-frescalo.exe
+vignette_frescalo.exe
 sparta.Rproj
 misc/
 /doc/
 /Meta/
 create_unicorn.r
+error_reproduction_scripts/
+docs

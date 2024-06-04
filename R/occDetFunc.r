@@ -51,7 +51,7 @@
 #' Defaults to 1, in which case the model is applied for so long there is a single record of the focal species.
 #' @param provenance An optional text string allowing the user to identify the dataset.
 #' @param rem_aggs_with_missing_regions An option which if TRUE will remove all aggregates which contain at least one region with no data.
-#' If `FALSE`, only aggregates where ALL regions in that aggregate contain no data, are dropped. Defaults to TRUE
+#' If `FALSE`, only aggregates where ALL regions in that aggregate contain no data, are dropped. Defaults to FALSE
 #' @param allowSitesMultiRegions An option that permits sites to be included in more than one region if `TRUE`. If `FALSE` then these sites are dropped. Defaults to `FALSE`
 #'
 #' @details \code{modeltype} is used to choose the model as well as the associated initial values,
@@ -186,7 +186,7 @@ occDetFunc <- function(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr 
                        region_aggs = NULL, additional.parameters = NULL,
                        additional.BUGS.elements = NULL, additional.init.values = NULL,
                        return_data = FALSE, criterion = 1, provenance = NULL, saveMatrix = FALSE,
-                       rem_aggs_with_missing_regions = TRUE, allowSitesMultiRegions = FALSE) {
+                       rem_aggs_with_missing_regions = FALSE, allowSitesMultiRegions = FALSE) {
 
   ################## BASIC CHECKS
   # first run the error checks
@@ -550,12 +550,18 @@ occDetFunc <- function(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr 
         region_names <- setdiff(region_names, zero_sites)
 
         # remove region aggregates
-        if (rem_aggs_with_missing_regions) {
-          rem_aggs <- unlist(lapply(region_aggs, FUN = function(x) any(zero_sites %in% x)))
-          rem_aggs_names <- names(region_aggs)[rem_aggs]
+        rem_aggs <- unlist(lapply(region_aggs, FUN = function(x) {
+          if (rem_aggs_with_missing_regions) {
+            any(zero_sites %in% x)
+          } else {
+            all(x %in% zero_sites)
+          }
+        }))
+        rem_aggs_names <- names(region_aggs)[rem_aggs]
 
-          # remove aggs if you need to
-          if (length(rem_aggs_names) > 0) {
+        # remove aggs if you need to
+        if (length(rem_aggs_names) > 0) {
+          if (rem_aggs_with_missing_regions) {
             warning(paste(
               "The following region aggregates have to be removed as they contain a region with no data:",
               paste(rem_aggs_names, collapse = ", "),
@@ -563,16 +569,22 @@ occDetFunc <- function(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr 
               "If you want to keep aggregates with one or more missing regions,",
               "set rem_aggs_with_missing_regions=FALSE"
             ))
-            region_aggs <- region_aggs[!names(region_aggs) %in% rem_aggs_names]
-            parameters <- parameters[!parameters %in% paste0("psi.fs.r_", rem_aggs_names)]
+          } else {
+            warning(paste(
+              "The following region aggregates have to be removed as all regions within them have no data:",
+              paste(rem_aggs_names, collapse = ", "),
+              "- These region aggregates will not be included in the model"
+            ))
           }
-        } else {
-          rem_aggs <- unlist(lapply(region_aggs, FUN = function(x) all(x %in% zero_sites)))
-          rem_aggs_names <- names(region_aggs)[rem_aggs]
+          region_aggs <- region_aggs[!names(region_aggs) %in% rem_aggs_names]
+          parameters <- parameters[!parameters %in% paste0("psi.fs.r_", rem_aggs_names)]
+        }
+
+        # Edit aggregates if some regions have no data and rem_aggs_with_missing_regions is FALSE
+        if (!rem_aggs_with_missing_regions) {
           edit_aggs <- unlist(lapply(region_aggs, FUN = function(x) any(zero_sites %in% x)))
           edit_aggs_names <- names(region_aggs)[edit_aggs & !(rem_aggs)]
 
-          # edit aggs if you need to
           if (length(edit_aggs_names) > 0) {
             warning(paste(
               "The following region aggregates have to be edited as they contain regions with no data:",
@@ -586,18 +598,9 @@ occDetFunc <- function(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr 
             names(region_aggs_new) <- names(region_aggs)
             region_aggs <- region_aggs_new
           }
-
-          # remove aggs completely if you need to
-          if (length(rem_aggs_names) > 0) {
-            warning(paste(
-              "The following region aggregates have to be removed as all regions within them have no data:",
-              paste(rem_aggs_names, collapse = ", "),
-              "- These region aggregates will not be included in the model"
-            ))
-            region_aggs <- region_aggs[!names(region_aggs) %in% rem_aggs_names]
-            parameters <- parameters[!parameters %in% paste0("psi.fs.r_", rem_aggs_names)]
-          }
         }
+
+
       }
 
       regions_years <- list()
