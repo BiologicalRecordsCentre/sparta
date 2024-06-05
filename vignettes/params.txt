@@ -1,0 +1,10 @@
+Log.txt 
+FocDist.txt 
+GB_LC_Wts.txt 
+ 
+ 
+Stats.txt 
+Freq.txt 
+Trend.txt 
+0.74 
+0.27 
