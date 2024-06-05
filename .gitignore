@@ -16,3 +16,4 @@ misc/
 create_unicorn.r
 error_reproduction_scripts/
 docs
+inst/JAGS

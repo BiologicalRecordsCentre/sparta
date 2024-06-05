@@ -3,8 +3,6 @@ title: "sparta - Species Presence/Absence R Trends Analyses"
 author: "Tom August"
 date: "May 2024"
 output:
-  pdf_document:
-    toc: yes
   html_document:
     keep_md: yes
     toc: yes
