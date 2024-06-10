@@ -40,6 +40,6 @@ If you have difficulties installing sparta using this method try updating your v
 Vignette/Tutorial
 ----------------
 
-We have written a vignette to support the package which can view [here](http://biologicalrecordscentre.github.io/sparta/articles/sparta_vignette.html)
+We have written a vignette to support the package which can viewed [here](https://biologicalrecordscentre.github.io/sparta/articles/vignette.html)
 
 *PLEASE NOTE THAT SINCE THIS PACKAGE IS IN DEVELOPMENT THE STRUCTURE AND FUNCTIONALITY OF THE PACKAGE ARE LIKELY TO CHANGE OVER TIME. WE WILL TRY TO KEEP THE TUTORIALS UP TO DATE SO THAT IT WORKS WITH THE CURRENT MASTER VERSION ON GITHUB*
