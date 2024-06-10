@@ -16,3 +16,4 @@ create_unicorn.r
 error_reproduction_scripts/
 inst/JAGS
 vignettes/wincomm.cmd
+vignettes/myFolder
