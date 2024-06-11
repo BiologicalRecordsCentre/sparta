@@ -43,7 +43,8 @@ Imports:
     sp,
     xfun (>= 0.4.3),
     runjags,
-    R2jags
+    R2jags,
+    rjags
 Suggests:
     knitr,
     roxygen2,
