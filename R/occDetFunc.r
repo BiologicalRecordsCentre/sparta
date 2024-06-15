@@ -53,7 +53,7 @@
 #' @param rem_aggs_with_missing_regions An option which if TRUE will remove all aggregates which contain at least one region with no data.
 #' If `FALSE`, only aggregates where ALL regions in that aggregate contain no data, are dropped. Defaults to FALSE
 #' @param allowSitesMultiRegions An option that permits sites to be included in more than one region if `TRUE`. If `FALSE` then these sites are dropped. Defaults to `FALSE`
-#'
+#' @param jags_path The full path to the JAGS executable. The default value is null. If null, will search the default installation path of the operating system. If specified, the path will be set to the JAGS_HOME system variable.
 #' @details \code{modeltype} is used to choose the model as well as the associated initial values,
 #' and parameters to monitor. Elements to choose from can be separated into the following components:
 #'
@@ -186,9 +186,23 @@ occDetFunc <- function(taxa_name, occDetdata, spp_vis, n_iterations = 5000, nyr 
                        region_aggs = NULL, additional.parameters = NULL,
                        additional.BUGS.elements = NULL, additional.init.values = NULL,
                        return_data = FALSE, criterion = 1, provenance = NULL, saveMatrix = FALSE,
-                       rem_aggs_with_missing_regions = FALSE, allowSitesMultiRegions = FALSE) {
+                       rem_aggs_with_missing_regions = FALSE, allowSitesMultiRegions = FALSE, jags_path = NULL) {
 
   ################## BASIC CHECKS
+
+  if (!detect_jags(jags_path)){
+
+    stop(
+      "JAGS could not be found\n",
+      "If you have not installed JAGS, please install it from: https://sourceforge.net/projects/mcmc-jags/\n",
+      "If JAGS has been installed to the default location, restart the console, and this error should not re-occur. If it does, specify the full path to the JAGS executable",
+      "To quickly recover the path of the jags executable you can run the following:\n",
+      "library(rjags)\n",
+      "runjags::findjags()"
+    )
+
+  }
+
   # first run the error checks
   errorChecks(
     n_iterations = n_iterations, burnin = burnin,
