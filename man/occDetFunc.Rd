@@ -29,7 +29,8 @@ occDetFunc(
   provenance = NULL,
   saveMatrix = FALSE,
   rem_aggs_with_missing_regions = FALSE,
-  allowSitesMultiRegions = FALSE
+  allowSitesMultiRegions = FALSE,
+  jags_path = NULL
 )
 }
 \arguments{
@@ -104,6 +105,8 @@ Defaults to 1, in which case the model is applied for so long there is a single 
 If `FALSE`, only aggregates where ALL regions in that aggregate contain no data, are dropped. Defaults to FALSE}
 
 \item{allowSitesMultiRegions}{An option that permits sites to be included in more than one region if `TRUE`. If `FALSE` then these sites are dropped. Defaults to `FALSE`}
+
+\item{jags_path}{The full path to the JAGS executable. The default value is null. If null, will search the default installation path of the operating system. If specified, the path will be set to the JAGS_HOME system variable.}
 }
 \value{
 A list including the model, JAGS model output, the path of the model file used and information on the number of iterations, first year, last year, etc.

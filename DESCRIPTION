@@ -48,6 +48,7 @@ Suggests:
     knitr,
     roxygen2,
     testthat (>= 0.8.0),
+    runjags
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
